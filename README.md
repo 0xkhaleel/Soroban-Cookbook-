@@ -304,6 +304,18 @@ The Soroban Cookbook is integrated into the official Stellar Developer ecosystem
 ### 🗺️ Contributor Roadmap & Ecosystem Alignment
 We maintain an active [Roadmap](./ROADMAP.md) detailing planned expansions, DeFi templates, governance structures, and security validation procedures. Contributions to the cookbook are recognized through the Stellar Developer community incentives, and all submissions undergo a thorough review process detailed in our [Contributing Guidelines](./CONTRIBUTING.md).
 
+### 📊 Community Health & Metrics
+We track community health transparently so everyone can see how the project is growing:
+
+| Resource | Description |
+|---|---|
+| [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
+| [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
+| [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
+
+The dashboard is updated automatically every Monday by a GitHub Actions workflow.
+
+
 ## Additional Resources
 
 - [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
