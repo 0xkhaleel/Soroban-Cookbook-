@@ -21,6 +21,4 @@ jobs:
         run: cargo install cargo-fuzz
 
       - name: Run example_fuzz for 30 seconds
-        run: |
-          cd fuzz
-          cargo +nightly fuzz run example_fuzz -- -max_total_time=30
+        run: cargo +nightly fuzz run --fuzz-dir tests/fuzz example_fuzz -- -max_total_time=30

@@ -9,7 +9,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-soroban-sdk = { workspace = true }
+soroban-sdk = { workspace = true, features = ["testutils"] }
 
 [dependencies.hello-world]
 path = "../../examples/basics/01-hello-world"
@@ -17,6 +17,9 @@ path = "../../examples/basics/01-hello-world"
 # Prevent this from interfering with workspaces
 [workspace]
 members = ["."]
+
+[workspace.dependencies]
+soroban-sdk = "26.0.0-rc.1"
 
 [[bin]]
 name = "example_fuzz"

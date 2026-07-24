@@ -11,15 +11,15 @@
 mod helpers;
 mod mocks;
 
+use lending_pool::LendingPoolClient;
+use liquidity_mining::LiquidityMiningClient;
+use simple_swap::SimpleSwapContractClient;
+use soroban_flash_loan::FlashLoanContractClient;
 use soroban_sdk::{
     contract, contractimpl, symbol_short,
     testutils::{Address as _, Ledger as _},
-    token, Address, Env, Symbol,
+    token, Address, Env,
 };
-use simple_swap::SimpleSwapContractClient;
-use lending_pool::LendingPoolClient;
-use soroban_flash_loan::FlashLoanContractClient;
-use liquidity_mining::LiquidityMiningClient;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -64,45 +64,85 @@ pub struct ArbitrageReceiver;
 
 #[contractimpl]
 impl ArbitrageReceiver {
-    pub fn init_arbitrage(
-        env: Env,
-        swap1: Address,
-        swap2: Address,
-        token_b: Address,
-    ) {
-        env.storage().temporary().set(&symbol_short!("swap1"), &swap1);
-        env.storage().temporary().set(&symbol_short!("swap2"), &swap2);
-        env.storage().temporary().set(&symbol_short!("tok_b"), &token_b);
+    pub fn init_arbitrage(env: Env, swap1: Address, swap2: Address, token_b: Address) {
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("swap1"), &swap1);
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("swap2"), &swap2);
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("tok_b"), &token_b);
     }
 
     pub fn on_flash_loan(env: Env, initiator: Address, token: Address, amount: i128, fee: i128) {
         let token_a_client = token::Client::new(&env, &token);
-        let token_b_addr: Address = env.storage().temporary().get(&symbol_short!("tok_b")).unwrap();
+        let token_b_addr: Address = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("tok_b"))
+            .unwrap();
         let token_b_client = token::Client::new(&env, &token_b_addr);
 
-        let swap1: Address = env.storage().temporary().get(&symbol_short!("swap1")).unwrap();
-        let swap2: Address = env.storage().temporary().get(&symbol_short!("swap2")).unwrap();
+        let swap1: Address = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("swap1"))
+            .unwrap();
+        let swap2: Address = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("swap2"))
+            .unwrap();
 
         // 1. Approve swap1 to spend the flash borrowed Token A
-        token_a_client.approve(&env.current_contract_address(), &swap1, &amount, &(env.ledger().sequence() + 1));
+        token_a_client.approve(
+            &env.current_contract_address(),
+            &swap1,
+            &amount,
+            &(env.ledger().sequence() + 1),
+        );
 
         // 2. Swap A -> B on swap1 (invoker of swap is this contract)
         let swap1_client = SimpleSwapContractClient::new(&env, &swap1);
         let quote1 = swap1_client.quote(&token, &amount);
-        swap1_client.swap(&env.current_contract_address(), &token, &amount, &quote1, &env.current_contract_address());
+        swap1_client.swap(
+            &env.current_contract_address(),
+            &token,
+            &amount,
+            &quote1,
+            &env.current_contract_address(),
+        );
 
         // 3. Approve swap2 to spend the received Token B
         let balance_b = token_b_client.balance(&env.current_contract_address());
-        token_b_client.approve(&env.current_contract_address(), &swap2, &balance_b, &(env.ledger().sequence() + 1));
+        token_b_client.approve(
+            &env.current_contract_address(),
+            &swap2,
+            &balance_b,
+            &(env.ledger().sequence() + 1),
+        );
 
         // 4. Swap B -> A on swap2
         let swap2_client = SimpleSwapContractClient::new(&env, &swap2);
         let quote2 = swap2_client.quote(&token_b_addr, &balance_b);
-        swap2_client.swap(&env.current_contract_address(), &token_b_addr, &balance_b, &quote2, &env.current_contract_address());
+        swap2_client.swap(
+            &env.current_contract_address(),
+            &token_b_addr,
+            &balance_b,
+            &quote2,
+            &env.current_contract_address(),
+        );
 
         // 5. Approve flash loan contract to pull amount + fee
         let repayment = amount + fee;
-        token_a_client.approve(&env.current_contract_address(), &initiator, &repayment, &(env.ledger().sequence() + 1));
+        token_a_client.approve(
+            &env.current_contract_address(),
+            &initiator,
+            &repayment,
+            &(env.ledger().sequence() + 1),
+        );
     }
 }
 
@@ -119,17 +159,41 @@ impl RefinancingReceiver {
         collateral_token: Address,
         collateral_amount: i128,
     ) {
-        env.storage().temporary().set(&symbol_short!("pool1"), &lending_pool1);
-        env.storage().temporary().set(&symbol_short!("pool2"), &lending_pool2);
-        env.storage().temporary().set(&symbol_short!("col_tok"), &collateral_token);
-        env.storage().temporary().set(&symbol_short!("col_amt"), &collateral_amount);
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("pool1"), &lending_pool1);
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("pool2"), &lending_pool2);
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("col_tok"), &collateral_token);
+        env.storage()
+            .temporary()
+            .set(&symbol_short!("col_amt"), &collateral_amount);
     }
 
     pub fn on_flash_loan(env: Env, initiator: Address, token: Address, amount: i128, fee: i128) {
-        let pool1: Address = env.storage().temporary().get(&symbol_short!("pool1")).unwrap();
-        let pool2: Address = env.storage().temporary().get(&symbol_short!("pool2")).unwrap();
-        let col_tok: Address = env.storage().temporary().get(&symbol_short!("col_tok")).unwrap();
-        let col_amt: i128 = env.storage().temporary().get(&symbol_short!("col_amt")).unwrap();
+        let pool1: Address = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("pool1"))
+            .unwrap();
+        let pool2: Address = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("pool2"))
+            .unwrap();
+        let col_tok: Address = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("col_tok"))
+            .unwrap();
+        let col_amt: i128 = env
+            .storage()
+            .temporary()
+            .get(&symbol_short!("col_amt"))
+            .unwrap();
 
         let debt_client = token::Client::new(&env, &token);
         let col_client = token::Client::new(&env, &col_tok);
@@ -138,14 +202,24 @@ impl RefinancingReceiver {
         let pool2_client = LendingPoolClient::new(&env, &pool2);
 
         // 1. Repay debt in LendingPool 1
-        debt_client.approve(&env.current_contract_address(), &pool1, &amount, &(env.ledger().sequence() + 1));
+        debt_client.approve(
+            &env.current_contract_address(),
+            &pool1,
+            &amount,
+            &(env.ledger().sequence() + 1),
+        );
         pool1_client.repay(&env.current_contract_address(), &amount);
 
         // 2. Withdraw collateral from LendingPool 1
         pool1_client.withdraw(&env.current_contract_address(), &col_amt);
 
         // 3. Deposit collateral into LendingPool 2
-        col_client.approve(&env.current_contract_address(), &pool2, &col_amt, &(env.ledger().sequence() + 1));
+        col_client.approve(
+            &env.current_contract_address(),
+            &pool2,
+            &col_amt,
+            &(env.ledger().sequence() + 1),
+        );
         pool2_client.deposit(&env.current_contract_address(), &col_amt);
 
         // 4. Borrow from LendingPool 2 (borrow enough to cover flash loan + fee)
@@ -153,7 +227,12 @@ impl RefinancingReceiver {
         pool2_client.borrow(&env.current_contract_address(), &total_repay);
 
         // 5. Approve flash loan contract to pull the repayment
-        debt_client.approve(&env.current_contract_address(), &initiator, &total_repay, &(env.ledger().sequence() + 1));
+        debt_client.approve(
+            &env.current_contract_address(),
+            &initiator,
+            &total_repay,
+            &(env.ledger().sequence() + 1),
+        );
     }
 }
 
@@ -176,7 +255,14 @@ pub struct BadReceiver;
 
 #[contractimpl]
 impl BadReceiver {
-    pub fn on_flash_loan(_env: Env, _initiator: Address, _token: Address, _amount: i128, _fee: i128) {}
+    pub fn on_flash_loan(
+        _env: Env,
+        _initiator: Address,
+        _token: Address,
+        _amount: i128,
+        _fee: i128,
+    ) {
+    }
 }
 
 // ===========================================================================
@@ -247,7 +333,12 @@ fn test_borrow_from_lending_then_swap() {
 
     // Fund Lending Pool with Token B reserves by having Depositor deposit
     mint_token(&env, &token_b, &depositor, 5_000);
-    client_b.approve(&depositor, &lending_id, &5_000, &(env.ledger().sequence() + 1));
+    client_b.approve(
+        &depositor,
+        &lending_id,
+        &5_000,
+        &(env.ledger().sequence() + 1),
+    );
     lending_client.deposit(&depositor, &5_000);
 
     // Fund Swap with Token A reserves
@@ -378,7 +469,7 @@ fn test_flash_loan_arbitrage_workflow() {
     let admin = Address::generate(&env);
 
     let (token_a, client_a) = create_token(&env, &admin);
-    let (token_b, client_b) = create_token(&env, &admin);
+    let (token_b, _client_b) = create_token(&env, &admin);
 
     // 1. Setup Flash Loan Contract (0.5% fee)
     let flash_loan_id = env.register_contract(None, soroban_flash_loan::FlashLoanContract);
@@ -400,8 +491,8 @@ fn test_flash_loan_arbitrage_workflow() {
 
     // 5. Fund Contracts
     mint_token(&env, &token_a, &flash_loan_id, 10_000); // Flash Loan pool reserves
-    mint_token(&env, &token_b, &swap1_id, 20_000);       // Swap 1 B reserves
-    mint_token(&env, &token_a, &swap2_id, 20_000);       // Swap 2 A reserves
+    mint_token(&env, &token_b, &swap1_id, 20_000); // Swap 1 B reserves
+    mint_token(&env, &token_a, &swap2_id, 20_000); // Swap 2 A reserves
 
     // 6. Execute Arbitrage
     let receiver_client = ArbitrageReceiverClient::new(&env, &receiver_id);
@@ -416,10 +507,10 @@ fn test_flash_loan_arbitrage_workflow() {
 fn test_flash_loan_refinancing() {
     let env = helpers::setup_env();
     let admin = Address::generate(&env);
-    let user = Address::generate(&env);
+    let _user = Address::generate(&env);
 
     let (collateral_token, client_c) = create_token(&env, &admin);
-    let (debt_token, client_d) = create_token(&env, &admin);
+    let (debt_token, _client_d) = create_token(&env, &admin);
 
     // 1. Deploy Flash Loan (0.5% fee)
     let flash_loan_id = env.register_contract(None, soroban_flash_loan::FlashLoanContract);
@@ -440,17 +531,22 @@ fn test_flash_loan_refinancing() {
 
     // 4. Fund Contracts
     mint_token(&env, &debt_token, &flash_loan_id, 10_000); // Flash Loan pool
-    mint_token(&env, &debt_token, &pool1_id, 10_000);      // Pool 1 debt reserves
-    mint_token(&env, &debt_token, &pool2_id, 10_000);      // Pool 2 debt reserves
+    mint_token(&env, &debt_token, &pool1_id, 10_000); // Pool 1 debt reserves
+    mint_token(&env, &debt_token, &pool2_id, 10_000); // Pool 2 debt reserves
 
     // 5. Setup initial User Position in Pool 1
     // Deposit 1000 Collateral Token, borrow 500 Debt Token
     mint_token(&env, &collateral_token, &receiver_id, 1000);
     // Fund receiver with the fee (2) to cover the mock pool's non-transfer of tokens
     mint_token(&env, &debt_token, &receiver_id, 2);
-    
+
     // We mock authorization to simulate the receiver acting on its own behalf
-    client_c.approve(&receiver_id, &pool1_id, &1000, &(env.ledger().sequence() + 1));
+    client_c.approve(
+        &receiver_id,
+        &pool1_id,
+        &1000,
+        &(env.ledger().sequence() + 1),
+    );
     pool1_client.deposit(&receiver_id, &1000);
     pool1_client.borrow(&receiver_id, &500);
 

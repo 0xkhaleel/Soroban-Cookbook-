@@ -10,7 +10,7 @@ use soroban_sdk::{
 // This contract implements a hierarchical role-based access control (RBAC)
 // system with dynamic permissions and secure updates. The hierarchy is:
 // - ADMIN (top-level, can manage all roles and permissions)
-// - MANAGER (can manage OPERATORs and specific resources)
+// - MANAGER (can manage OPERATOR roles and specific resources)
 // - OPERATOR (can perform basic resource operations)
 //
 // Features:

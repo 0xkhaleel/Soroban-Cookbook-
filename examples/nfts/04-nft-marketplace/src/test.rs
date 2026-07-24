@@ -1,7 +1,7 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::{testutils::Address as _, testutils::Ledger as _, vec, Address, Env, Vec};
+use soroban_sdk::{testutils::Address as _, testutils::Ledger as _, vec, Address, Env};
 
 fn setup() -> (Env, Address, NftMarketplaceContractClient<'static>) {
     let env = Env::default();
@@ -26,8 +26,8 @@ fn test_fixed_price_listing_and_buy() {
         nft_contract: Address::generate(&env),
         token_id: 7u32,
     };
-    let listing_id = client
-        .create_fixed_price_listing(&seller, &vec![&env, item.clone()], &100, &royalty, &50);
+    let listing_id =
+        client.create_fixed_price_listing(&seller, &vec![&env, item.clone()], &100, &royalty, &50);
 
     client.buy(&buyer, &listing_id, &100);
     let listing = client.get_listing(&listing_id);
@@ -55,8 +55,7 @@ fn test_bundle_sale_tracks_trade_history() {
             token_id: 2u32,
         },
     ];
-    let listing_id = client
-        .create_fixed_price_listing(&seller, &items, &250, &royalty, &100);
+    let listing_id = client.create_fixed_price_listing(&seller, &items, &250, &royalty, &100);
 
     client.buy(&buyer, &listing_id, &250);
     let trade = client.get_trade(&0u32);
@@ -77,8 +76,14 @@ fn test_auction_listing_and_finalize() {
         nft_contract: Address::generate(&env),
         token_id: 42u32,
     };
-    let listing_id = client
-        .create_auction_listing(&seller, &vec![&env, item.clone()], &100, &1u32, &royalty, &75);
+    let listing_id = client.create_auction_listing(
+        &seller,
+        &vec![&env, item.clone()],
+        &100,
+        &1u32,
+        &royalty,
+        &75,
+    );
 
     client.place_bid(&bidder, &listing_id, &120);
     env.ledger().with_mut(|li| li.sequence_number += 2);
@@ -101,8 +106,14 @@ fn test_bid_too_low_fails() {
         nft_contract: Address::generate(&env),
         token_id: 3u32,
     };
-    let listing_id = client
-        .create_auction_listing(&seller, &vec![&env, item.clone()], &100, &2u32, &royalty, &50);
+    let listing_id = client.create_auction_listing(
+        &seller,
+        &vec![&env, item.clone()],
+        &100,
+        &2u32,
+        &royalty,
+        &50,
+    );
 
     let err = client.try_place_bid(&bidder, &listing_id, &90).unwrap_err();
     assert_eq!(err, Ok(MarketplaceError::BidTooLow));
@@ -118,8 +129,8 @@ fn test_listing_retrieval() {
         nft_contract: Address::generate(&env),
         token_id: 99u32,
     };
-    let listing_id = client
-        .create_fixed_price_listing(&seller, &vec![&env, item.clone()], &300, &royalty, &100);
+    let listing_id =
+        client.create_fixed_price_listing(&seller, &vec![&env, item.clone()], &300, &royalty, &100);
 
     let listing = client.get_listing(&listing_id);
     assert_eq!(listing.seller, seller);

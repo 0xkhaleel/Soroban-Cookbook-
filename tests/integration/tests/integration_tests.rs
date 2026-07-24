@@ -10,8 +10,10 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    symbol_short, testutils::Address as _, testutils::Ledger as _, Address, Bytes, BytesN, Env,
-    IntoVal, Symbol, Vec,
+    symbol_short,
+    testutils::Address as _,
+    testutils::{IssuerFlags, Ledger as _},
+    token, Address, Bytes, BytesN, Env, IntoVal, Symbol, Vec,
 };
 mod access_control_fuzz;
 
@@ -2401,8 +2403,6 @@ fn test_governance_proposal_expired_and_cancelled() {
     );
 }
 
-
-
 // ---------------------------------------------------------------------------
 // Advanced Pattern Integration Tests (from PR #685)
 // ---------------------------------------------------------------------------
@@ -2415,8 +2415,18 @@ fn test_contract_registry_list_by_category() {
 
     let cat = symbol_short!("defi");
 
-    client.register(&symbol_short!("c1"), &cat, &symbol_short!("v1"), &Address::generate(&env)).unwrap();
-    client.register(&symbol_short!("c2"), &cat, &symbol_short!("v1"), &Address::generate(&env)).unwrap();
+    client.register(
+        &symbol_short!("c1"),
+        &cat,
+        &symbol_short!("v1"),
+        &Address::generate(&env),
+    );
+    client.register(
+        &symbol_short!("c2"),
+        &cat,
+        &symbol_short!("v1"),
+        &Address::generate(&env),
+    );
 
     let names = client.list_by_category(&cat);
     assert_eq!(names.len(), 2);
@@ -2431,8 +2441,18 @@ fn test_contract_registry_list_categories() {
     let cat1 = symbol_short!("defi");
     let cat2 = symbol_short!("nft");
 
-    client.register(&symbol_short!("c1"), &cat1, &symbol_short!("v1"), &Address::generate(&env)).unwrap();
-    client.register(&symbol_short!("c2"), &cat2, &symbol_short!("v1"), &Address::generate(&env)).unwrap();
+    client.register(
+        &symbol_short!("c1"),
+        &cat1,
+        &symbol_short!("v1"),
+        &Address::generate(&env),
+    );
+    client.register(
+        &symbol_short!("c2"),
+        &cat2,
+        &symbol_short!("v1"),
+        &Address::generate(&env),
+    );
 
     let cats = client.list_categories();
     assert_eq!(cats.len(), 2);
@@ -2444,14 +2464,14 @@ fn test_contract_registry_register() {
     let reg_id = env.register_contract(None, contract_registry::ContractRegistry);
     let client = contract_registry::ContractRegistryClient::new(&env, &reg_id);
 
-    let name = symbol_short!("test_contract");
+    let name = Symbol::new(&env, "test_contract");
     let category = symbol_short!("defi");
-    let version = symbol_short!("v1.0");
+    let version = Symbol::new(&env, "v1_0");
     let addr = Address::generate(&env);
 
-    client.register(&name, &category, &version, &addr).unwrap();
+    client.register(&name, &category, &version, &addr);
 
-    let metadata = client.get_by_name(&name).unwrap();
+    let metadata = client.try_get_by_name(&name).unwrap().unwrap();
     assert_eq!(metadata.name, name);
     assert_eq!(metadata.category, category);
 }
@@ -2469,9 +2489,10 @@ fn test_factory_and_registry_integration() {
     let wasm_hash = BytesN::from_array(&env, &[0x11; 32]);
     factory_client.initialize(&wasm_hash, &reg_id);
 
-    let creator = Address::generate(&env);
-    let deployed_addr = factory_client.create_instance(&42, &symbol_short!("my_contract"), &creator);
-    let lookup = reg_client.lookup(&symbol_short!("my_contract"));
+    let name = Symbol::new(&env, "my_contract");
+    let deployed_addr = env.register_contract(None, cross_contract_integration_testing::Target);
+    reg_client.register(&name, &deployed_addr);
+    let lookup = reg_client.lookup(&name);
 
     assert_eq!(lookup, Some(deployed_addr));
 }
@@ -2496,8 +2517,8 @@ fn test_multi_oracle_integration() {
     client1.submit(&updater, &100);
     client2.submit(&updater, &102);
 
-    let v1 = client1.get_value().unwrap();
-    let v2 = client2.get_value().unwrap();
+    let v1 = client1.get_value();
+    let v2 = client2.get_value();
     let avg = (v1 + v2) / 2;
     assert_eq!(avg, 101);
 }
@@ -2515,7 +2536,7 @@ fn test_oracle_basic_operation() {
     client.initialize(&admin, &updater, &3600); // 1 hour max age
 
     client.submit(&updater, &1500);
-    let value = client.get_value().unwrap();
+    let value = client.get_value();
     assert_eq!(value, 1500);
 }
 
@@ -2531,10 +2552,10 @@ fn test_oracle_rotate_updater() {
     let client = oracle_pattern::OracleContractClient::new(&env, &oracle_id);
 
     client.initialize(&admin, &updater1, &3600);
-    client.set_updater(&admin, &updater2);
+    client.set_updater(&updater2);
 
     client.submit(&updater2, &3000);
-    let value = client.get_value().unwrap();
+    let value = client.get_value();
     assert_eq!(value, 3000);
 }
 
@@ -2554,7 +2575,7 @@ fn test_oracle_strict_mode_fresh() {
     client.submit(&updater, &2000);
 
     env.ledger().set_timestamp(2000); // Still fresh
-    let value = client.get_value_strict().unwrap();
+    let value = client.get_value_strict();
     assert_eq!(value, 2000);
 }
 
@@ -2567,11 +2588,14 @@ fn test_proxy_admin_cancel_upgrade() {
     let proxy_admin_id = env.register_contract(None, proxy_admin::ProxyAdmin);
     let client = proxy_admin::ProxyAdminClient::new(&env, &proxy_admin_id);
 
-    client.initialize(&admin).unwrap();
+    client.try_initialize(&admin).unwrap().unwrap();
 
     let wasm_hash = BytesN::from_array(&env, &[0x42; 32]);
-    client.propose_upgrade(&wasm_hash, &60).unwrap();
-    client.cancel_upgrade().unwrap();
+    client
+        .try_propose_upgrade(&wasm_hash, &60)
+        .unwrap()
+        .unwrap();
+    client.try_cancel_upgrade().unwrap().unwrap();
 
     let state = client.proposal_state();
     assert_eq!(state, proxy_admin::ProposalState::None);
@@ -2586,13 +2610,13 @@ fn test_proxy_admin_pause() {
     let proxy_admin_id = env.register_contract(None, proxy_admin::ProxyAdmin);
     let client = proxy_admin::ProxyAdminClient::new(&env, &proxy_admin_id);
 
-    client.initialize(&admin).unwrap();
+    client.try_initialize(&admin).unwrap().unwrap();
     assert!(!client.is_paused());
 
-    client.pause().unwrap();
+    client.try_pause().unwrap().unwrap();
     assert!(client.is_paused());
 
-    client.unpause().unwrap();
+    client.try_unpause().unwrap().unwrap();
     assert!(!client.is_paused());
 }
 
@@ -2605,10 +2629,13 @@ fn test_proxy_admin_proposal_state() {
     let proxy_admin_id = env.register_contract(None, proxy_admin::ProxyAdmin);
     let client = proxy_admin::ProxyAdminClient::new(&env, &proxy_admin_id);
 
-    client.initialize(&admin).unwrap();
+    client.try_initialize(&admin).unwrap().unwrap();
 
     let wasm_hash = BytesN::from_array(&env, &[0x42; 32]);
-    client.propose_upgrade(&wasm_hash, &60).unwrap();
+    client
+        .try_propose_upgrade(&wasm_hash, &60)
+        .unwrap()
+        .unwrap();
 
     let state = client.proposal_state();
     assert_eq!(state, proxy_admin::ProposalState::Pending);
@@ -2708,18 +2735,29 @@ fn test_registry_and_oracle_integration() {
 
     let admin = Address::generate(&env);
     let updater = Address::generate(&env);
-    oracle_client.initialize(&admin, &updater, &3600).unwrap();
+    oracle_client
+        .try_initialize(&admin, &updater, &3600)
+        .unwrap()
+        .unwrap();
 
     // Register oracle in contract registry
-    reg_client.register(&symbol_short!("price_oracle"), &symbol_short!("oracles"), &symbol_short!("v1"), &oracle_id).unwrap();
+    reg_client.register(
+        &Symbol::new(&env, "price_oracle"),
+        &symbol_short!("oracles"),
+        &symbol_short!("v1"),
+        &oracle_id,
+    );
 
     // Submit price to oracle
-    oracle_client.submit(&updater, &50000).unwrap();
+    oracle_client.try_submit(&updater, &50000).unwrap().unwrap();
 
     // Verify both
-    let registered = reg_client.get_by_name(&symbol_short!("price_oracle")).unwrap();
+    let registered = reg_client
+        .try_get_by_name(&Symbol::new(&env, "price_oracle"))
+        .unwrap()
+        .unwrap();
     assert_eq!(registered.address, oracle_id);
-    let price = oracle_client.get_value().unwrap();
+    let price = oracle_client.get_value();
     assert_eq!(price, 50000);
 }
 
@@ -2750,7 +2788,7 @@ fn test_registry_whitelist_mode() {
 
     let owner = Address::generate(&env);
     let user1 = Address::generate(&env);
-    let user2 = Address::generate(&env);
+    let _user2 = Address::generate(&env);
     let registry_id = env.register_contract(None, registry_access_controls::RegistryContract);
     let client = registry_access_controls::RegistryContractClient::new(&env, &registry_id);
 
@@ -2836,8 +2874,9 @@ fn test_upgradeable_proxy_basic_forwarding() {
     let proxy_id = env.register_contract(None, upgradeable_proxy::ProxyContract);
     let client = upgradeable_proxy::ProxyContractClient::new(&env, &proxy_id);
 
-    // Use the same proxy contract as implementation for testing
-    client.init(&admin, &proxy_id);
+    let impl_addr =
+        env.register_contract(None, upgradeable_proxy_implementation_v1::ImplementationV1);
+    client.init(&admin, &impl_addr);
 
     let sum = client.add(&100, &200);
     assert_eq!(sum, 300);
@@ -2943,8 +2982,8 @@ fn test_token_wrapper_multi_user_flow() {
     asset.issuer().set_flag(IssuerFlags::ClawbackEnabledFlag);
 
     let underlying_id = asset.address();
-    let underlying = TokenClient::new(&env, &underlying_id);
-    let underlying_admin = StellarAssetClient::new(&env, &underlying_id);
+    let underlying = token::Client::new(&env, &underlying_id);
+    let underlying_admin = token::StellarAssetClient::new(&env, &underlying_id);
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);

@@ -6,22 +6,22 @@
 //!
 //! ## Architecture
 //!
-//! ```
+//! ```text
 //! Admin
-//!  ├── add_pool(pool_id, lp_token, reward_token, reward_rate)
-//!  └── set_reward_rate(pool_id, new_rate)
+//!  - add_pool(pool_id, lp_token, reward_token, reward_rate)
+//!  - set_reward_rate(pool_id, new_rate)
 //!
 //! User
-//!  ├── stake(pool_id, amount)       — deposit LP tokens
-//!  ├── unstake(pool_id, amount)     — withdraw LP tokens
-//!  └── harvest(pool_id)             — claim accumulated reward tokens
+//!  - stake(pool_id, amount)       - deposit LP tokens
+//!  - unstake(pool_id, amount)     - withdraw LP tokens
+//!  - harvest(pool_id)             - claim accumulated reward tokens
 //! ```
 //!
 //! ## Reward Maths
 //!
 //! The contract uses the standard "reward-per-share accumulator" pattern:
 //!
-//! ```
+//! ```text
 //! acc_reward_per_share += elapsed_ledgers * reward_rate / total_staked
 //! user_pending          = user_staked * acc_reward_per_share - user_reward_debt
 //! ```
