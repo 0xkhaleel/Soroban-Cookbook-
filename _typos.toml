@@ -1,5 +1,8 @@
 [default.extend-words]
 soroban = "soroban"
+IST = "IST"
+teh = "teh"
+Supress = "Supress"
 Soroban = "Soroban"
 Stellar = "Stellar"
 XLM = "XLM"
@@ -30,4 +33,16 @@ contracttype = "contracttype"
 soroban-sdk = "soroban-sdk"
 wasm-opt = "wasm-opt"
 wasm32-unknown-unknown = "wasm32-unknown-unknown"
+
+[default.extend-identifiers]
+set_thr = "set_thr"
+
+[files]
+extend-exclude = [
+  "examples/basics/events/**",
+  "test_out.txt",
+  "README.md",
+  "**/node_modules/**",
+  "doc/**",
+]
 

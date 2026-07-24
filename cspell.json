@@ -100,7 +100,12 @@
     "rust-toolchain",
     "rustfmt",
     "clippy",
-    "semver"
+    "semver",
+    "prefs",
+    "Prefs",
+    "ESPAÑOL",
+    "FRANÇAIS",
+    "Soroscope"
   ],
   "ignorePaths": [
     "target/**",

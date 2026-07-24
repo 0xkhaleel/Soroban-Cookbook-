@@ -10,9 +10,7 @@
 
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, token, Address, Env};
 
 #[contracttype]
 #[derive(Clone)]
@@ -76,7 +74,12 @@ impl FlashLoanContract {
         // 6. Verify repayment
         // We use transfer_from to pull the funds (amount + fee) back from the receiver.
         // The receiver MUST have approved the flash loan contract to spend this amount.
-        token_client.transfer_from(&contract_address, &receiver, &contract_address, &(amount + fee));
+        token_client.transfer_from(
+            &contract_address,
+            &receiver,
+            &contract_address,
+            &(amount + fee),
+        );
 
         // 7. Release lock
         env.storage().temporary().remove(&DataKey::Locked);

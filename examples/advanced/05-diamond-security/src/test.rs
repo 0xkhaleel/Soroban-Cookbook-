@@ -3,7 +3,7 @@
 use super::*;
 use facet_adder::{FacetAdderContract, FacetAdderContractClient};
 use facet_multiplier::{FacetMultiplierContract, FacetMultiplierContractClient};
-use soroban_sdk::{testutils::Address as _, Env, IntoVal};
+use soroban_sdk::{testutils::Address as _, Env, IntoVal, TryIntoVal};
 
 #[test]
 fn test_proxy_initialization() {

@@ -1,5 +1,5 @@
 use super::*;
-use soroban_sdk::{Env, Address, testutils::Address as _};
+use soroban_sdk::{testutils::Address as _, Address, Env};
 
 #[test]
 fn test_initialize() {
@@ -298,7 +298,7 @@ fn test_emergency_pause() {
     client.initialize(&80, &85, &10, &50);
     client.set_emergency_pause(&admin, &true);
 
-    client.try_deposit_collateral(&user, &1000).unwrap_err();
+    let _ = client.try_deposit_collateral(&user, &1000).unwrap_err();
 }
 
 #[test]

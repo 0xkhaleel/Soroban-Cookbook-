@@ -5,7 +5,7 @@ use batch_operations::{BatchError, BatchOperation};
 use proposal_validation::ProposalError;
 use soroban_sdk::{
     testutils::{Address as _, Ledger},
-    Address, Bytes, Env, Symbol, Vec,
+    Address, Bytes, Env, Vec,
 };
 
 #[test]
@@ -17,8 +17,8 @@ fn test_atomic_batch_rollback_security_invariant() {
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
-    client.set_balance(&alice, &100).unwrap();
-    client.set_balance(&bob, &0).unwrap();
+    client.try_set_balance(&alice, &100).unwrap().unwrap();
+    client.try_set_balance(&bob, &0).unwrap().unwrap();
 
     let ops = Vec::from_array(
         &env,
@@ -29,7 +29,7 @@ fn test_atomic_batch_rollback_security_invariant() {
     );
 
     assert_eq!(
-        client.execute_batch_atomic(&ops),
+        client.try_execute_batch_atomic(&ops),
         Err(Ok(BatchError::InsufficientBalance))
     );
     assert_eq!(client.get_balance(&alice), 100);
@@ -66,20 +66,18 @@ fn test_governance_topic_conflict_detection_security_invariant() {
     let contract_id = env.register_contract(None, proposal_validation::ProposalValidation);
     let client = proposal_validation::ProposalValidationClient::new(&env, &contract_id);
 
-    let topic = Symbol::new(&env, "bridge");
-    let first = client
-        .create_proposal(
-            &topic,
-            &2_020,
-            &2_120,
-            &6_000,
-            &Bytes::from_slice(&env, b"hash-a"),
-        )
-        .unwrap();
+    let topic = soroban_sdk::Symbol::new(&env, "bridge");
+    let first = client.create_proposal(
+        &topic,
+        &2_020,
+        &2_120,
+        &6_000,
+        &Bytes::from_slice(&env, b"hash-a"),
+    );
 
     assert_eq!(first, 1);
 
-    let conflict = client.create_proposal(
+    let conflict = client.try_create_proposal(
         &topic,
         &2_100,
         &2_200,

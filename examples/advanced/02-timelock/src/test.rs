@@ -246,7 +246,7 @@ fn test_cancel_unauthorized() {
     let contract_id = env.register_contract(None, TimelockContract);
     let client = TimelockContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
-    let attacker = Address::generate(&env);
+    let _attacker = Address::generate(&env);
 
     env.mock_all_auths();
     client.initialize(&admin);
@@ -277,7 +277,7 @@ fn test_timelock_skip_prevented() {
     env.ledger().with_mut(|l| l.timestamp += min_delay + 1);
 
     // Now execute should succeed
-    assert!(client.execute(&id));
+    client.execute(&id);
 }
 
 #[test]

@@ -56,7 +56,7 @@ fn test_create_and_approve_proposal() {
     client.approve(&proposal_id, &signer1);
     client.approve(&proposal_id, &signer2);
 
-    let proposal = client.get_proposal(&proposal_id);
+    let proposal = client.get_proposal(&proposal_id).unwrap();
     assert_eq!(proposal.approvals.len(), 2);
     assert!(!proposal.executed);
     assert!(!proposal.cancelled);
@@ -122,7 +122,7 @@ fn test_cancel_proposal_by_proposer() {
     client.approve(&proposal_id, &signer1);
     client.cancel(&proposal_id, &signer1);
 
-    let proposal = client.get_proposal(&proposal_id);
+    let proposal = client.get_proposal(&proposal_id).unwrap();
     assert!(proposal.cancelled);
 
     let result = client.try_execute(&proposal_id, &signer1);
@@ -158,7 +158,7 @@ fn test_execute_with_threshold() {
     let result = client.execute(&proposal_id, &signer1);
     assert!(result);
 
-    let proposal = client.get_proposal(&proposal_id);
+    let proposal = client.get_proposal(&proposal_id).unwrap();
     assert!(proposal.executed);
 
     // Test execution after execution
@@ -185,7 +185,7 @@ fn test_cancel_proposal_by_other_signer() {
     client.approve(&proposal_id, &signer1);
     client.cancel(&proposal_id, &signer2);
 
-    let proposal = client.get_proposal(&proposal_id);
+    let proposal = client.get_proposal(&proposal_id).unwrap();
     assert!(proposal.cancelled);
 
     let result = client.try_approve(&proposal_id, &signer3);

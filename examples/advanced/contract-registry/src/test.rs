@@ -1,5 +1,5 @@
 use super::*;
-use soroban_sdk::{symbol_short, vec, Address, Env, Symbol, Vec};
+use soroban_sdk::{symbol_short, Env, Symbol, Vec};
 
 #[test]
 fn test_register_and_query() {

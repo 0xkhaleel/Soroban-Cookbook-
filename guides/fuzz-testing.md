@@ -21,16 +21,10 @@ rustup default nightly
 
 ## Running Fuzz Tests
 
-Navigate into the `tests/fuzz` directory in the cookbook:
+From the repository root, run a fuzz target (for example `example_fuzz`):
 
 ```bash
-cd tests/fuzz
-```
-
-To run a specific fuzz target, such as the `example_fuzz` test:
-
-```bash
-cargo fuzz run example_fuzz
+cargo +nightly fuzz run --fuzz-dir tests/fuzz example_fuzz
 ```
 
 The fuzzer will run continuously, trying to find inputs that cause your contract to panic or crash.

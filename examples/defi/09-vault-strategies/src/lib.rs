@@ -11,9 +11,9 @@
 //! ┌──────────┐  deposit/withdraw  ┌───────────────────────────────────────┐
 //! │  User    │ ─────────────────► │              VaultContract             │
 //! └──────────┘                    │                                        │
-//!                                 │  active_strategy ──► ConservativeStrat │
-//!                                 │                  ──► BalancedStrat      │
-//!                                 │                  ──► AggressiveStrat    │
+//!                                 │  active_strategy ──► Conservative     │
+//!                                 │                  ──► Balanced         │
+//!                                 │                  ──► Aggressive       │
 //!                                 └───────────────────────────────────────┘
 //! ```
 //!

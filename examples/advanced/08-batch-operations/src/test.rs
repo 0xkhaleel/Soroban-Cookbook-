@@ -3,7 +3,13 @@ extern crate std;
 use super::*;
 use soroban_sdk::{testutils::Address as _, Address, Env, Vec};
 
-fn setup() -> (Env, BatchOperationsClient<'static>, Address, Address, Address) {
+fn setup() -> (
+    Env,
+    BatchOperationsClient<'static>,
+    Address,
+    Address,
+    Address,
+) {
     let env = Env::default();
     let contract_id = env.register_contract(None, BatchOperations);
     let client = BatchOperationsClient::new(&env, &contract_id);
@@ -12,9 +18,9 @@ fn setup() -> (Env, BatchOperationsClient<'static>, Address, Address, Address) {
     let bob = Address::generate(&env);
     let carol = Address::generate(&env);
 
-    client.set_balance(&alice, &100).unwrap();
-    client.set_balance(&bob, &20).unwrap();
-    client.set_balance(&carol, &0).unwrap();
+    client.try_set_balance(&alice, &100).unwrap().unwrap();
+    client.try_set_balance(&bob, &20).unwrap().unwrap();
+    client.try_set_balance(&carol, &0).unwrap().unwrap();
 
     (env, client, alice, bob, carol)
 }
@@ -32,7 +38,7 @@ fn test_atomic_executes_all_operations() {
         ],
     );
 
-    client.execute_batch_atomic(&ops).unwrap();
+    client.try_execute_batch_atomic(&ops).unwrap().unwrap();
 
     assert_eq!(client.get_balance(&alice), 70);
     assert_eq!(client.get_balance(&bob), 45);
@@ -52,7 +58,7 @@ fn test_atomic_rolls_back_on_failure() {
     );
 
     assert_eq!(
-        client.execute_batch_atomic(&ops),
+        client.try_execute_batch_atomic(&ops),
         Err(Ok(BatchError::InsufficientBalance))
     );
 
@@ -73,7 +79,7 @@ fn test_atomic_rolls_back_pause_toggle() {
     );
 
     assert_eq!(
-        client.execute_batch_atomic(&ops),
+        client.try_execute_batch_atomic(&ops),
         Err(Ok(BatchError::ContractPaused))
     );
 
@@ -102,7 +108,7 @@ fn test_partial_executes_valid_and_skips_invalid() {
     assert_eq!(result.statuses.get(0).unwrap(), OpStatus::Applied);
     assert_eq!(
         result.statuses.get(1).unwrap(),
-        OpStatus::Skipped(BatchError::InsufficientBalance)
+        OpStatus::Skipped(BatchError::InsufficientBalance as u32)
     );
     assert_eq!(result.statuses.get(2).unwrap(), OpStatus::Applied);
 
@@ -136,11 +142,12 @@ fn test_paused_contract_blocks_financial_ops() {
     let (env, client, alice, bob, _carol) = setup();
 
     client
-        .execute_batch_atomic(&Vec::from_array(&env, [BatchOperation::SetPaused(true)]))
+        .try_execute_batch_atomic(&Vec::from_array(&env, [BatchOperation::SetPaused(true)]))
+        .unwrap()
         .unwrap();
 
     assert_eq!(
-        client.execute_batch_atomic(&Vec::from_array(
+        client.try_execute_batch_atomic(&Vec::from_array(
             &env,
             [BatchOperation::Transfer(alice.clone(), bob.clone(), 1)]
         )),
@@ -153,17 +160,20 @@ fn test_unpause_restores_operations() {
     let (env, client, alice, bob, _carol) = setup();
 
     client
-        .execute_batch_atomic(&Vec::from_array(&env, [BatchOperation::SetPaused(true)]))
+        .try_execute_batch_atomic(&Vec::from_array(&env, [BatchOperation::SetPaused(true)]))
+        .unwrap()
         .unwrap();
     client
-        .execute_batch_atomic(&Vec::from_array(&env, [BatchOperation::SetPaused(false)]))
+        .try_execute_batch_atomic(&Vec::from_array(&env, [BatchOperation::SetPaused(false)]))
+        .unwrap()
         .unwrap();
 
     client
-        .execute_batch_atomic(&Vec::from_array(
+        .try_execute_batch_atomic(&Vec::from_array(
             &env,
             [BatchOperation::Transfer(alice.clone(), bob.clone(), 10)],
         ))
+        .unwrap()
         .unwrap();
 
     assert_eq!(client.get_balance(&alice), 90);
@@ -175,17 +185,23 @@ fn test_invalid_amount_rejected() {
     let (env, client, alice, _bob, _carol) = setup();
 
     let ops = Vec::from_array(&env, [BatchOperation::Credit(alice.clone(), 0)]);
-    assert_eq!(client.execute_batch_atomic(&ops), Err(Ok(BatchError::InvalidAmount)));
+    assert_eq!(
+        client.try_execute_batch_atomic(&ops),
+        Err(Ok(BatchError::InvalidAmount))
+    );
 }
 
 #[test]
 fn test_transfer_overflow_rejected() {
     let (env, client, alice, bob, _carol) = setup();
-    client.set_balance(&bob, &i128::MAX).unwrap();
+    client.try_set_balance(&bob, &i128::MAX).unwrap().unwrap();
 
-    let ops = Vec::from_array(&env, [BatchOperation::Transfer(alice.clone(), bob.clone(), 1)]);
+    let ops = Vec::from_array(
+        &env,
+        [BatchOperation::Transfer(alice.clone(), bob.clone(), 1)],
+    );
     assert_eq!(
-        client.execute_batch_atomic(&ops),
+        client.try_execute_batch_atomic(&ops),
         Err(Ok(BatchError::ArithmeticOverflow))
     );
 }
@@ -194,7 +210,10 @@ fn test_transfer_overflow_rejected() {
 fn test_empty_batch_is_noop() {
     let (env, client, alice, bob, _carol) = setup();
 
-    client.execute_batch_atomic(&Vec::new(&env)).unwrap();
+    client
+        .try_execute_batch_atomic(&Vec::new(&env))
+        .unwrap()
+        .unwrap();
     let partial = client.execute_batch_partial(&Vec::new(&env));
 
     assert_eq!(partial.applied, 0);
@@ -209,7 +228,7 @@ fn test_set_balance_rejects_negative_values() {
     let dave = Address::generate(&env);
 
     assert_eq!(
-        client.set_balance(&dave, &-1),
+        client.try_set_balance(&dave, &-1),
         Err(Ok(BatchError::InvalidAmount))
     );
 }

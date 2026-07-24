@@ -1,7 +1,7 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation};
+use soroban_sdk::testutils::Address as _;
 use soroban_sdk::{Address, Env, Symbol};
 
 #[test]
@@ -13,7 +13,7 @@ fn test_whitelist_and_registration() {
 
     let owner = Address::generate(&env);
     let alice = Address::generate(&env);
-    let bob = Address::generate(&env);
+    let _bob = Address::generate(&env);
 
     // Initialize as whitelist-only with no fee
     client.init(&owner, &true, &0i128);
@@ -50,7 +50,7 @@ fn test_fee_enforcement() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let alice = Address::generate(&env);
+    let _alice = Address::generate(&env);
 
     // Initialize without whitelist-only and fee = 10
     client.init(&owner, &false, &10i128);

@@ -1,5 +1,5 @@
 use super::*;
-use soroban_sdk::{Env, Address, testutils::Address as _};
+use soroban_sdk::{testutils::Address as _, Address, Env};
 
 #[test]
 fn test_initialize() {
@@ -177,9 +177,11 @@ fn test_interest_rate_model_above_kink() {
     let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
     let user = Address::generate(&env);
-    client.initialize(&5, &10, &80);
+    // Kink at 75%: max per-user borrow is 80%, so 80% pool utilization is above kink.
+    client.initialize(&5, &10, &75);
     client.deposit(&user, &1000);
-    client.borrow(&user, &850);
+    client.borrow(&user, &800);
     let rate = client.get_borrow_rate();
-    assert_eq!(rate, 65);
+    // excess_utilization = 5; rate = 5 + 10 + (5 * 200 / 25) = 55
+    assert_eq!(rate, 55);
 }
