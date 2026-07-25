@@ -313,6 +313,10 @@ Testing wallet flows is critical because they involve user consent, network conf
 
 If you are building a frontend test suite, mock the wallet provider interface instead of trying to depend on the real wallet during automated tests. Keep the mock close to the provider boundary and verify that the app responds correctly to connection success, rejection, and network errors.
 
+### Testing on mobile
+
+Mobile wallets (xBull, Lobstr) connect over WalletConnect rather than a browser extension, and most retail users reach dApps through a mobile browser. See the [Mobile Testing Guide](../guides/mobile-testing.md) for a responsive-layout checklist, the WalletConnect pairing/sign/reject flow to verify, and a device/browser matrix.
+
 ### Common debugging steps
 
 1. Check whether the wallet is installed and enabled.
