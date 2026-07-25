@@ -99,3 +99,7 @@ To rebuild the search index after adding new content:
 ```bash
 cd book && mdbook build
 ```
+
+## Rebuild on Deploy
+
+You don't need to publish the rebuilt index yourself. The `Deploy Docs` GitHub Actions workflow (`.github/workflows/deploy-docs.yml`) runs `mdbook build` and pushes the output — including the freshly generated `searchindex.json` — to the `gh-pages` branch on every push to `main`. So once your content change merges, the live search index picks it up automatically on the next deploy; running `mdbook build` locally is only needed to preview your changes before opening a PR.
