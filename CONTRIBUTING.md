@@ -68,3 +68,35 @@ Once you have worked through the onboarding guide and run `cargo test --workspac
 ---
 
 ## 🎯 Ways to Contribute
+
+## 🧪 Testing Requirements
+
+Every change that touches contract logic needs test coverage before it merges. This section covers the commands you need day-to-day; for testing patterns, fixtures, and best practices, see the [Testing Guide](./book/src/guides/testing.md) and [Testing Best Practices](./book/src/docs/testing-best-practices.md).
+
+### Running Tests
+
+```bash
+# Run everything in the workspace (what CI runs by default)
+cargo test --workspace
+
+# Run tests for a single example you're working on
+cd examples/<category>/<example-name>
+cargo test
+
+# Run the shared integration test suite
+cargo test -p integration-tests
+
+# Run the security-focused test suite
+cargo test --package security-tests
+```
+
+CI also runs `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` — run both locally before opening a PR to avoid a red pipeline.
+
+### Where to Add a Test
+
+- **Example-level test** (`src/test.rs` or `tests/` inside the example crate): the default for any new or changed example. If the behavior only involves that one contract, it belongs here.
+- **Shared integration test** (`tests/integration/`): for scenarios that span multiple contracts — cross-contract calls, multi-step workflows, or state coordination between examples. See `tests/integration/README.md` for existing patterns before adding a new one.
+- **Security test** (`tests/security/`): for authorization bypass, reentrancy, and other security-relevant regressions. See `tests/security/README.md` for the threat models already covered.
+- **Fuzz target** (`tests/fuzz/`): for property-based testing of parsing/serialization boundaries. Only needed when you're adding a new fuzzable surface, not for typical example changes.
+
+Coverage is measured with `cargo tarpaulin` in CI and uploaded to Codecov; run `cargo tarpaulin` locally if you want to check coverage before pushing.
