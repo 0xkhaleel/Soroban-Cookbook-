@@ -15,6 +15,7 @@ members = [
     "examples/tokens/06-token-wrapper",
     "examples/tokens/03-optimized-operations",
     "examples/governance/01-vote-delegation",
+    "examples/intermediate/lazy-loading",
     "tests/integration",
     "tests/security",
 ]
