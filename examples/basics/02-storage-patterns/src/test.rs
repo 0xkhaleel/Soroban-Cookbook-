@@ -43,8 +43,22 @@
 //! ✅ 6+ tests passing (21 tests passing)
 
 use super::*;
-use soroban_sdk::testutils::Ledger as _;
-use soroban_sdk::{symbol_short, Env};
+use soroban_sdk::testutils::{Events as _, Ledger as _};
+use soroban_sdk::{symbol_short, Env, Symbol, TryFromVal, Val, Vec};
+
+fn get_last_event_topics_and_data(
+    env: &Env,
+    events: &soroban_sdk::testutils::ContractEvents,
+) -> (Vec<Val>, Val) {
+    let last_event = events.events().last().unwrap();
+    let soroban_sdk::xdr::ContractEventBody::V0(body) = &last_event.body;
+    let mut topics = Vec::new(env);
+    for topic in body.topics.iter() {
+        topics.push_back(Val::try_from_val(env, topic).unwrap());
+    }
+    let data = Val::try_from_val(env, &body.data).unwrap();
+    (topics, data)
+}
 
 #[test]
 fn test_persistent_storage() {
@@ -61,6 +75,18 @@ fn test_persistent_storage() {
     // Set value
     client.set_persistent(&key, &value);
 
+    // Verify set event
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("persist"));
+    assert_eq!(t1, symbol_short!("set"));
+    let (d_key, d_value): (Symbol, u64) = <(Symbol, u64)>::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
+    assert_eq!(d_value, value);
+
     // Key should now exist
     assert!(client.has_persistent(&key));
 
@@ -69,6 +95,17 @@ fn test_persistent_storage() {
 
     // Remove value
     client.remove_persistent(&key);
+
+    // Verify remove event
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("persist"));
+    assert_eq!(t1, symbol_short!("remove"));
+    let d_key: Symbol = Symbol::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
 
     // Key should no longer exist
     assert!(!client.has_persistent(&key));
@@ -88,6 +125,18 @@ fn test_temporary_storage() {
 
     // Set value
     client.set_temporary(&key, &value);
+
+    // Verify event
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("temp"));
+    assert_eq!(t1, symbol_short!("set"));
+    let (d_key, d_value): (Symbol, u64) = <(Symbol, u64)>::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
+    assert_eq!(d_value, value);
 
     // Key should now exist
     assert!(client.has_temporary(&key));
@@ -111,6 +160,18 @@ fn test_instance_storage() {
     // Set value
     client.set_instance(&key, &value);
 
+    // Verify event
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("instance"));
+    assert_eq!(t1, symbol_short!("set"));
+    let (d_key, d_value): (Symbol, u64) = <(Symbol, u64)>::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
+    assert_eq!(d_value, value);
+
     // Key should now exist
     assert!(client.has_instance(&key));
 
@@ -120,8 +181,45 @@ fn test_instance_storage() {
     // Remove value
     client.remove_instance(&key);
 
+    // Verify remove event
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("instance"));
+    assert_eq!(t1, symbol_short!("remove"));
+    let d_key: Symbol = Symbol::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
+
     // Key should no longer exist
     assert!(!client.has_instance(&key));
+}
+
+/// Benchmark storage costs for different storage types.
+#[test]
+fn test_storage_costs_benchmark() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&env, &contract_id);
+
+    let key = symbol_short!("test");
+    let value = 100u64;
+
+    // Benchmark Persistent Storage
+    env.budget().reset_default();
+    client.set_persistent(&key, &value);
+    env.budget().print();
+
+    // Benchmark Instance Storage
+    env.budget().reset_default();
+    client.set_instance(&key, &value);
+    env.budget().print();
+
+    // Benchmark Temporary Storage
+    env.budget().reset_default();
+    client.set_temporary(&key, &value);
+    env.budget().print();
 }
 
 #[test]

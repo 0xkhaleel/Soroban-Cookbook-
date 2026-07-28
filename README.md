@@ -1,234 +1,187 @@
-# Soroban Cookbook
+# typos
 
-**A comprehensive guide to building smart contracts on Stellar with Soroban**
+> **Source code spell checker**
 
-[![CI](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/ci.yml/badge.svg)](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/ci.yml)
-[![Test and Lint](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/test.yml/badge.svg)](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/test.yml)
-[![Security Audit](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/security-audit.yml/badge.svg)](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/security-audit.yml)
-[![codecov](https://codecov.io/gh/Soroban-Cookbook/Soroban-Cookbook-/branch/main/graph/badge.svg)](https://codecov.io/gh/Soroban-Cookbook/Soroban-Cookbook-)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Finds and corrects spelling mistakes among source code:
+- Fast enough to run on monorepos
+- Low false positives so you can run on PRs
 
-## Table of Contents
+![Screenshot](./docs/screenshot.png)
 
-- [About](#about)
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Repository Structure](#repository-structure)
-- [Examples](#examples)
-- [Guides](#guides)
-- [Documentation](#documentation)
-- [Web Application](#web-application)
-- [Contributing](#contributing)
-- [Additional Resources](#additional-resources)
-- [License](#license)
+[![codecov](https://codecov.io/gh/crate-ci/typos/branch/master/graph/badge.svg)](https://codecov.io/gh/crate-ci/typos)
+[![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][Documentation]
+![License](https://img.shields.io/crates/l/typos.svg)
+[![Crates Status](https://img.shields.io/crates/v/typos.svg)][Crates.io]
 
-## About
-
-The Soroban Cookbook is a community-driven developer resource for building smart contracts on the [Stellar](https://stellar.org) network using [Soroban](https://developers.stellar.org/docs/smart-contracts). It provides clear, well-documented examples and practical patterns for developers at every level — from a first "Hello World" contract to production-grade DeFi protocols
-
-Every example in this cookbook:
-
-- Compiles with the latest stable Soroban SDK
-- Includes comprehensive unit and integration tests
-- Features inline documentation explaining key concepts
-- Follows Rust and Soroban best practices
-- Passes all automated CI/CD checks
-
-## Quick Start
-
-```bash
-# Clone the repository
-git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook-.git
-cd Soroban-Cookbook-
-
-# Run a basic example
-cd examples/basics/01-hello-world
-cargo test
-
-# Build the contract as WASM
-cargo build --target wasm32-unknown-unknown --release
-```
-
-## Installation
-
-### Prerequisites
-
-- [Rust](https://www.rust-lang.org/tools/install) (stable, 1.74+)
-- [Soroban / Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli)
-
-### 1. Install Rust
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-rustc --version
-```
-
-### 2. Add the WASM target
-
-Soroban contracts compile to WebAssembly:
-
-```bash
-rustup target add wasm32-unknown-unknown
-```
-
-### 3. Install Stellar CLI
-
-```bash
-cargo install --locked stellar-cli --version 22.1.0
-stellar --version
-```
-
-### 4. Clone and verify
-
-```bash
-git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook-.git
-cd Soroban-Cookbook-
-cargo test --workspace
-```
-
-## Repository Structure
-
-```
-Soroban-Cookbook/
-├── examples/               # Smart contract examples
-│   ├── basics/             # Beginner-friendly fundamentals
-│   ├── intermediate/       # Common patterns and use cases
-│   ├── advanced/           # Complex systems and protocols
-│   ├── defi/               # DeFi-specific examples
-│   ├── nfts/               # NFT implementations
-│   ├── governance/         # DAO and voting systems
-│   └── tokens/             # Token standards and patterns
-├── book/                   # mdBook documentation source
-│   └── src/
-│       ├── guides/         # Step-by-step tutorials
-│       ├── examples/       # Example write-ups
-│       └── docs/           # Reference documentation
-├── docs/                   # Supplementary reference docs
-├── webapp/                 # Next.js web application for interactive examples
-├── scripts/                # Build and deployment scripts
-└── .github/                # CI/CD workflows and templates
-```
-
-## Examples
-
-### By Difficulty
-
-#### [Basics](./examples/basics/)
-
-Core Soroban concepts, one at a time.
-
-| Example | Concepts |
-| --- | --- |
-| [01-hello-world](./examples/basics/01-hello-world/) | Contract struct, `#[contract]` / `#[contractimpl]`, unit tests |
-| [02-storage-patterns](./examples/basics/02-storage-patterns/) | `persistent`, `instance`, `temporary` storage, TTL |
-| [03-authentication](./examples/basics/03-authentication/) | `require_auth()`, admin roles, balances |
-| [03-custom-errors](./examples/basics/03-custom-errors/) | `#[contracterror]`, error codes, rate limiting |
-| [04-events](./examples/basics/04-events/) | `env.events().publish()`, topic design |
-| [05-auth-context](./examples/basics/05-auth-context/) | Cross-contract execution context |
-| [05-error-handling](./examples/basics/05-error-handling/) | Error enums, validation, propagation |
-| [06-soroban-types](./examples/basics/06-soroban-types/) | `Address`, `Symbol`, `Bytes`, `Map`, `Vec` |
-| [06-validation-patterns](./examples/basics/06-validation-patterns/) | Precondition checks, overflow-safe arithmetic |
-| [07-enum-types](./examples/basics/07-enum-types/) | `#[contracttype]` enums, role dispatch |
-| [08-custom-structs](./examples/basics/08-custom-structs/) | `#[contracttype]` structs, nested types |
-| [09-primitive-types](./examples/basics/09-primitive-types/) | `u32`, `u64`, `i128`, arithmetic safety |
-
-#### [Intermediate](./examples/intermediate/)
-
-Common patterns and real-world use cases.
-
-- Token interactions and wrappers
-- Cross-contract patterns (factory, proxy, registry)
-- Access control: [multi-sig patterns](./examples/intermediate/multi-sig-patterns/), RBAC, timelocks
-- Data structures: iterables, queues, priority queues
-
-#### [Advanced](./examples/advanced/)
-
-Complex systems for experienced developers.
-
-| Example | Concepts |
-| --- | --- |
-| [01-multi-party-auth](./examples/advanced/01-multi-party-auth/) | Threshold signatures, multi-party authorization |
-| [02-timelock](./examples/advanced/02-timelock/) | Time-delayed execution, queue/cancel/execute |
-
-### By Use Case
-
-| Category | Description |
-| --- | --- |
-| [DeFi](./examples/defi/) | AMMs, lending pools, vaults, escrow, yield protocols |
-| [NFTs](./examples/nfts/) | Minting, marketplaces, metadata standards |
-| [Governance](./examples/governance/) | DAOs, voting systems, proposals |
-| [Tokens](./examples/tokens/) | SEP-41 tokens, wrappers, vesting, airdrops |
-
-## Guides
-
-Step-by-step tutorials in the [book](./book/src/guides/):
-
-| Guide | Description |
-| --- | --- |
-| [Getting Started](./book/src/guides/getting-started.md) | Set up your development environment |
-| [Testing](./book/src/guides/testing.md) | Unit tests, integration tests, best practices |
-| [Deployment](./book/src/guides/deployment.md) | Deploy to testnet and mainnet |
-| [Ethereum to Soroban](./book/src/guides/ethereum-to-soroban.md) | Solidity → Rust pattern translation |
+Dual-licensed under [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE)
 
 ## Documentation
 
-Reference docs in [docs/](./docs/):
+- [Installation](#install)
+- [Getting Started](#getting-started)
+  - [False Positives](#false-positives)
+  - [Integrations](#integrations)
+    - [GitHub Action](docs/github-action.md)
+    - [pre-commit](docs/pre-commit.md)
+    - [Custom](#custom)
+  - [Debugging](#debugging)
+- [Reference](docs/reference.md)
+- [FAQ](#faq)
+- [Comparison with other spell checkers](docs/comparison.md)
+- [Projects using typos](https://github.com/crate-ci/typos/wiki)
+- [Benchmarks](benchsuite/runs)
+- [Design](docs/design.md)
+- [Contribute](CONTRIBUTING.md)
+- [CHANGELOG](CHANGELOG.md)
 
-- [Best Practices](./docs/best-practices.md) — Security, storage, and code quality guidelines
-- [Style Guide](./docs/style-guide.md) — Naming, documentation, and testing standards
-- [Quick Reference](./docs/quick-reference.md) — Cheat sheet for common patterns
-- [Glossary](./docs/glossary.md) — Key terms and concepts
+## Install
 
-The full documentation site is built with [mdBook](https://rust-lang.github.io/mdBook/) and deployed to GitHub Pages on every push to `main`.
+[Download](https://github.com/crate-ci/typos/releases) a pre-built binary
+(installable via [gh-install](https://github.com/crate-ci/gh-install)).
 
-## Web Application
-
-An interactive web application built with Next.js to explore and run Soroban contract examples directly in your browser.
-
-- Located in [webapp/](./webapp/)
-- Built with Next.js, React, and TypeScript
-- Provides a playground for testing contracts
-
-To run the webapp locally:
-
+Or use rust to install:
 ```bash
-cd webapp
-npm install
-npm run dev
+cargo install typos-cli
 ```
 
-## Contributing
-
-Contributions are welcome. Whether you're fixing a typo, improving docs, or adding a new example — see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines. Please also read our [Code of Conduct](./CODE_OF_CONDUCT.md).
-
-Ways to contribute:
-
-- Add new contract examples or patterns
-- Improve documentation and guides
-- Report bugs or suggest improvements
-- Review pull requests
-
-Before submitting a PR, make sure your changes pass the local checks:
-
+Or use [Homebrew](https://brew.sh/) to install:
 ```bash
-cargo fmt --all --check
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --workspace --all-features
-cargo build --workspace --target wasm32-unknown-unknown --release
+brew install typos-cli
 ```
 
-## Additional Resources
+Or use [Conda](https://conda.io/) to install:
+```bash
+conda install typos
+```
 
-- [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
-- [Stellar Developer Portal](https://developers.stellar.org)
-- [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
-- [Stellar Community Discord](https://discord.gg/stellardev)
-- [Project Roadmap](./ROADMAP.md) - Planned phases, milestones, and KPIs
+Or use [Pacman](https://wiki.archlinux.org/title/pacman) to install:
+```
+sudo pacman -S typos
+```
 
-## License
+## Getting Started
 
-This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
+Most commonly, you'll either want to see what typos are available with
+```bash
+typos
+```
 
----
+Or have them fixed
+```bash
+typos --write-changes
+typos -w
+```
+If there is any ambiguity (multiple possible corrections), `typos` will just report it to the user and move on.
 
-Built by the community · Powered by Stellar · Written in Rust.
+### False-positives
+
+Sometimes, what looks like a typo is intentional, like with people's names, acronyms, or localized content.
+
+To mark a word or an identifier (grouping of words) as valid, add it your [`_typos.toml`](docs/reference.md) by declaring itself as the valid spelling:
+```toml
+[default]
+extend-ignore-identifiers-re = [
+    # *sigh* this just isn't worth the cost of fixing
+    "AttributeID.*Supress.*",
+]
+
+[default.extend-identifiers]
+# *sigh* this just isn't worth the cost of fixing
+AttributeIDSupressMenu = "AttributeIDSupressMenu"
+
+[default.extend-words]
+# Don't correct the surname "Teh"
+teh = "teh"
+```
+
+For cases like localized content, you can disable spell checking of file contents while still checking the file name:
+```toml
+[type.po]
+extend-glob = ["*.po"]
+check-file = false
+```
+(run `typos --type-list` to see configured file types)
+
+If you need some more flexibility, you can completely exclude some files from consideration:
+```toml
+[files]
+extend-exclude = ["localized/*.po"]
+```
+
+### Integrations
+
+- [GitHub Actions](docs/github-action.md)
+- [pre-commit](docs/pre-commit.md)
+- [🐊Putout Processor](https://github.com/putoutjs/putout-processor-typos)
+- [Visual Studio Code](https://github.com/tekumara/typos-vscode)
+- [typos-lsp (Language Server Protocol server)](https://github.com/tekumara/typos-vscode)
+
+#### Custom
+
+`typos` provides several building blocks for custom native integrations
+- `-` reads from `stdin`, `--write-changes` will be written to `stdout`
+- `--diff` to provide a diff
+- `--format json` to get jsonlines with exit code 0 on no errors, code 2 on typos, anything else is an error.
+
+Examples:
+```bash
+# Read file from stdin, write corrected version to stdout
+typos - --write-changes
+# Creates a diff of what would change
+typos dir/file --diff
+# Fully programmatic control
+typos dir/file --format json
+```
+
+### Debugging
+
+You can see what the effective config looks like by running
+```bash
+typos --dump-config -
+```
+
+You can then see how typos is processing your project with
+```bash
+typos --files
+typos --identifiers
+typos --words
+```
+
+If you need to dig in more, you can enable debug logging with `-v`
+
+## FAQ
+
+### Why was ... not corrected?
+
+**Does the file show up in `typos --files`?**
+If not, check your config with `typos --dump-config -`.
+The `[files]` table controls how we walk files.
+If you are using `files.extend-exclude`,
+are you running into [#593](https://github.com/crate-ci/typos/issues/593)?
+If you are using `files.ignore-vcs = true`,
+is the file in your `.gitignore` but git tracks it anyways?
+Prefer allowing the file explicitly (see [#909](https://github.com/crate-ci/typos/issues/909)).
+
+**Does the identifier show up in `typos --identifiers` or the word show up in `typos --words`?**
+If not, it might be subject to one of typos' heuristics for
+detecting non-words (like hashes) or
+unambiguous words (like words after a `\` escape).
+
+If it is showing up, likely `typos` doesn't know about it yet.
+
+`typos` maintains a list of known typo corrections to keep the false positive
+count low so it can safely run unassisted.
+
+This is in contrast to most spell checking UIs people use where there is a
+known list of valid words.  In this case, the spell checker tries to guess your
+intent by finding the closest-looking word.  It then has a gauge for when a
+word isn't close enough and assumes you know best.  The user has the
+opportunity to verify these corrections and explicitly allow or reject them.
+
+For more on the trade offs of these approaches, see [Design](docs/design.md).
+
+- To correct it locally, see also our [False Positives documentation](#false-positives).
+- To contribute your correction, see [Contribute](CONTRIBUTING.md)
+
+[Crates.io]: https://crates.io/crates/typos-cli
+[Documentation]: https://docs.rs/typos

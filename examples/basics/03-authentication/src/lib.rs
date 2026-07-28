@@ -19,11 +19,13 @@
 //! - **State-Based Authorization**: Contract state gating (Active/Paused/Frozen)
 
 #![no_std]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, Symbol,
     Vec,
 };
+use soroban_validation::*;
 
 // ---------------------------------------------------------------------------
 // Role definitions
@@ -192,7 +194,8 @@ impl AuthContract {
             .get(&DataKey::Admin)
             .ok_or(AuthError::NotAdmin)?;
 
-        if admin != stored_admin {
+        // Use shared validation pattern
+        if require_admin(stored_admin, admin.clone()).is_err() {
             return Err(AuthError::NotAdmin);
         }
 
@@ -222,7 +225,8 @@ impl AuthContract {
             .get(&DataKey::Admin)
             .ok_or(AuthError::NotAdmin)?;
 
-        if admin != stored_admin {
+        // Use shared validation pattern
+        if require_admin(stored_admin, admin.clone()).is_err() {
             return Err(AuthError::NotAdmin);
         }
 
@@ -261,7 +265,8 @@ impl AuthContract {
             .get(&DataKey::Balance(from.clone()))
             .unwrap_or(0);
 
-        if amount <= 0 || from_balance < amount {
+        // Use shared validation pattern
+        if require_sufficient_balance(from_balance, amount).is_err() {
             return Err(AuthError::InsufficientBalance);
         }
 

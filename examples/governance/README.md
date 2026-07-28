@@ -1,54 +1,26 @@
 # Governance Examples
 
-Decentralized governance systems, DAO frameworks, and treasury management implementations on Soroban.
+This category contains examples related to on-chain governance, including Decentralized Autonomous Organizations (DAOs) and voting systems.
 
-## 📂 Examples
+## Examples
 
-### [01-delegation-marketplace](./01-delegation-marketplace/)
-A marketplace for listing and renting voting power with incentive mechanisms.
-- **Concepts:** `require_auth()`, persistent storage, typed errors, event topics, fee transfer.
+| # | Example | Concepts |
+|---|---------|----------|
+| 01 | [simple-voting](./01-simple-voting/) | Proposal creation, one-address-one-vote, time-based deadlines, vote tallying, execution |
+| 02 | [voting-time-constraints](./01-voting-time-constraints/) | Voting periods, proposal deadlines, grace periods, early closure |
+| 06 | [timelock-governance](./06-timelock-governance/) | Proposal queue, mandatory delays, veto, emergency execution |
 
-## 📂 Example Categories
+## Examples
 
-### Voting Systems
-Mechanisms for decision-making and voting power.
-- **Planned:** Simple Voting (Yes/No), Weighted Voting (Token-based), Quadratic Voting, NFT-based Voting.
+*   **[01-vote-delegation](./01-vote-delegation/) — 🟡 Intermediate**
+    Liquid voting delegation with chain delegation, loop prevention (cycle detection), and recursion depth limits.
 
-### DAO Frameworks
-Complete systems for managing decentralized organizations.
-- **Planned:** Basic DAO with treasury, Multi-sig DAO, Token-gated DAO, NFT-holder DAO.
+## Examples
 
-### Proposal Management
-The lifecycle of governance decisions.
-- **Planned:** Timelock (Delayed execution), Veto systems, Cancellation logic, Proposal lifecycle (Draft -> Vote -> Execute).
+*   **[01-vote-delegation](./01-vote-delegation/) — 🟡 Intermediate**
+    Liquid voting delegation with chain delegation, loop prevention (cycle detection), and recursion depth limits.
 
-### Treasury Management
-Securely managing organization funds.
-- **Planned:** DAO Treasury, Streaming Payments (Vesting), Budget Allocation, Grant systems.
+## Planned Examples
 
-## 📋 Planned Examples
-
-- **Simple DAO** - Proposal creation and token-weighted voting.
-- **Weighted Voting** - Calculating voting power based on token balances.
-- **Quadratic Voting** - Fairer voting mechanics for larger communities.
-- **DAO Treasury** - Securely spending DAO funds through governance.
-- **Vesting Schedule** - Automated token release for DAO contributors.
-
-## 🏛️ Key Concepts
-
-### Proposals
-A proposal is a structured set of actions that a DAO can vote on and execute.
-
-### Voting Power
-The amount of influence a participant has in a governance system, often derived from token holdings or reputation.
-
-### Quorum and Thresholds
-The minimum participation and approval requirements for a proposal to pass.
-
-## 🎯 Prerequisites
-
-Before exploring governance examples, ensure you understand:
-- [Basic Examples](../basics/) - Core concepts.
-- [Token Examples](../tokens/) - Fungible and non-fungible tokens.
-- [Intermediate Patterns](../intermediate/) - Access control and multi-sig.
-- [Advanced Patterns](../advanced/) - Timelocks and advanced security.
+- `03-treasury`: A contract for managing a DAO's funds, controlled by governance.
+- `04-quadratic-voting`: An implementation of a quadratic voting mechanism.
