@@ -277,12 +277,7 @@ impl MultiPartyAuthContract {
     }
 
     /// Add `new_signer` to the signer set for `proposal_id`.
-    pub fn add_signer(
-        env: Env,
-        caller: Address,
-        proposal_id: Symbol,
-        new_signer: Address,
-    ) {
+    pub fn add_signer(env: Env, caller: Address, proposal_id: Symbol, new_signer: Address) {
         caller.require_auth();
 
         let key = DataKey::Signers(proposal_id.clone());
@@ -366,12 +361,7 @@ impl MultiPartyAuthContract {
     }
 
     /// Update the approval threshold for `proposal_id`.
-    pub fn set_threshold(
-        env: Env,
-        caller: Address,
-        proposal_id: Symbol,
-        new_threshold: u32,
-    ) {
+    pub fn set_threshold(env: Env, caller: Address, proposal_id: Symbol, new_threshold: u32) {
         caller.require_auth();
 
         let signers: Vec<Address> = env

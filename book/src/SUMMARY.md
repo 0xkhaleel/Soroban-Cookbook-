@@ -10,6 +10,7 @@
 # Guides
 
 - [Testing Guide](./guides/testing.md)
+- [Mobile Testing Guide](./guides/mobile-testing.md)
 - [Local Simulation](./guides/local-simulation.md)
 - [Deployment Guide](./guides/deployment.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)
@@ -137,8 +138,6 @@
   - [Code of Conduct](contributing/code-of-conduct.md)
   - [Development Workflow](contributing/development-workflow.md)
 - [Video Tutorials](./examples/video-tutorials.md)
-- [Pause / Unpause](./examples/intermediate.md)
-- [Oracle Pattern](./examples/advanced.md)
 - [Diamond Security](./examples/advanced/05-diamond-security/README.md)
 - [Vote Delegation](./examples/governance/01-vote-delegation/README.md)
 

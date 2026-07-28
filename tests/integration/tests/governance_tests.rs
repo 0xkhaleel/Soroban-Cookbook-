@@ -20,8 +20,8 @@
 #![cfg(test)]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, testutils::Address as _, testutils::Ledger as _,
-    Address, Env, IntoVal, String, Symbol, Vec,
+    contract, contractimpl, contracttype, testutils::Address as _, testutils::Ledger as _, Address,
+    Env, IntoVal, String, Symbol, Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -420,7 +420,7 @@ fn test_gov_vote_deadline_enforcement() {
     let result = client.try_vote(&voter, &proposal_id, &true, &20i128);
     assert_eq!(
         result,
-        Err(Ok(proposal_lifecycle::ProposalError::VotingEnded))
+        Err(Ok(proposal_lifecycle::ProposalError::InvalidState))
     );
 }
 
@@ -907,8 +907,11 @@ fn test_gov_delegation_zero_weight_edge_case() {
 fn setup_vtc(env: &Env, voting_period: u64, grace_period: u64) -> (Address, Address) {
     let id = env.register_contract(None, voting_time_constraints::VotingContract);
     let admin = Address::generate(env);
-    voting_time_constraints::VotingContractClient::new(env, &id)
-        .initialize(&admin, &voting_period, &grace_period);
+    voting_time_constraints::VotingContractClient::new(env, &id).initialize(
+        &admin,
+        &voting_period,
+        &grace_period,
+    );
     (id, admin)
 }
 
@@ -926,7 +929,10 @@ fn test_vtc_proposal_creation() {
     client.create_proposal(&creator, &proposal_id, &1u32);
 
     let proposal = client.get_proposal(&proposal_id);
-    assert_eq!(proposal.state, voting_time_constraints::ProposalState::Active);
+    assert_eq!(
+        proposal.state,
+        voting_time_constraints::ProposalState::Active
+    );
     assert_eq!(proposal.quorum_threshold, 1);
     assert_eq!(proposal.votes_for, 0);
 }

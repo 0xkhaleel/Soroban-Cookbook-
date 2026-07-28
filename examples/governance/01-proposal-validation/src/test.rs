@@ -21,7 +21,8 @@ fn test_create_proposal_success() {
     let topic = Symbol::new(&env, "treasury");
 
     let id = client
-        .create_proposal(&topic, &1_020, &1_120, &6_000, &bytes(&env, b"hash-1"))
+        .try_create_proposal(&topic, &1_020, &1_120, &6_000, &bytes(&env, b"hash-1"))
+        .unwrap()
         .unwrap();
 
     assert_eq!(id, 1);
@@ -34,7 +35,7 @@ fn test_create_proposal_success() {
 fn test_reject_start_too_soon() {
     let (env, client) = setup();
 
-    let result = client.create_proposal(
+    let result = client.try_create_proposal(
         &Symbol::new(&env, "ops"),
         &1_009,
         &1_100,
@@ -48,7 +49,7 @@ fn test_reject_start_too_soon() {
 fn test_reject_end_before_start() {
     let (env, client) = setup();
 
-    let result = client.create_proposal(
+    let result = client.try_create_proposal(
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_019,
@@ -62,7 +63,7 @@ fn test_reject_end_before_start() {
 fn test_reject_duration_too_short() {
     let (env, client) = setup();
 
-    let result = client.create_proposal(
+    let result = client.try_create_proposal(
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_030,
@@ -76,7 +77,7 @@ fn test_reject_duration_too_short() {
 fn test_reject_invalid_quorum() {
     let (env, client) = setup();
 
-    let low = client.create_proposal(
+    let low = client.try_create_proposal(
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_120,
@@ -85,7 +86,7 @@ fn test_reject_invalid_quorum() {
     );
     assert_eq!(low, Err(Ok(ProposalError::InvalidQuorum)));
 
-    let high = client.create_proposal(
+    let high = client.try_create_proposal(
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_120,
@@ -99,7 +100,7 @@ fn test_reject_invalid_quorum() {
 fn test_reject_empty_metadata() {
     let (env, client) = setup();
 
-    let result = client.create_proposal(
+    let result = client.try_create_proposal(
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_120,
@@ -115,10 +116,12 @@ fn test_detect_topic_conflict() {
     let topic = Symbol::new(&env, "bridge");
 
     client
-        .create_proposal(&topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
+        .try_create_proposal(&topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
+        .unwrap()
         .unwrap();
 
-    let conflict = client.create_proposal(&topic, &1_100, &1_200, &5_000, &bytes(&env, b"hash-b"));
+    let conflict =
+        client.try_create_proposal(&topic, &1_100, &1_200, &5_000, &bytes(&env, b"hash-b"));
     assert_eq!(conflict, Err(Ok(ProposalError::TopicConflict)));
 }
 
@@ -128,12 +131,14 @@ fn test_allow_same_topic_after_close() {
     let topic = Symbol::new(&env, "bridge");
 
     let first = client
-        .create_proposal(&topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
+        .try_create_proposal(&topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
+        .unwrap()
         .unwrap();
-    client.close_proposal(&first).unwrap();
+    client.try_close_proposal(&first).unwrap().unwrap();
 
     let second = client
-        .create_proposal(&topic, &1_130, &1_230, &5_000, &bytes(&env, b"hash-b"))
+        .try_create_proposal(&topic, &1_130, &1_230, &5_000, &bytes(&env, b"hash-b"))
+        .unwrap()
         .unwrap();
     assert_eq!(second, 2);
 }
@@ -143,23 +148,25 @@ fn test_non_conflicting_topics_are_allowed() {
     let (env, client) = setup();
 
     client
-        .create_proposal(
+        .try_create_proposal(
             &Symbol::new(&env, "treasury"),
             &1_020,
             &1_120,
             &5_000,
             &bytes(&env, b"hash-a"),
         )
+        .unwrap()
         .unwrap();
 
     let other = client
-        .create_proposal(
+        .try_create_proposal(
             &Symbol::new(&env, "validator"),
             &1_030,
             &1_130,
             &6_500,
             &bytes(&env, b"hash-b"),
         )
+        .unwrap()
         .unwrap();
 
     assert_eq!(other, 2);
@@ -169,21 +176,25 @@ fn test_non_conflicting_topics_are_allowed() {
 fn test_close_errors_for_missing_or_closed_proposal() {
     let (env, client) = setup();
 
-    assert_eq!(client.close_proposal(&404), Err(Ok(ProposalError::ProposalNotFound)));
+    assert_eq!(
+        client.try_close_proposal(&404),
+        Err(Ok(ProposalError::ProposalNotFound))
+    );
 
     let id = client
-        .create_proposal(
+        .try_create_proposal(
             &Symbol::new(&env, "ops"),
             &1_020,
             &1_120,
             &5_000,
             &bytes(&env, b"hash"),
         )
+        .unwrap()
         .unwrap();
-    client.close_proposal(&id).unwrap();
+    client.try_close_proposal(&id).unwrap().unwrap();
 
     assert_eq!(
-        client.close_proposal(&id),
+        client.try_close_proposal(&id),
         Err(Ok(ProposalError::ProposalAlreadyClosed))
     );
 }

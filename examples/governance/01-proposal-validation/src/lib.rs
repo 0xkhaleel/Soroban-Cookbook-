@@ -57,13 +57,14 @@ impl ProposalValidation {
         metadata_hash: Bytes,
     ) -> Result<u32, ProposalError> {
         Self::validate_input(&env, starts_at, ends_at, quorum_bps, metadata_hash.clone())?;
-        Self::validate_topic_conflicts(&env, topic, starts_at, ends_at)?;
+        let topic_key = topic.clone();
+        Self::validate_topic_conflicts(&env, topic_key.clone(), starts_at, ends_at)?;
 
         let proposal_id = Self::next_proposal_id(&env);
 
         let proposal = Proposal {
             id: proposal_id,
-            topic,
+            topic: topic_key.clone(),
             starts_at,
             ends_at,
             quorum_bps,
@@ -78,15 +79,19 @@ impl ProposalValidation {
         let mut topic_index: Vec<u32> = env
             .storage()
             .persistent()
-            .get(&DataKey::TopicIndex(topic))
+            .get(&DataKey::TopicIndex(topic_key.clone()))
             .unwrap_or_else(|| Vec::new(&env));
         topic_index.push_back(proposal_id);
         env.storage()
             .persistent()
-            .set(&DataKey::TopicIndex(topic), &topic_index);
+            .set(&DataKey::TopicIndex(topic_key.clone()), &topic_index);
 
         env.events().publish(
-            (symbol_short!("proposal"), symbol_short!("created"), topic),
+            (
+                symbol_short!("proposal"),
+                symbol_short!("created"),
+                topic_key,
+            ),
             proposal_id,
         );
 
@@ -94,12 +99,14 @@ impl ProposalValidation {
     }
 
     pub fn get_proposal(env: Env, proposal_id: u32) -> Option<Proposal> {
-        env.storage().persistent().get(&DataKey::Proposal(proposal_id))
+        env.storage()
+            .persistent()
+            .get(&DataKey::Proposal(proposal_id))
     }
 
     pub fn close_proposal(env: Env, proposal_id: u32) -> Result<(), ProposalError> {
-        let mut proposal = Self::get_proposal(env.clone(), proposal_id)
-            .ok_or(ProposalError::ProposalNotFound)?;
+        let mut proposal =
+            Self::get_proposal(env.clone(), proposal_id).ok_or(ProposalError::ProposalNotFound)?;
 
         if !proposal.active {
             return Err(ProposalError::ProposalAlreadyClosed);
@@ -111,18 +118,18 @@ impl ProposalValidation {
             .set(&DataKey::Proposal(proposal_id), &proposal);
 
         env.events().publish(
-            (symbol_short!("proposal"), symbol_short!("closed"), proposal.topic),
+            (
+                symbol_short!("proposal"),
+                symbol_short!("closed"),
+                proposal.topic,
+            ),
             proposal_id,
         );
 
         Ok(())
     }
 
-    pub fn validate_window(
-        env: Env,
-        starts_at: u64,
-        ends_at: u64,
-    ) -> Result<(), ProposalError> {
+    pub fn validate_window(env: Env, starts_at: u64, ends_at: u64) -> Result<(), ProposalError> {
         Self::validate_window_internal(&env, starts_at, ends_at)
     }
 
@@ -184,7 +191,8 @@ impl ProposalValidation {
                 .get(&DataKey::Proposal(proposal_id))
                 .ok_or(ProposalError::ProposalNotFound)?;
 
-            if proposal.active && windows_overlap(starts_at, ends_at, proposal.starts_at, proposal.ends_at)
+            if proposal.active
+                && windows_overlap(starts_at, ends_at, proposal.starts_at, proposal.ends_at)
             {
                 return Err(ProposalError::TopicConflict);
             }
@@ -194,7 +202,11 @@ impl ProposalValidation {
     }
 
     fn next_proposal_id(env: &Env) -> u32 {
-        let next: u32 = env.storage().instance().get(&DataKey::NextProposalId).unwrap_or(1);
+        let next: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::NextProposalId)
+            .unwrap_or(1);
         env.storage()
             .instance()
             .set(&DataKey::NextProposalId, &(next + 1));

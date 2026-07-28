@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map};
 
 #[derive(Clone)]
 #[contracttype]
@@ -149,7 +149,7 @@ impl LendingPool {
         position.borrow += amount;
         positions.set(user, position);
 
-        let mut new_total_borrows = total_borrows + amount;
+        let new_total_borrows = total_borrows + amount;
         env.storage()
             .instance()
             .set(&soroban_sdk::Symbol::new(&env, "positions"), &positions);

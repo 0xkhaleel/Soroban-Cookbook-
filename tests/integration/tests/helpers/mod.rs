@@ -3,6 +3,8 @@
 //! Reusable test infrastructure for Soroban Cookbook integration tests.
 //! Provides environment setup, contract registration, and assertion helpers.
 
+#![allow(dead_code)]
+
 use soroban_sdk::{
     testutils::Address as _, testutils::Ledger as _, Address, Env, IntoVal, Symbol, Vec,
 };

@@ -46,35 +46,60 @@ pub struct BadReceiver;
 
 #[contractimpl]
 impl BadReceiver {
-    pub fn on_flash_loan(_env: Env, _initiator: Address, _token: Address, _amount: i128, _fee: i128) {}
+    pub fn on_flash_loan(
+        _env: Env,
+        _initiator: Address,
+        _token: Address,
+        _amount: i128,
+        _fee: i128,
+    ) {
+    }
 }
 
-
-fn setup_test(env: &Env) -> (Address, Address, Address, FlashLoanContractClient, token::Client, token::StellarAssetClient) {
+fn setup_test(
+    env: &Env,
+) -> (
+    Address,
+    Address,
+    Address,
+    FlashLoanContractClient<'_>,
+    token::Client<'_>,
+    token::StellarAssetClient<'_>,
+) {
     let admin = Address::generate(env);
     let flash_loan_address = env.register(FlashLoanContract, ());
     let flash_loan_client = FlashLoanContractClient::new(env, &flash_loan_address);
     flash_loan_client.init(&admin, &50); // 0.5% fee
 
     let token_admin = Address::generate(env);
-    let token_address = env.register_stellar_asset_contract_v2(token_admin.clone()).address();
+    let token_address = env
+        .register_stellar_asset_contract_v2(token_admin.clone())
+        .address();
     let token_client = token::Client::new(env, &token_address);
     let token_admin_client = token::StellarAssetClient::new(env, &token_address);
 
-    (admin, token_admin, flash_loan_address, flash_loan_client, token_client, token_admin_client)
+    (
+        admin,
+        token_admin,
+        flash_loan_address,
+        flash_loan_client,
+        token_client,
+        token_admin_client,
+    )
 }
 
 #[test]
 fn test_successful_flash_loan() {
     let env = Env::default();
     env.mock_all_auths();
-    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) = setup_test(&env);
+    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) =
+        setup_test(&env);
 
     let receiver_address = env.register(Receiver, ());
-    
+
     // Fund the flash loan contract
     token_admin_client.mint(&flash_loan_address, &10000);
-    
+
     // Fund the receiver for the fee (0.5% of 1000 = 5)
     token_admin_client.mint(&receiver_address, &5);
 
@@ -88,8 +113,9 @@ fn test_successful_flash_loan() {
 fn test_successful_flash_loan_zero_fee() {
     let env = Env::default();
     env.mock_all_auths();
-    let (admin, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) = setup_test(&env);
-    
+    let (_admin, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) =
+        setup_test(&env);
+
     flash_loan_client.set_fee(&0);
 
     let receiver_address = env.register(Receiver, ());
@@ -126,8 +152,9 @@ fn test_fail_zero_amount() {
 fn test_fail_reentrancy() {
     let env = Env::default();
     env.mock_all_auths();
-    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) = setup_test(&env);
-    
+    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) =
+        setup_test(&env);
+
     let reentrant_receiver = env.register(ReentrantReceiver, ());
     token_admin_client.mint(&flash_loan_address, &10000);
 
@@ -139,8 +166,9 @@ fn test_fail_reentrancy() {
 fn test_fail_no_repayment() {
     let env = Env::default();
     env.mock_all_auths();
-    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) = setup_test(&env);
-    
+    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) =
+        setup_test(&env);
+
     let bad_receiver = env.register(BadReceiver, ());
     token_admin_client.mint(&flash_loan_address, &10000);
 
@@ -151,7 +179,7 @@ fn test_fail_no_repayment() {
 fn test_admin_set_fee() {
     let env = Env::default();
     env.mock_all_auths();
-    let (admin, _, _, flash_loan_client, _, _) = setup_test(&env);
+    let (_admin, _, _, flash_loan_client, _, _) = setup_test(&env);
 
     flash_loan_client.set_fee(&100);
     assert_eq!(flash_loan_client.get_fee(), 100);
@@ -163,7 +191,7 @@ fn test_fail_non_admin_set_fee() {
     let env = Env::default();
     // No mock_all_auths, or we can manually check auth
     let (_, _, _, flash_loan_client, _, _) = setup_test(&env);
-    
+
     // This will fail because it's not the admin address calling it
     flash_loan_client.set_fee(&100);
 }
@@ -172,9 +200,10 @@ fn test_fail_non_admin_set_fee() {
 fn test_sequential_loans_work() {
     let env = Env::default();
     env.mock_all_auths();
-    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) = setup_test(&env);
+    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) =
+        setup_test(&env);
     let receiver_address = env.register(Receiver, ());
-    
+
     token_admin_client.mint(&flash_loan_address, &10000);
     token_admin_client.mint(&receiver_address, &100);
 
@@ -188,15 +217,18 @@ fn test_sequential_loans_work() {
 fn test_multiple_tokens() {
     let env = Env::default();
     env.mock_all_auths();
-    let (_, _, flash_loan_address, flash_loan_client, token_client1, token_admin_client1) = setup_test(&env);
-    
+    let (_, _, flash_loan_address, flash_loan_client, token_client1, token_admin_client1) =
+        setup_test(&env);
+
     let token_admin2 = Address::generate(&env);
-    let token_address2 = env.register_stellar_asset_contract_v2(token_admin2).address();
+    let token_address2 = env
+        .register_stellar_asset_contract_v2(token_admin2)
+        .address();
     let token_client2 = token::Client::new(&env, &token_address2);
     let token_admin_client2 = token::StellarAssetClient::new(&env, &token_address2);
 
     let receiver_address = env.register(Receiver, ());
-    
+
     token_admin_client1.mint(&flash_loan_address, &10000);
     token_admin_client2.mint(&flash_loan_address, &20000);
     token_admin_client1.mint(&receiver_address, &5);
@@ -213,9 +245,10 @@ fn test_multiple_tokens() {
 fn test_events_emitted() {
     let env = Env::default();
     env.mock_all_auths();
-    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) = setup_test(&env);
+    let (_, _, flash_loan_address, flash_loan_client, token_client, token_admin_client) =
+        setup_test(&env);
     let receiver_address = env.register(Receiver, ());
-    
+
     token_admin_client.mint(&flash_loan_address, &10000);
     token_admin_client.mint(&receiver_address, &5);
 
@@ -223,7 +256,7 @@ fn test_events_emitted() {
 
     let events = env.events().all();
     let last_event = events.events().last().unwrap();
-    
+
     let contract_id = last_event.contract_id.clone().unwrap();
     let sc_address = soroban_sdk::xdr::ScAddress::Contract(contract_id);
     let sc_val = soroban_sdk::xdr::ScVal::Address(sc_address);

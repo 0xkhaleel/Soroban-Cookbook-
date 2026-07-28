@@ -11,8 +11,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, IntoVal,
-    Symbol, TryIntoVal, Val, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Val,
+    Vec,
 };
 
 #[contracterror]

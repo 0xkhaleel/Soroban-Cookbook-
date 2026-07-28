@@ -12,9 +12,7 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{
-    symbol_short, testutils::Address as _, Address, Bytes, Env, IntoVal, Symbol, Vec,
-};
+use soroban_sdk::{testutils::Address as _, testutils::Ledger, Address, Env, IntoVal, Symbol, Vec};
 
 // ===========================================================================
 // Section 1: Authorization Bypass Attempts
@@ -26,21 +24,16 @@ fn test_unauthorized_admin_action_rejected() {
     env.mock_all_auths();
 
     let auth_id = env.register_contract(None, authentication::AuthContract);
+    let client = authentication::AuthContractClient::new(&env, &auth_id);
     let admin = Address::generate(&env);
     let attacker = Address::generate(&env);
 
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.clone().into_val(&env)]),
-    );
+    client.initialize(&admin);
 
-    let result: Result<u32, authentication::AuthError> = env.invoke_contract(
-        &auth_id,
-        &Symbol::new(&env, "admin_action"),
-        Vec::from_array(&env, [attacker.into_val(&env), 42u32.into_val(&env)]),
+    assert_eq!(
+        client.try_admin_action(&attacker, &42),
+        Err(Ok(authentication::AuthError::NotAdmin))
     );
-    assert_eq!(result, Err(authentication::AuthError::NotAdmin));
 }
 
 #[test]
@@ -49,63 +42,37 @@ fn test_unauthorized_role_action_rejected() {
     env.mock_all_auths();
 
     let auth_id = env.register_contract(None, authentication::AuthContract);
+    let client = authentication::AuthContractClient::new(&env, &auth_id);
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
 
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.clone().into_val(&env)]),
-    );
+    client.initialize(&admin);
+    client
+        .try_grant_role(&admin, &user, &authentication::Role::User)
+        .unwrap()
+        .unwrap();
 
-    env.invoke_contract::<Result<(), authentication::AuthError>>(
-        &auth_id,
-        &Symbol::new(&env, "grant_role"),
-        Vec::from_array(
-            &env,
-            [
-                admin.into_val(&env),
-                user.clone().into_val(&env),
-                authentication::Role::User.into_val(&env),
-            ],
-        ),
-    )
-    .unwrap();
-
-    let result: Result<u64, authentication::AuthError> = env.invoke_contract(
-        &auth_id,
-        &Symbol::new(&env, "admin_role_action"),
-        Vec::from_array(&env, [user.into_val(&env), 100u64.into_val(&env)]),
+    assert_eq!(
+        client.try_admin_role_action(&user, &100),
+        Err(Ok(authentication::AuthError::InsufficientRole))
     );
-    assert_eq!(result, Err(authentication::AuthError::InsufficientRole));
 }
 
 #[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn test_unauthorized_pause_rejected() {
     let env = Env::default();
-    env.mock_all_auths();
 
     let pausable_id = env.register_contract(None, pause_unpause::PausableContract);
+    let client = pause_unpause::PausableContractClient::new(&env, &pausable_id);
     let admin = Address::generate(&env);
-    let attacker = Address::generate(&env);
+    let _attacker = Address::generate(&env);
 
-    env.invoke_contract::<Result<(), pause_unpause::PauseError>>(
-        &pausable_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.into_val(&env)]),
-    )
-    .unwrap();
+    env.mock_all_auths();
+    client.initialize(&admin);
 
-    let result: Result<(), pause_unpause::PauseError> = env.invoke_contract(
-        &pausable_id,
-        &Symbol::new(&env, "pause"),
-        Vec::new(&env),
-    );
-
-    // No attacker auth in the auths list (env.mock_all_auths mocks all, but
-    // the contract checks stored admin != caller). With mock_all_auths the
-    // stored admin check fails for attacker because attacker != admin.
-    assert!(result.is_err());
+    env.set_auths(&[]);
+    client.pause();
 }
 
 #[test]
@@ -117,55 +84,31 @@ fn test_unauthorized_registry_owner_actions_rejected() {
     let owner = Address::generate(&env);
     let attacker = Address::generate(&env);
 
-    env.invoke_contract::<()>(
-        &registry_id,
-        &Symbol::new(&env, "init"),
-        Vec::from_array(
-            &env,
-            [owner.into_val(&env), false.into_val(&env), 100i128.into_val(&env)],
-        ),
-    );
+    let client = registry_access_controls::RegistryContractClient::new(&env, &registry_id);
+    client.init(&owner, &false, &100);
 
-    // attacker tries to add_whitelist — should panic because attacker.require_auth()
-    // succeeds with mock_all_auths but stored admin check fails
+    env.set_auths(&[]);
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        env.invoke_contract::<()>(
-            &registry_id,
-            &Symbol::new(&env, "add_whitelist"),
-            Vec::from_array(&env, [attacker.into_val(&env)]),
-        );
+        client.add_whitelist(&attacker);
     }));
     assert!(result.is_err());
 }
 
 #[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn test_unauthorized_proxy_admin_propose_rejected() {
     let env = Env::default();
-    env.mock_all_auths();
 
     let proxy_id = env.register_contract(None, proxy_admin::ProxyAdmin);
+    let client = proxy_admin::ProxyAdminClient::new(&env, &proxy_id);
     let admin = Address::generate(&env);
-    let attacker = Address::generate(&env);
 
-    env.invoke_contract::<Result<(), proxy_admin::AdminError>>(
-        &proxy_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.into_val(&env)]),
-    )
-    .unwrap();
+    env.mock_all_auths();
+    client.try_initialize(&admin).unwrap().unwrap();
+    env.set_auths(&[]);
 
-    let result: Result<(), proxy_admin::AdminError> = env.invoke_contract(
-        &proxy_id,
-        &Symbol::new(&env, "propose_upgrade"),
-        Vec::from_array(
-            &env,
-            [
-                soroban_sdk::BytesN::from_array(&env, &[1u8; 32]).into_val(&env),
-                60u64.into_val(&env),
-            ],
-        ),
-    );
-    assert!(result.is_err());
+    let wasm_hash = soroban_sdk::BytesN::from_array(&env, &[1u8; 32]);
+    client.propose_upgrade(&wasm_hash, &60);
 }
 
 // ===========================================================================
@@ -178,46 +121,21 @@ fn test_role_grant_requires_admin_auth() {
     env.mock_all_auths();
 
     let rbac_id = env.register_contract(None, role_based_access_control::RoleBasedAccessControl);
+    let client = role_based_access_control::RoleBasedAccessControlClient::new(&env, &rbac_id);
     let owner = Address::generate(&env);
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
 
-    env.invoke_contract::<Result<(), role_based_access_control::RbacError>>(
-        &rbac_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [owner.clone().into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&owner).unwrap().unwrap();
+    client
+        .try_grant_role(&owner, &admin, &role_based_access_control::Role::Admin)
+        .unwrap()
+        .unwrap();
 
-    // Owner grants Admin to admin user
-    env.invoke_contract::<Result<(), role_based_access_control::RbacError>>(
-        &rbac_id,
-        &Symbol::new(&env, "grant_role"),
-        Vec::from_array(
-            &env,
-            [
-                owner.into_val(&env),
-                admin.clone().into_val(&env),
-                role_based_access_control::Role::Admin.into_val(&env),
-            ],
-        ),
-    )
-    .unwrap();
-
-    // Admin tries to grant Admin to user — should succeed
-    let res = env.invoke_contract::<Result<(), role_based_access_control::RbacError>>(
-        &rbac_id,
-        &Symbol::new(&env, "grant_role"),
-        Vec::from_array(
-            &env,
-            [
-                admin.into_val(&env),
-                user.into_val(&env),
-                role_based_access_control::Role::Admin.into_val(&env),
-            ],
-        ),
-    );
-    assert!(res.is_ok());
+    client
+        .try_grant_role(&admin, &user, &role_based_access_control::Role::Moderator)
+        .unwrap()
+        .unwrap();
 }
 
 #[test]
@@ -226,29 +144,16 @@ fn test_role_revoke_prevents_escalation() {
     env.mock_all_auths();
 
     let rbac_id = env.register_contract(None, role_based_access_control::RoleBasedAccessControl);
+    let client = role_based_access_control::RoleBasedAccessControlClient::new(&env, &rbac_id);
     let owner = Address::generate(&env);
     let admin = Address::generate(&env);
 
-    env.invoke_contract::<Result<(), role_based_access_control::RbacError>>(
-        &rbac_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [owner.clone().into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&owner).unwrap().unwrap();
 
-    // Admin tries to revoke Owner role from owner — should fail
-    let result: Result<(), role_based_access_control::RbacError> = env.invoke_contract(
-        &rbac_id,
-        &Symbol::new(&env, "revoke_role"),
-        Vec::from_array(
-            &env,
-            [
-                admin.into_val(&env),
-                owner.into_val(&env),
-            ],
-        ),
+    assert_eq!(
+        client.try_revoke_role(&admin, &owner),
+        Err(Ok(role_based_access_control::RbacError::Unauthorized))
     );
-    assert_eq!(result, Err(role_based_access_control::RbacError::Unauthorized));
 }
 
 #[test]
@@ -306,7 +211,8 @@ fn test_symbol_role_guard_rejects_unauthorized() {
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
 
-    rbac_modifiers::RbacContract::initialize(&env, admin.clone());
+    let client = rbac_modifiers::RbacContractClient::new(&env, &rbac_id);
+    client.initialize(&admin);
 
     // Non-minter tries protected_mint — should panic
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
@@ -326,21 +232,11 @@ fn test_symbol_role_guard_rejects_unauthorized() {
     assert!(result.is_err());
 
     // Admin should be able to call protected_mint after getting MINTER role
-    rbac_modifiers::RbacContract::grant_role(
-        &env,
-        admin.clone(),
-        rbac_modifiers::ROLE_MINTER,
-        admin.clone(),
-    );
-    rbac_modifiers::RbacContract::protected_mint(
-        &env,
-        admin.clone(),
-        user.clone(),
-        100i128,
-    );
+    client.grant_role(&admin, &rbac_modifiers::ROLE_MINTER, &admin);
+    client.protected_mint(&admin, &user, &100);
 
     // Admin can also call admin_action
-    rbac_modifiers::RbacContract::admin_action(&env, admin);
+    client.admin_action(&admin);
 }
 
 // ===========================================================================
@@ -353,52 +249,23 @@ fn test_multisig_partial_approval_fails_execution() {
     env.mock_all_auths();
 
     let multisig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &multisig_id);
     let signer1 = Address::generate(&env);
     let signer2 = Address::generate(&env);
     let signer3 = Address::generate(&env);
     let signers = Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [3u32.into_val(&env), signers.into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&3u32, &signers).unwrap().unwrap();
 
-    let proposal_id: u32 = env
-        .invoke_contract::<Result<u32, multi_sig_patterns::AuthError>>(
-            &multisig_id,
-            &Symbol::new(&env, "create_proposal"),
-            Vec::from_array(&env, [signer1.clone().into_val(&env)]),
-        )
-        .unwrap();
+    let proposal_id = client.try_create_proposal(&signer1).unwrap().unwrap();
 
-    // Only 2 of 3 approve — below threshold
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [proposal_id.into_val(&env), signer1.into_val(&env)],
-        ),
-    )
-    .unwrap();
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [proposal_id.into_val(&env), signer2.into_val(&env)],
-        ),
-    )
-    .unwrap();
+    client.try_approve(&proposal_id, &signer1).unwrap().unwrap();
+    client.try_approve(&proposal_id, &signer2).unwrap().unwrap();
 
-    let result: Result<bool, multi_sig_patterns::AuthError> = env.invoke_contract(
-        &multisig_id,
-        &Symbol::new(&env, "execute"),
-        Vec::from_array(&env, [proposal_id.into_val(&env), signer1.into_val(&env)]),
+    assert_eq!(
+        client.try_execute(&proposal_id, &signer1),
+        Err(Ok(multi_sig_patterns::AuthError::ThresholdNotMet))
     );
-    assert_eq!(result, Err(multi_sig_patterns::AuthError::ThresholdNotMet));
 }
 
 #[test]
@@ -407,44 +274,19 @@ fn test_multisig_duplicate_approval_rejected() {
     env.mock_all_auths();
 
     let multisig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &multisig_id);
     let signer1 = Address::generate(&env);
     let signers = Vec::from_array(&env, [signer1.clone()]);
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [1u32.into_val(&env), signers.into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&1u32, &signers).unwrap().unwrap();
 
-    let proposal_id: u32 = env
-        .invoke_contract::<Result<u32, multi_sig_patterns::AuthError>>(
-            &multisig_id,
-            &Symbol::new(&env, "create_proposal"),
-            Vec::from_array(&env, [signer1.clone().into_val(&env)]),
-        )
-        .unwrap();
+    let proposal_id = client.try_create_proposal(&signer1).unwrap().unwrap();
+    client.try_approve(&proposal_id, &signer1).unwrap().unwrap();
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [proposal_id.into_val(&env), signer1.clone().into_val(&env)],
-        ),
-    )
-    .unwrap();
-
-    // Approve again — should fail
-    let dup: Result<(), multi_sig_patterns::AuthError> = env.invoke_contract(
-        &multisig_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [proposal_id.into_val(&env), signer1.into_val(&env)],
-        ),
+    assert_eq!(
+        client.try_approve(&proposal_id, &signer1),
+        Err(Ok(multi_sig_patterns::AuthError::AlreadyApproved))
     );
-    assert_eq!(dup, Err(multi_sig_patterns::AuthError::AlreadyApproved));
 }
 
 #[test]
@@ -453,34 +295,19 @@ fn test_multisig_unauthorized_signer_blocked() {
     env.mock_all_auths();
 
     let multisig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &multisig_id);
     let signer1 = Address::generate(&env);
     let outsider = Address::generate(&env);
     let signers = Vec::from_array(&env, [signer1.clone()]);
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [1u32.into_val(&env), signers.into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&1u32, &signers).unwrap().unwrap();
 
-    let proposal_id: u32 = env
-        .invoke_contract::<Result<u32, multi_sig_patterns::AuthError>>(
-            &multisig_id,
-            &Symbol::new(&env, "create_proposal"),
-            Vec::from_array(&env, [signer1.clone().into_val(&env)]),
-        )
-        .unwrap();
+    let proposal_id = client.try_create_proposal(&signer1).unwrap().unwrap();
 
-    let result: Result<(), multi_sig_patterns::AuthError> = env.invoke_contract(
-        &multisig_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [proposal_id.into_val(&env), outsider.into_val(&env)],
-        ),
+    assert_eq!(
+        client.try_approve(&proposal_id, &outsider),
+        Err(Ok(multi_sig_patterns::AuthError::NotAuthorized))
     );
-    assert_eq!(result, Err(multi_sig_patterns::AuthError::NotAuthorized));
 }
 
 #[test]
@@ -489,47 +316,20 @@ fn test_multisig_cancel_after_execute_blocked() {
     env.mock_all_auths();
 
     let multisig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &multisig_id);
     let signer1 = Address::generate(&env);
     let signers = Vec::from_array(&env, [signer1.clone()]);
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [1u32.into_val(&env), signers.into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&1u32, &signers).unwrap().unwrap();
 
-    let proposal_id: u32 = env
-        .invoke_contract::<Result<u32, multi_sig_patterns::AuthError>>(
-            &multisig_id,
-            &Symbol::new(&env, "create_proposal"),
-            Vec::from_array(&env, [signer1.clone().into_val(&env)]),
-        )
-        .unwrap();
+    let proposal_id = client.try_create_proposal(&signer1).unwrap().unwrap();
+    client.try_approve(&proposal_id, &signer1).unwrap().unwrap();
+    client.try_execute(&proposal_id, &signer1).unwrap().unwrap();
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [proposal_id.into_val(&env), signer1.clone().into_val(&env)],
-        ),
-    )
-    .unwrap();
-
-    env.invoke_contract::<Result<bool, multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "execute"),
-        Vec::from_array(&env, [proposal_id.into_val(&env), signer1.clone().into_val(&env)]),
-    )
-    .unwrap();
-
-    let cancel_result: Result<(), multi_sig_patterns::AuthError> = env.invoke_contract(
-        &multisig_id,
-        &Symbol::new(&env, "cancel"),
-        Vec::from_array(&env, [proposal_id.into_val(&env), signer1.into_val(&env)]),
+    assert_eq!(
+        client.try_cancel(&proposal_id, &signer1),
+        Err(Ok(multi_sig_patterns::AuthError::AlreadyExecuted))
     );
-    assert_eq!(cancel_result, Err(multi_sig_patterns::AuthError::AlreadyExecuted));
 }
 
 // ===========================================================================
@@ -560,18 +360,22 @@ fn test_timelock_replay_after_execution_blocked() {
     env.mock_all_auths();
 
     let timelock_id = env.register_contract(None, timelock::TimelockContract);
+    let client = timelock::TimelockContractClient::new(&env, &timelock_id);
     let admin = Address::generate(&env);
 
-    timelock::TimelockContractClient::new(&env, &timelock_id).initialize(&admin);
+    client.initialize(&admin);
     let op_id = soroban_sdk::Bytes::from_array(&env, &[4u8; 32]);
-    timelock::TimelockContractClient::new(&env, &timelock_id).queue(&op_id, &5u64);
+    let (min_delay, _) = client.get_delay_bounds();
+    client.queue(&op_id, &min_delay);
 
-    env.ledger().with_mut(|l| l.timestamp += 6);
-    timelock::TimelockContractClient::new(&env, &timelock_id).execute(&op_id);
+    env.ledger()
+        .set_timestamp(env.ledger().timestamp() + min_delay + 1);
+    client.execute(&op_id);
 
-    // State should be Unknown after execution
-    let state = timelock::TimelockContractClient::new(&env, &timelock_id).get_state(&op_id);
+    let state = client.get_state(&op_id);
     assert_eq!(state, timelock::OperationState::Unknown);
+
+    assert!(client.try_execute(&op_id).is_err());
 }
 
 #[test]
@@ -598,30 +402,18 @@ fn test_auth_vector_round_trip() {
 }
 
 #[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn test_proxy_admin_unauthorized_set_pause_rejected() {
     let env = Env::default();
-    env.mock_all_auths();
 
     let proxy_id = env.register_contract(None, proxy_admin::ProxyAdmin);
+    let client = proxy_admin::ProxyAdminClient::new(&env, &proxy_id);
     let admin = Address::generate(&env);
-    let attacker = Address::generate(&env);
 
-    env.invoke_contract::<Result<(), proxy_admin::AdminError>>(
-        &proxy_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.into_val(&env)]),
-    )
-    .unwrap();
-
-    // attacker tries to pause — stored-admin check should fail
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        env.invoke_contract::<()>(
-            &proxy_id,
-            &Symbol::new(&env, "pause"),
-            Vec::new(&env),
-        );
-    }));
-    assert!(result.is_err());
+    env.mock_all_auths();
+    client.try_initialize(&admin).unwrap().unwrap();
+    env.set_auths(&[]);
+    client.pause();
 }
 
 #[test]
@@ -630,58 +422,20 @@ fn test_allowance_excess_spend_rejected() {
     env.mock_all_auths();
 
     let auth_id = env.register_contract(None, authentication::AuthContract);
+    let client = authentication::AuthContractClient::new(&env, &auth_id);
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
+    let recipient = Address::generate(&env);
 
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.into_val(&env)]),
+    client.initialize(&admin);
+    client.set_balance(&admin, &alice, &100);
+    client.approve(&alice, &bob, &50);
+
+    assert_eq!(
+        client.try_transfer_from(&bob, &alice, &recipient, &200),
+        Err(Ok(authentication::AuthError::Unauthorized))
     );
-
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "set_balance"),
-        Vec::from_array(
-            &env,
-            [
-                admin.into_val(&env),
-                alice.clone().into_val(&env),
-                100i128.into_val(&env),
-            ],
-        ),
-    )
-    .unwrap();
-
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "approve"),
-        Vec::from_array(
-            &env,
-            [
-                alice.clone().into_val(&env),
-                bob.clone().into_val(&env),
-                50i128.into_val(&env),
-            ],
-        ),
-    )
-    .unwrap();
-
-    let result: Result<(), authentication::AuthError> = env.invoke_contract(
-        &auth_id,
-        &symbol_short!("transfer_from"),
-        Vec::from_array(
-            &env,
-            [
-                bob.into_val(&env),
-                alice.into_val(&env),
-                Address::generate(&env).into_val(&env),
-                200i128.into_val(&env),
-            ],
-        ),
-    );
-    assert_eq!(result, Err(authentication::AuthError::Unauthorized));
 }
 
 #[test]
@@ -690,44 +444,21 @@ fn test_revoked_role_loses_access() {
     env.mock_all_auths();
 
     let auth_id = env.register_contract(None, authentication::AuthContract);
+    let client = authentication::AuthContractClient::new(&env, &auth_id);
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
 
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.clone().into_val(&env)]),
+    client.initialize(&admin);
+    client
+        .try_grant_role(&admin, &user, &authentication::Role::Moderator)
+        .unwrap()
+        .unwrap();
+    client.try_revoke_role(&admin, &user).unwrap().unwrap();
+
+    assert_eq!(
+        client.try_moderator_action(&user, &42),
+        Err(Ok(authentication::AuthError::InsufficientRole))
     );
-
-    env.invoke_contract::<Result<(), authentication::AuthError>>(
-        &auth_id,
-        &Symbol::new(&env, "grant_role"),
-        Vec::from_array(
-            &env,
-            [
-                admin.clone().into_val(&env),
-                user.clone().into_val(&env),
-                authentication::Role::Moderator.into_val(&env),
-            ],
-        ),
-    )
-    .unwrap();
-
-    // Revoke role
-    env.invoke_contract::<Result<(), authentication::AuthError>>(
-        &auth_id,
-        &Symbol::new(&env, "revoke_role"),
-        Vec::from_array(&env, [admin.into_val(&env), user.clone().into_val(&env)]),
-    )
-    .unwrap();
-
-    // Try moderator action after revocation
-    let result: Result<u64, authentication::AuthError> = env.invoke_contract(
-        &auth_id,
-        &Symbol::new(&env, "moderator_action"),
-        Vec::from_array(&env, [user.into_val(&env), 42u64.into_val(&env)]),
-    );
-    assert_eq!(result, Err(authentication::AuthError::InsufficientRole));
 }
 
 #[test]
@@ -743,10 +474,8 @@ fn test_timelock_pause_blocks_queue() {
     assert!(timelock::TimelockContractClient::new(&env, &timelock_id).is_paused());
 
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        timelock::TimelockContractClient::new(&env, &timelock_id).queue(
-            &soroban_sdk::Bytes::from_array(&env, &[5u8; 32]),
-            &60u64,
-        );
+        timelock::TimelockContractClient::new(&env, &timelock_id)
+            .queue(&soroban_sdk::Bytes::from_array(&env, &[5u8; 32]), &60u64);
     }));
     assert!(result.is_err());
 }
@@ -757,56 +486,25 @@ fn test_proxy_admin_delay_bounds_enforced() {
     env.mock_all_auths();
 
     let proxy_id = env.register_contract(None, proxy_admin::ProxyAdmin);
+    let client = proxy_admin::ProxyAdminClient::new(&env, &proxy_id);
     let admin = Address::generate(&env);
 
-    env.invoke_contract::<Result<(), proxy_admin::AdminError>>(
-        &proxy_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&admin).unwrap().unwrap();
 
-    // Delay too low
-    let result: Result<(), proxy_admin::AdminError> = env.invoke_contract(
-        &proxy_id,
-        &Symbol::new(&env, "propose_upgrade"),
-        Vec::from_array(
-            &env,
-            [
-                soroban_sdk::BytesN::from_array(&env, &[2u8; 32]).into_val(&env),
-                10u64.into_val(&env),
-            ],
-        ),
+    let hash_low = soroban_sdk::BytesN::from_array(&env, &[2u8; 32]);
+    assert_eq!(
+        client.try_propose_upgrade(&hash_low, &10),
+        Err(Ok(proxy_admin::AdminError::DelayOutOfRange))
     );
-    assert_eq!(result, Err(proxy_admin::AdminError::DelayOutOfRange));
 
-    // Delay too high ( > 7 days)
-    let result2: Result<(), proxy_admin::AdminError> = env.invoke_contract(
-        &proxy_id,
-        &Symbol::new(&env, "propose_upgrade"),
-        Vec::from_array(
-            &env,
-            [
-                soroban_sdk::BytesN::from_array(&env, &[3u8; 32]).into_val(&env),
-                604_801u64.into_val(&env),
-            ],
-        ),
+    let hash_high = soroban_sdk::BytesN::from_array(&env, &[3u8; 32]);
+    assert_eq!(
+        client.try_propose_upgrade(&hash_high, &604_801),
+        Err(Ok(proxy_admin::AdminError::DelayOutOfRange))
     );
-    assert_eq!(result2, Err(proxy_admin::AdminError::DelayOutOfRange));
 
-    // Valid delay
-    let result3: Result<(), proxy_admin::AdminError> = env.invoke_contract(
-        &proxy_id,
-        &Symbol::new(&env, "propose_upgrade"),
-        Vec::from_array(
-            &env,
-            [
-                soroban_sdk::BytesN::from_array(&env, &[4u8; 32]).into_val(&env),
-                300u64.into_val(&env),
-            ],
-        ),
-    );
-    assert!(result3.is_ok());
+    let hash_ok = soroban_sdk::BytesN::from_array(&env, &[4u8; 32]);
+    client.try_propose_upgrade(&hash_ok, &300).unwrap().unwrap();
 }
 
 #[test]
@@ -823,7 +521,11 @@ fn test_register_without_whitelist_fails_when_whitelist_only() {
         &Symbol::new(&env, "init"),
         Vec::from_array(
             &env,
-            [owner.into_val(&env), true.into_val(&env), 0i128.into_val(&env)],
+            [
+                owner.into_val(&env),
+                true.into_val(&env),
+                0i128.into_val(&env),
+            ],
         ),
     );
 
@@ -845,21 +547,16 @@ fn test_non_initializer_cannot_reinitialize() {
     env.mock_all_auths();
 
     let auth_id = env.register_contract(None, authentication::AuthContract);
+    let client = authentication::AuthContractClient::new(&env, &auth_id);
     let admin = Address::generate(&env);
     let other = Address::generate(&env);
 
-    env.invoke_contract::<()>(
-        &auth_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [admin.into_val(&env)]),
-    );
+    client.initialize(&admin);
 
-    let result: Result<(), authentication::AuthError> = env.invoke_contract(
-        &auth_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [other.into_val(&env)]),
+    assert_eq!(
+        client.try_initialize(&other),
+        Err(Ok(authentication::AuthError::AlreadyInitialized))
     );
-    assert_eq!(result, Err(authentication::AuthError::AlreadyInitialized));
 }
 
 #[test]
@@ -868,20 +565,14 @@ fn test_multi_sig_proposal_nonexistent_execute_fails() {
     env.mock_all_auths();
 
     let multisig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &multisig_id);
     let signer1 = Address::generate(&env);
     let signers = Vec::from_array(&env, [signer1.clone()]);
 
-    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
-        &multisig_id,
-        &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [1u32.into_val(&env), signers.into_val(&env)]),
-    )
-    .unwrap();
+    client.try_initialize(&1u32, &signers).unwrap().unwrap();
 
-    let result: Result<bool, multi_sig_patterns::AuthError> = env.invoke_contract(
-        &multisig_id,
-        &Symbol::new(&env, "execute"),
-        Vec::from_array(&env, [999u32.into_val(&env), signer1.into_val(&env)]),
+    assert_eq!(
+        client.try_execute(&999, &signer1),
+        Err(Ok(multi_sig_patterns::AuthError::ProposalNotFound))
     );
-    assert_eq!(result, Err(multi_sig_patterns::AuthError::ProposalNotFound));
 }

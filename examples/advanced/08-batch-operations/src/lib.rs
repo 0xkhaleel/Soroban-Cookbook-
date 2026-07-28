@@ -32,7 +32,7 @@ pub enum BatchError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum OpStatus {
     Applied,
-    Skipped(BatchError),
+    Skipped(u32),
 }
 
 #[contracttype]
@@ -52,7 +52,9 @@ impl BatchOperations {
         if amount < 0 {
             return Err(BatchError::InvalidAmount);
         }
-        env.storage().instance().set(&DataKey::Balance(user), &amount);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(user), &amount);
         Ok(())
     }
 
@@ -64,7 +66,10 @@ impl BatchOperations {
     }
 
     pub fn is_paused(env: Env) -> bool {
-        env.storage().instance().get(&DataKey::Paused).unwrap_or(false)
+        env.storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false)
     }
 
     pub fn execute_batch_atomic(
@@ -96,7 +101,7 @@ impl BatchOperations {
                     applied += 1;
                 }
                 Err(err) => {
-                    statuses.push_back(OpStatus::Skipped(err));
+                    statuses.push_back(OpStatus::Skipped(err as u32));
                     failed += 1;
                 }
             }
@@ -129,7 +134,9 @@ impl BatchOperations {
             .checked_add(amount)
             .ok_or(BatchError::ArithmeticOverflow)?;
 
-        env.storage().instance().set(&DataKey::Balance(user), &updated);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(user), &updated);
         Ok(())
     }
 
@@ -145,7 +152,9 @@ impl BatchOperations {
             .checked_sub(amount)
             .ok_or(BatchError::ArithmeticOverflow)?;
 
-        env.storage().instance().set(&DataKey::Balance(user), &updated);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(user), &updated);
         Ok(())
     }
 
@@ -165,8 +174,12 @@ impl BatchOperations {
             .checked_add(amount)
             .ok_or(BatchError::ArithmeticOverflow)?;
 
-        env.storage().instance().set(&DataKey::Balance(from), &next_from);
-        env.storage().instance().set(&DataKey::Balance(to), &next_to);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(from), &next_from);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(to), &next_to);
         Ok(())
     }
 
@@ -222,14 +235,18 @@ impl BatchOperations {
         snapshot_balances: Vec<i128>,
         paused_before: bool,
     ) {
-        env.storage().instance().set(&DataKey::Paused, &paused_before);
+        env.storage()
+            .instance()
+            .set(&DataKey::Paused, &paused_before);
 
         let len = tracked_accounts.len();
         let mut i = 0;
         while i < len {
             let account = tracked_accounts.get(i).unwrap();
             let balance = snapshot_balances.get(i).unwrap();
-            env.storage().instance().set(&DataKey::Balance(account), &balance);
+            env.storage()
+                .instance()
+                .set(&DataKey::Balance(account), &balance);
             i += 1;
         }
     }
