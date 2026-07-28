@@ -62,13 +62,13 @@ fn require_not_paused(env: &Env) -> Result<(), PauseError> {
 }
 ```
 ### Storage Migration [./storage-migration/](../examples/intermediate/storage-migration/)
-**Versioned storage upgrades.** Stage migrations, transform legacy storage, and execute in safe batches.
+**Versioned storage upgrades.** Stage migrations, transform legacy storage, and execute in safe batches with explicit version checks and rollback-friendly state.
 
 **Key Concepts:**
-- Explicit version tracking
-- Prepared migration state
-- Chunked batch execution
-- Safe rollback/cancellation
+- Explicit version tracking with guarded upgrade paths
+- Prepared migration state for staged, batched execution
+- Concrete legacy-to-new data transforms such as `migrate_v1_to_v2()`
+- Safe rollback/cancellation and migration-safety tests
 
 ### Event History [./event-history/](../examples/intermediate/event-history/)
 **On-chain audit history.** Record event entries persistently and query them with cursor-based pagination and time filters.
