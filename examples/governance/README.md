@@ -2,6 +2,12 @@
 
 Decentralized governance systems, DAO frameworks, and treasury management implementations on Soroban.
 
+## 📂 Examples
+
+### [01-delegation-marketplace](./01-delegation-marketplace/)
+A marketplace for listing and renting voting power with incentive mechanisms.
+- **Concepts:** `require_auth()`, persistent storage, typed errors, event topics, fee transfer.
+
 ## 📂 Example Categories
 
 ### Voting Systems
