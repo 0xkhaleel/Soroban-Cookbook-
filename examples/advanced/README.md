@@ -18,6 +18,7 @@ This category contains examples of complex systems and advanced architectural pa
 - [`03-data-aggregation-oracle`](./03-data-aggregation-oracle/) — Data aggregation with manipulation detection and outlier filtering (Phase 5)
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with freshness checks
 - [`05-bridge-security`](./05-bridge-security/) — Rate limiting, pause, challenge window, and fraud-proof patterns for bridge releases
+- [`05-rate-limiting`](./05-rate-limiting/) — Per-user time- and amount-based rate limiting with admin overrides
 - [`06-beacon-management`](./06-beacon-management/) — Versioned beacon management with rollback support
 
 ## Planned Examples
