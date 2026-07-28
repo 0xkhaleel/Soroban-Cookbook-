@@ -9,6 +9,7 @@ This category contains examples related to on-chain governance, including Decent
 | 01 | [simple-voting](./01-simple-voting/) | Proposal creation, one-address-one-vote, time-based deadlines, vote tallying, execution |
 | 02 | [voting-time-constraints](./01-voting-time-constraints/) | Voting periods, proposal deadlines, grace periods, early closure |
 | 06 | [timelock-governance](./06-timelock-governance/) | Proposal queue, mandatory delays, veto, emergency execution |
+| 07 | [automatic-snapshot-triggers](./07-automatic-snapshot-triggers/) | Time-based & event-based snapshots, snapshot pruning, gas-efficient storage |
 
 ## Examples
 
