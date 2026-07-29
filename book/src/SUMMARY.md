@@ -108,6 +108,12 @@
 - [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Monthly Call Governance](../GOVERNANCE/README.md)
+  - [Agenda Template](../GOVERNANCE/monthly-call-agenda-template.md)
+  - [Format Guidelines](../GOVERNANCE/monthly-call-format-guidelines.md)
+  - [Moderation Guide](../GOVERNANCE/monthly-call-moderation-guide.md)
+  - [Q&A Process](../GOVERNANCE/monthly-call-qa-process.md)
+  - [Follow-up Process](../GOVERNANCE/monthly-call-followup-process.md)
 
 # Architecture Decisions
 
