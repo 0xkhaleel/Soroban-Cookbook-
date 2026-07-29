@@ -36,10 +36,23 @@ We commit to:
 
 For more details, see the [Feedback System Documentation](docs/feedback-system/README.md).
 
+## Monthly Community Call Governance
+
+The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates and governance documents are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
+
+- [Agenda Template](./GOVERNANCE/monthly-call-agenda-template.md)
+- [Format Guidelines](./GOVERNANCE/monthly-call-format-guidelines.md)
+- [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
+- [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md)
+- [Follow-up Process](./GOVERNANCE/monthly-call-followup-process.md)
+
+To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
+
 ---
 
 ## 📍 Table of Contents
 - [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
+- [Monthly Community Call Governance](#monthly-community-call-governance)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
