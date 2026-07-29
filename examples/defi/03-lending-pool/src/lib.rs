@@ -95,6 +95,10 @@ impl LendingPool {
             panic!("insufficient deposit");
         }
         position.deposit -= amount;
+        let max_borrow = position.deposit * 80 / 100;
+        if position.borrow > max_borrow {
+            panic!("insufficient collateral remaining");
+        }
         positions.set(user, position);
 
         let mut total_deposits: i128 = env
