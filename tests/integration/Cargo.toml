@@ -70,3 +70,5 @@ queue_variants = { path = "../../examples/basics/13-queue-variants", package = "
 event_filtering = { path = "../../examples/basics/14-event-filtering", package = "event_filtering" }
 fifo_queue = { path = "../../examples/basics/14-fifo-queue", package = "fifo-queue" }
 lazy_cache = { path = "../../examples/basics/lazy-cache", package = "lazy_cache" }
+version_registry = { path = "../../examples/advanced/11-version-registry", package = "version-registry" }
+storage_optimization = { path = "../../examples/advanced/09-storage-optimization", package = "storage-optimization" }

@@ -2,7 +2,7 @@
 
 Complex protocols & optimizations for production systems.
 
-## 📋 Examples (2 currently)
+## 📋 Examples (5 currently)
 
 ### [01-multi-party-auth](../examples/advanced/01-multi-party-auth/)
 **Advanced multi-party authorization** beyond simple multisig.
@@ -67,6 +67,34 @@ let value = client.get_value_strict(); // errors if stale
 - Access control per facet (restricting direct execution to proxy)
 - Upgrade checks & interface supports verification
 - Namespaced key isolation to prevent shared storage collisions
+
+### [11-version-registry](../examples/advanced/11-version-registry/)
+**Contract version tracking** with history and rollback support.
+
+**Key Concepts:**
+- Version registration with metadata
+- Per-contract version history
+- Admin-controlled rollback
+
+---
+
+### [08-batch-operations](../examples/advanced/08-batch-operations/)
+**Batch operations** with atomic and partial execution.
+
+**Key Concepts:**
+- Batch call interface
+- Atomic execution with rollback
+- Partial execution mode
+
+---
+
+### [09-storage-optimization](../examples/advanced/09-storage-optimization/)
+**Storage optimization** patterns for efficient contracts.
+
+**Key Concepts:**
+- Packed storage (grouping fields)
+- Lazy loading patterns
+- Batch operations
 
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
