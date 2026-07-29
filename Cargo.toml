@@ -13,6 +13,7 @@ members = [
     "examples/advanced/05-diamond-security",
     "examples/advanced/05-diamond-security/facet-adder",
     "examples/advanced/05-diamond-security/facet-multiplier",
+    "examples/advanced/07-trusted-forwarder",
     "examples/tokens/06-token-wrapper",
     "examples/tokens/03-optimized-operations",
     "examples/governance/01-vote-delegation",
