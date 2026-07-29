@@ -9,6 +9,7 @@ members = [
     "examples/intermediate/multi-sig-patterns",
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-timelock",
+    "examples/advanced/03-permit-pattern",
     "examples/advanced/05-diamond-security",
     "examples/advanced/05-diamond-security/facet-adder",
     "examples/advanced/05-diamond-security/facet-multiplier",
