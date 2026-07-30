@@ -65,6 +65,7 @@
 
 ## Governance (3 examples)
 - [Overview](./examples/governance.md)
+- [Governance Patterns Guide](./docs/governance-patterns.md)
 - [01 · Simple Voting](./examples/governance/01-simple-voting.md)
 - [02 · Voting Time Constraints](./examples/governance/02-voting-time-constraints.md)
 - [03 · Proposal Lifecycle](./examples/governance/03-proposal-lifecycle.md)
