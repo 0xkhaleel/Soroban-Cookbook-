@@ -19,6 +19,9 @@ This category contains examples of complex systems and advanced architectural pa
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with freshness checks
 - [`05-bridge-security`](./05-bridge-security/) — Rate limiting, pause, challenge window, and fraud-proof patterns for bridge releases
 - [`06-beacon-management`](./06-beacon-management/) — Versioned beacon management with rollback support
+- [`07-upgrade-patterns`](./07-upgrade-patterns/) — Direct WASM upgrade, versioned storage migration, init guards
+- [`09-fuzz-testing`](./09-fuzz-testing/) — Fuzzable claimable-balance contract with property tests and cargo-fuzz targets
+- [`10-contract-migrations`](./10-contract-migrations/) — Batched v1→v2 storage migration with dual-read and version gates
 
 ## Planned Examples
 

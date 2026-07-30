@@ -46,6 +46,17 @@ The integration tests combine multiple basic examples to showcase real-world usa
    - Combines the token wrapper with a Stellar asset token
    - Demonstrates multi-user wrapping, transfer, unwrapping, and backing checks
 
+## Token Integration Tests (`token_integration_tests.rs`)
+
+Cross-crate flows spanning multiple token examples (Issue #119):
+
+1. **SEP-41 + Mint/Burn + Pausable** (`test_sep41_mint_burn_pausable_multi_user`)
+   - Multi-user mint, transfer, allowance, supply-cap, and pause edge cases
+2. **Wrapper + Vesting** (`test_wrapper_and_vesting_cross_contract_flow`)
+   - Shared underlying asset, wrap/unwrap alongside timed vesting claims
+3. **Edge Cases** (`test_token_edge_cases_across_contracts`)
+   - Zero amounts, overdraft, and pause-already-in-state across contracts
+
 ## Governance Integration Tests (`governance_tests.rs`)
 
 30 tests across 8 categories covering the complete governance stack. All tests use
