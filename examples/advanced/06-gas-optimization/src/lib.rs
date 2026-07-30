@@ -124,14 +124,14 @@ fn save_config(env: &Env, config: &Config) {
 fn read_balance(env: &Env, account: &Address) -> i128 {
     env.storage()
         .persistent()
-        .get(&DataKey::Balance(account.clone()))
+        .get(&DataKey::Balance(*account))
         .unwrap_or(0)
 }
 
 fn write_balance(env: &Env, account: &Address, amount: i128) {
     env.storage()
         .persistent()
-        .set(&DataKey::Balance(account.clone()), &amount);
+        .set(&DataKey::Balance(*account), &amount);
 }
 
 // ---------------------------------------------------------------------------
@@ -234,7 +234,7 @@ impl GasOptimizationContract {
     /// Pause the contract (admin only).
     pub fn pause(env: Env) -> Result<(), ContractError> {
         let mut config = load_config(&env);
-        config.admin.clone().require_auth();
+        config.admin.require_auth();
         config.set_paused(true);
         save_config(&env, &config);
         Ok(())
@@ -243,7 +243,7 @@ impl GasOptimizationContract {
     /// Unpause the contract (admin only).
     pub fn unpause(env: Env) -> Result<(), ContractError> {
         let mut config = load_config(&env);
-        config.admin.clone().require_auth();
+        config.admin.require_auth();
         config.set_paused(false);
         save_config(&env, &config);
         Ok(())
@@ -255,7 +255,7 @@ impl GasOptimizationContract {
     /// making reads and comparisons significantly cheaper.
     pub fn set_emergency(env: Env, emergency: bool) -> Result<(), ContractError> {
         let mut config = load_config(&env);
-        config.admin.clone().require_auth();
+        config.admin.require_auth();
         config.set_emergency(emergency);
         save_config(&env, &config);
         Ok(())
