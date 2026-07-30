@@ -86,7 +86,6 @@ pub struct GasOptimizationContract;
 /// Instance storage is cheaper than persistent and sufficient for config
 /// Symbol interning: symbol_short! creates efficient short symbols
 const CONFIG_KEY: Symbol = symbol_short!("cfg");
-const BALANCE_MULTIPLIER: u64 = 1_000_000; // Fixed decimal places (avoid floating point)
 
 #[contractimpl]
 impl GasOptimizationContract {
@@ -129,20 +128,30 @@ impl GasOptimizationContract {
             return Err(Error::Paused);
         }
 
+        // Optimization 5: Use typed enum state — block transfers during emergency
+        if config.is_emergency() {
+            return Err(Error::EmergencyMode);
+        }
+
         // Optimization 10: Use typed errors for efficient error handling
         if amount == 0 {
             return Err(Error::InvalidAmount);
         }
 
         // Optimization 6: Single read for from balance
-        let from_balance: u64 = env.storage().persistent().get(&DataKey::Balance(from.clone())).unwrap_or(0);
+        let from_balance: u64 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(from.clone()))
+            .unwrap_or(0);
 
         if from_balance < amount {
             return Err(Error::InsufficientBalance);
         }
 
         // Optimization 8: Use checked arithmetic
-        let new_from_balance = from_balance.checked_sub(amount).ok_or(Error::InvalidAmount)?;
+        let new_from_balance =
+            from_balance.checked_sub(amount).ok_or(Error::InvalidAmount)?;
 
         // Calculate fee (using integer arithmetic, no floating point)
         let fee = (amount * config.fee_bps as u64) / 10_000;
@@ -154,8 +163,13 @@ impl GasOptimizationContract {
             .persistent()
             .set(&DataKey::Balance(from.clone()), &new_from_balance);
 
-        let to_balance: u64 = env.storage().persistent().get(&DataKey::Balance(to.clone())).unwrap_or(0);
-        let new_to_balance = to_balance.checked_add(to_amount).ok_or(Error::InvalidAmount)?;
+        let to_balance: u64 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(to.clone()))
+            .unwrap_or(0);
+        let new_to_balance =
+            to_balance.checked_add(to_amount).ok_or(Error::InvalidAmount)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &new_to_balance);
@@ -180,7 +194,11 @@ impl GasOptimizationContract {
     ) -> soroban_sdk::Vec<u64> {
         let mut balances = soroban_sdk::Vec::new(&env);
         for account in accounts.iter() {
-            let balance = env.storage().persistent().get(&DataKey::Balance(account.clone())).unwrap_or(0);
+            let balance = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Balance(account.clone()))
+                .unwrap_or(0);
             balances.push_back(balance);
         }
         balances
@@ -239,7 +257,10 @@ impl GasOptimizationContract {
 
     /// Optimization 3: Batch initialization of multiple accounts
     /// More efficient than calling transfer multiple times
-    pub fn batch_mint(env: Env, recipients: soroban_sdk::Vec<(soroban_sdk::Address, u64)>) -> Result<(), Error> {
+    pub fn batch_mint(
+        env: Env,
+        recipients: soroban_sdk::Vec<(soroban_sdk::Address, u64)>,
+    ) -> Result<(), Error> {
         let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
             flags: 0,
             fee_bps: 0,
@@ -251,8 +272,13 @@ impl GasOptimizationContract {
         // Optimization 3: Write all balances in one batch
         for (recipient, amount) in recipients.iter() {
             if amount > 0 {
-                let current_balance: u64 = env.storage().persistent().get(&DataKey::Balance(recipient.clone())).unwrap_or(0);
-                let new_balance = current_balance.checked_add(amount).ok_or(Error::InvalidAmount)?;
+                let current_balance: u64 = env
+                    .storage()
+                    .persistent()
+                    .get(&DataKey::Balance(recipient.clone()))
+                    .unwrap_or(0);
+                let new_balance =
+                    current_balance.checked_add(amount).ok_or(Error::InvalidAmount)?;
                 env.storage()
                     .persistent()
                     .set(&DataKey::Balance(recipient.clone()), &new_balance);
@@ -263,7 +289,10 @@ impl GasOptimizationContract {
     }
 
     /// Optimization 3: Batch burn operation
-    pub fn batch_burn(env: Env, accounts: soroban_sdk::Vec<(soroban_sdk::Address, u64)>) -> Result<(), Error> {
+    pub fn batch_burn(
+        env: Env,
+        accounts: soroban_sdk::Vec<(soroban_sdk::Address, u64)>,
+    ) -> Result<(), Error> {
         let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
             flags: 0,
             fee_bps: 0,
@@ -274,7 +303,11 @@ impl GasOptimizationContract {
 
         // Optimization 3: Process all burns efficiently
         for (account, amount) in accounts.iter() {
-            let current_balance: u64 = env.storage().persistent().get(&DataKey::Balance(account.clone())).unwrap_or(0);
+            let current_balance: u64 = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Balance(account.clone()))
+                .unwrap_or(0);
             if current_balance < amount {
                 return Err(Error::InsufficientBalance);
             }
