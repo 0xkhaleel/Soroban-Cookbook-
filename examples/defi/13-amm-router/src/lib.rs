@@ -79,7 +79,7 @@ impl AMMRouter {
         amount_in: i128,
         amount_out_min: i128,
         path: Vec<Address>,
-        to: Address,
+        _to: Address,
         deadline: u64,
     ) -> i128 {
         user.require_auth();
@@ -93,7 +93,7 @@ impl AMMRouter {
         }
 
         let mut current_amount = amount_in;
-        let mut current_token = path.get(0).unwrap();
+        let mut _current_token = path.get(0).unwrap();
 
         for i in 0..path.len() - 1 {
             let token_in = path.get(i).unwrap();
@@ -107,7 +107,7 @@ impl AMMRouter {
             };
 
             current_amount = Self::calculate_swap_output(reserve_in, reserve_out, current_amount);
-            current_token = token_out;
+            _current_token = token_out;
         }
 
         if current_amount < amount_out_min {

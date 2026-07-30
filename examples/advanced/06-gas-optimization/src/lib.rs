@@ -22,7 +22,7 @@ use soroban_sdk::{
 
 /// DataKey enum for typed, efficient storage access.
 ///
-/// Optimization 1: No explicit discriminants on tuple variants —
+/// Optimization 1: no explicit discriminants on tuple variants —
 /// `#[contracttype]` does not support mixing explicit integer discriminants
 /// with tuple variants.
 #[contracttype]
@@ -36,26 +36,26 @@ pub enum DataKey {
     SessionCache(u64),
 }
 
-/// Optimization 11: Bitflags for boolean state (packs multiple booleans into
-/// a single `u32`, which is one Soroban-compatible storage word).
+/// Optimization 11: bitflags pack multiple booleans into a single `u32`,
+/// which is one Soroban-compatible storage word.
 #[contracttype]
 #[derive(Clone)]
 pub struct Config {
-    /// Packed flags: bit 0 = paused, bit 1 = emergency_mode, bits 2–31 reserved
+    /// Packed flags: bit 0 = paused, bit 1 = emergency_mode, bits 2-31 reserved
     pub flags: u32,
-    /// Fee rate in basis points using `u32` (Soroban does not support `u16` in
-    /// contract types — use `u32` and enforce the range in application logic).
+    /// Fee rate in basis points.  Uses `u32` because Soroban does not provide
+    /// `TryFromVal` for `u16`; range enforcement happens in application logic.
     pub fee_bps: u32,
     /// Administrator address
     pub admin: Address,
 }
 
 impl Config {
-    fn is_paused(&self) -> bool {
+    pub fn is_paused(&self) -> bool {
         (self.flags & 0x01) != 0
     }
 
-    fn set_paused(&mut self, paused: bool) {
+    pub fn set_paused(&mut self, paused: bool) {
         if paused {
             self.flags |= 0x01;
         } else {
@@ -63,11 +63,11 @@ impl Config {
         }
     }
 
-    fn is_emergency(&self) -> bool {
+    pub fn is_emergency(&self) -> bool {
         (self.flags & 0x02) != 0
     }
 
-    fn set_emergency(&mut self, emergency: bool) {
+    pub fn set_emergency(&mut self, emergency: bool) {
         if emergency {
             self.flags |= 0x02;
         } else {
@@ -76,11 +76,11 @@ impl Config {
     }
 }
 
-/// Optimization 10: Typed errors via `#[contracterror]` are more efficient
+/// Optimization 10: typed errors via `#[contracterror]` are more efficient
 /// than string panics and let callers pattern-match on specific failure modes.
 ///
 /// Note: the type cannot be named `Error` because that conflicts with a
-/// reserved name inside the Soroban SDK macros.
+/// reserved name inside the Soroban SDK macros; use `ContractError` instead.
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
@@ -99,38 +99,67 @@ pub struct GasOptimizationContract;
 /// that is cheaper to compare and store than a heap-allocated string.
 const CONFIG_KEY: Symbol = symbol_short!("cfg");
 
+// ---------------------------------------------------------------------------
+// Private helpers
+// ---------------------------------------------------------------------------
+
+/// Load config from instance storage, falling back to a zeroed default keyed
+/// on the current contract address.  Centralising the load avoids repeated
+/// multi-line `get(&CONFIG_KEY).unwrap_or(Config { … })` expressions.
+fn load_config(env: &Env) -> Config {
+    env.storage()
+        .instance()
+        .get(&CONFIG_KEY)
+        .unwrap_or(Config {
+            flags: 0,
+            fee_bps: 0,
+            admin: env.current_contract_address(),
+        })
+}
+
+fn save_config(env: &Env, config: &Config) {
+    env.storage().instance().set(&CONFIG_KEY, config);
+}
+
+fn read_balance(env: &Env, account: &Address) -> i128 {
+    env.storage()
+        .persistent()
+        .get(&DataKey::Balance(account.clone()))
+        .unwrap_or(0)
+}
+
+fn write_balance(env: &Env, account: &Address, amount: i128) {
+    env.storage()
+        .persistent()
+        .set(&DataKey::Balance(account.clone()), &amount);
+}
+
+// ---------------------------------------------------------------------------
+// Contract implementation
+// ---------------------------------------------------------------------------
+
 #[contractimpl]
 impl GasOptimizationContract {
     /// Initialize contract config once.
     ///
-    /// Optimization 7: Lazy initialization — config is written exactly once;
-    /// subsequent calls are rejected, so callers only pay the write cost once.
-    pub fn initialize(
-        env: Env,
-        admin: Address,
-        fee_bps: u32,
-    ) -> Result<(), ContractError> {
-        // Guard against re-initialization before writing anything.
+    /// Optimization 7: lazy initialization — config is written exactly once;
+    /// subsequent calls are rejected so callers only pay the write cost once.
+    pub fn initialize(env: Env, admin: Address, fee_bps: u32) -> Result<(), ContractError> {
         if env.storage().instance().has(&CONFIG_KEY) {
             return Err(ContractError::Unauthorized);
         }
-
-        let config = Config {
-            flags: 0,
-            fee_bps,
-            admin,
-        };
-        env.storage().instance().set(&CONFIG_KEY, &config);
+        save_config(&env, &Config { flags: 0, fee_bps, admin });
         Ok(())
     }
 
     /// Transfer tokens from `from` to `to`.
     ///
-    /// Optimization 2 & 6: Read config once and cache it locally rather than
-    /// issuing multiple individual storage reads throughout the function.
+    /// Optimization 2 & 6: config is read once and cached in a local variable
+    /// rather than issuing multiple individual storage reads throughout the
+    /// function body.
     ///
-    /// Optimization 9: Short-circuit on `paused` / `emergency` before touching
-    /// balance storage, so we pay zero balance-read gas on blocked calls.
+    /// Optimization 9: short-circuit on `paused` / `emergency` before
+    /// touching balance storage — zero balance-read gas on blocked calls.
     pub fn transfer(
         env: Env,
         from: Address,
@@ -139,15 +168,8 @@ impl GasOptimizationContract {
     ) -> Result<(), ContractError> {
         from.require_auth();
 
-        // Optimization 2: single config read cached in a local variable.
-        let config: Config =
-            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-                flags: 0,
-                fee_bps: 0,
-                admin: from.clone(),
-            });
+        let config = load_config(&env);
 
-        // Optimization 9: exit immediately when paused (no balance I/O).
         if config.is_paused() {
             return Err(ContractError::Paused);
         }
@@ -161,44 +183,30 @@ impl GasOptimizationContract {
             return Err(ContractError::InvalidAmount);
         }
 
-        // Optimization 6: single read for the sender balance.
-        let from_balance: i128 = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Balance(from.clone()))
-            .unwrap_or(0);
-
+        // Optimization 6: single read per account.
+        let from_balance = read_balance(&env, &from);
         if from_balance < amount {
             return Err(ContractError::InsufficientBalance);
         }
 
         // Optimization 8: checked arithmetic to catch overflow without panic.
-        let new_from_balance = from_balance
+        let new_from = from_balance
             .checked_sub(amount)
             .ok_or(ContractError::InvalidAmount)?;
 
-        // Fee calculated with integer arithmetic — no floating point needed.
+        // Fee via integer arithmetic — no floating point.
         let fee = (amount * config.fee_bps as i128) / 10_000;
         let to_amount = amount
             .checked_sub(fee)
             .ok_or(ContractError::InvalidAmount)?;
 
         // Optimization 3 & 6: batch both balance writes together.
-        env.storage()
-            .persistent()
-            .set(&DataKey::Balance(from.clone()), &new_from_balance);
+        write_balance(&env, &from, new_from);
 
-        let to_balance: i128 = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Balance(to.clone()))
-            .unwrap_or(0);
-        let new_to_balance = to_balance
+        let new_to = read_balance(&env, &to)
             .checked_add(to_amount)
             .ok_or(ContractError::InvalidAmount)?;
-        env.storage()
-            .persistent()
-            .set(&DataKey::Balance(to.clone()), &new_to_balance);
+        write_balance(&env, &to, new_to);
 
         Ok(())
     }
@@ -208,60 +216,36 @@ impl GasOptimizationContract {
     /// Optimization 1: balances live in persistent storage so they survive
     /// contract upgrades without a migration step.
     pub fn get_balance(env: Env, account: Address) -> i128 {
-        env.storage()
-            .persistent()
-            .get(&DataKey::Balance(account))
-            .unwrap_or(0)
+        read_balance(&env, &account)
     }
 
     /// Return balances for multiple accounts in a single call.
     ///
-    /// Optimization 6: batching queries reduces per-call overhead versus
-    /// issuing N individual `get_balance` cross-contract calls.
+    /// Optimization 6: batching queries reduces per-call overhead versus N
+    /// individual cross-contract `get_balance` calls.
     pub fn get_balances(env: Env, accounts: Vec<Address>) -> Vec<i128> {
         let mut balances = Vec::new(&env);
         for account in accounts.iter() {
-            let balance: i128 = env
-                .storage()
-                .persistent()
-                .get(&DataKey::Balance(account.clone()))
-                .unwrap_or(0);
-            balances.push_back(balance);
+            balances.push_back(read_balance(&env, &account));
         }
         balances
     }
 
     /// Pause the contract (admin only).
     pub fn pause(env: Env) -> Result<(), ContractError> {
-        let config: Config =
-            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-                flags: 0,
-                fee_bps: 0,
-                admin: env.current_contract_address(),
-            });
-
-        config.admin.require_auth();
-
-        let mut new_config = config;
-        new_config.set_paused(true);
-        env.storage().instance().set(&CONFIG_KEY, &new_config);
+        let mut config = load_config(&env);
+        config.admin.clone().require_auth();
+        config.set_paused(true);
+        save_config(&env, &config);
         Ok(())
     }
 
     /// Unpause the contract (admin only).
     pub fn unpause(env: Env) -> Result<(), ContractError> {
-        let config: Config =
-            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-                flags: 0,
-                fee_bps: 0,
-                admin: env.current_contract_address(),
-            });
-
-        config.admin.require_auth();
-
-        let mut new_config = config;
-        new_config.set_paused(false);
-        env.storage().instance().set(&CONFIG_KEY, &new_config);
+        let mut config = load_config(&env);
+        config.admin.clone().require_auth();
+        config.set_paused(false);
+        save_config(&env, &config);
         Ok(())
     }
 
@@ -270,18 +254,10 @@ impl GasOptimizationContract {
     /// Optimization 5: state is stored as a bitflag rather than a string,
     /// making reads and comparisons significantly cheaper.
     pub fn set_emergency(env: Env, emergency: bool) -> Result<(), ContractError> {
-        let config: Config =
-            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-                flags: 0,
-                fee_bps: 0,
-                admin: env.current_contract_address(),
-            });
-
-        config.admin.require_auth();
-
-        let mut new_config = config;
-        new_config.set_emergency(emergency);
-        env.storage().instance().set(&CONFIG_KEY, &new_config);
+        let mut config = load_config(&env);
+        config.admin.clone().require_auth();
+        config.set_emergency(emergency);
+        save_config(&env, &config);
         Ok(())
     }
 
@@ -293,28 +269,16 @@ impl GasOptimizationContract {
         env: Env,
         recipients: Vec<(Address, i128)>,
     ) -> Result<(), ContractError> {
-        let config: Config =
-            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-                flags: 0,
-                fee_bps: 0,
-                admin: env.current_contract_address(),
-            });
-
+        let config = load_config(&env);
         config.admin.require_auth();
 
         for (recipient, amount) in recipients.iter() {
             if amount > 0 {
-                let current: i128 = env
-                    .storage()
-                    .persistent()
-                    .get(&DataKey::Balance(recipient.clone()))
-                    .unwrap_or(0);
-                let new_balance = current
+                let current = read_balance(&env, &recipient);
+                let new_bal = current
                     .checked_add(amount)
                     .ok_or(ContractError::InvalidAmount)?;
-                env.storage()
-                    .persistent()
-                    .set(&DataKey::Balance(recipient.clone()), &new_balance);
+                write_balance(&env, &recipient, new_bal);
             }
         }
         Ok(())
@@ -327,27 +291,15 @@ impl GasOptimizationContract {
         env: Env,
         accounts: Vec<(Address, i128)>,
     ) -> Result<(), ContractError> {
-        let config: Config =
-            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-                flags: 0,
-                fee_bps: 0,
-                admin: env.current_contract_address(),
-            });
-
+        let config = load_config(&env);
         config.admin.require_auth();
 
         for (account, amount) in accounts.iter() {
-            let current: i128 = env
-                .storage()
-                .persistent()
-                .get(&DataKey::Balance(account.clone()))
-                .unwrap_or(0);
+            let current = read_balance(&env, &account);
             if current < amount {
                 return Err(ContractError::InsufficientBalance);
             }
-            env.storage()
-                .persistent()
-                .set(&DataKey::Balance(account.clone()), &(current - amount));
+            write_balance(&env, &account, current - amount);
         }
         Ok(())
     }
