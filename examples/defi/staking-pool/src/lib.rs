@@ -65,7 +65,7 @@ pub struct StakingPoolContract;
 #[contractimpl]
 impl StakingPoolContract {
     pub fn get_lockup_options(env: Env) -> Vec<LockupOption> {
-        vec![
+        soroban_sdk::vec![
             &env,
             LockupOption {
                 duration: LOCKUP_30_DAYS,

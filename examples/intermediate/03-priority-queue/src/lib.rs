@@ -25,10 +25,18 @@ pub struct PriorityQueueContract;
 impl PriorityQueueContract {
     pub fn push(env: Env, item: Symbol, priority: i128) {
         let mut heap = Self::load_heap(&env);
-        heap.push_back(HeapEntry { item, priority });
+        heap.push_back(HeapEntry {
+            item: item.clone(),
+            priority,
+        });
         let last_index = heap.len() - 1;
         Self::sift_up(&mut heap, last_index);
         Self::save_heap(&env, &heap);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_HEAP, symbol_short!("push")),
+            (item, priority),
+        );
     }
 
     pub fn peek_max(env: Env) -> Option<Symbol> {
@@ -46,12 +54,18 @@ impl PriorityQueueContract {
         let top_item = top.item.clone();
         let last = heap.pop_back().unwrap();
 
-        if heap.len() > 0 {
+        if !heap.is_empty() {
             heap.set(0, last);
             Self::sift_down(&mut heap, 0);
         }
 
         Self::save_heap(&env, &heap);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_HEAP, symbol_short!("pop")),
+            (top_item.clone(), top.priority),
+        );
+
         top_item
     }
 
@@ -71,7 +85,7 @@ impl PriorityQueueContract {
         env.storage()
             .persistent()
             .get(&DataKey::Heap)
-            .unwrap_or_else(|| Vec::new(&env))
+            .unwrap_or_else(|| Vec::new(env))
     }
 
     fn save_heap(env: &Env, heap: &Vec<HeapEntry>) {
@@ -121,3 +135,6 @@ impl PriorityQueueContract {
         heap.set(b, a_val);
     }
 }
+
+#[cfg(test)]
+mod test;
