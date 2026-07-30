@@ -1,10 +1,12 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Env, Symbol};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
+};
 
 /// # Gas Optimization Patterns for Soroban
 ///
-/// This contract demonstrates 10+ gas optimization techniques:
+/// This contract demonstrates 12 gas optimization techniques:
 /// 1. Storage tier selection (Instance vs Persistent vs Temporary)
 /// 2. Caching frequently accessed values
 /// 3. Batch operations vs individual operations
@@ -14,31 +16,38 @@ use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Env, Symbo
 /// 7. Lazy initialization
 /// 8. Checked arithmetic vs unchecked
 /// 9. Short-circuit evaluation
-/// 10. Efficient error handling
-/// 11. Bitflags for boolean state
-/// 12. Struct packing and layout
+/// 10. Efficient error handling with typed errors
+/// 11. Bitflags for boolean state packing
+/// 12. Struct packing and layout optimization
 
-/// DataKey enum for typed, efficient storage access
+/// DataKey enum for typed, efficient storage access.
+///
+/// Optimization 1: No explicit discriminants on tuple variants —
+/// `#[contracttype]` does not support mixing explicit integer discriminants
+/// with tuple variants.
 #[contracttype]
 #[derive(Clone)]
 pub enum DataKey {
-    /// Instance storage: Config that survives the lifetime of the contract instance
-    Config = 0,
-    /// Persistent storage: User balances (survives upgrades)
-    Balance(soroban_sdk::Address) = 1,
-    /// Temporary storage: Session data (1 ledger TTL by default)
-    SessionCache(u64) = 2,
+    /// Instance storage: contract-wide config
+    Config,
+    /// Persistent storage: per-user balance (survives upgrades)
+    Balance(Address),
+    /// Temporary storage: session cache keyed by session id
+    SessionCache(u64),
 }
 
-/// Optimization 11: Bitflags for boolean state (more efficient than separate bools)
+/// Optimization 11: Bitflags for boolean state (packs multiple booleans into
+/// a single `u32`, which is one Soroban-compatible storage word).
 #[contracttype]
+#[derive(Clone)]
 pub struct Config {
-    /// Packed flags: bit 0 = paused, bit 1 = emergency_mode, bits 2-31 = reserved
-    flags: u32,
-    /// Fee rate in basis points (avoids floating point)
-    fee_bps: u16,
-    /// Admin address
-    admin: soroban_sdk::Address,
+    /// Packed flags: bit 0 = paused, bit 1 = emergency_mode, bits 2–31 reserved
+    pub flags: u32,
+    /// Fee rate in basis points using `u32` (Soroban does not support `u16` in
+    /// contract types — use `u32` and enforce the range in application logic).
+    pub fee_bps: u32,
+    /// Administrator address
+    pub admin: Address,
 }
 
 impl Config {
@@ -67,11 +76,15 @@ impl Config {
     }
 }
 
-#[contracttype]
+/// Optimization 10: Typed errors via `#[contracterror]` are more efficient
+/// than string panics and let callers pattern-match on specific failure modes.
+///
+/// Note: the type cannot be named `Error` because that conflicts with a
+/// reserved name inside the Soroban SDK macros.
+#[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
-pub enum Error {
-    /// Optimization 10: Typed errors are more efficient than strings
+pub enum ContractError {
     Paused = 1,
     EmergencyMode = 2,
     InsufficientBalance = 3,
@@ -82,19 +95,24 @@ pub enum Error {
 #[contract]
 pub struct GasOptimizationContract;
 
-/// Optimization 1 & 4: Use instance storage for contract config
-/// Instance storage is cheaper than persistent and sufficient for config
-/// Symbol interning: symbol_short! creates efficient short symbols
+/// Optimization 4: `symbol_short!` creates a compile-time `Symbol` constant
+/// that is cheaper to compare and store than a heap-allocated string.
 const CONFIG_KEY: Symbol = symbol_short!("cfg");
 
 #[contractimpl]
 impl GasOptimizationContract {
-    /// Initialize contract config once
-    /// Optimization 7: Lazy initialization - config only written once
-    pub fn initialize(env: Env, admin: soroban_sdk::Address, fee_bps: u16) -> Result<(), Error> {
-        // Optimization 3: Check if already initialized before writing
+    /// Initialize contract config once.
+    ///
+    /// Optimization 7: Lazy initialization — config is written exactly once;
+    /// subsequent calls are rejected, so callers only pay the write cost once.
+    pub fn initialize(
+        env: Env,
+        admin: Address,
+        fee_bps: u32,
+    ) -> Result<(), ContractError> {
+        // Guard against re-initialization before writing anything.
         if env.storage().instance().has(&CONFIG_KEY) {
-            return Err(Error::Unauthorized);
+            return Err(ContractError::Unauthorized);
         }
 
         let config = Config {
@@ -106,70 +124,78 @@ impl GasOptimizationContract {
         Ok(())
     }
 
-    /// Optimization 2 & 6: Minimize storage reads by caching config locally
-    /// Single read at function entry instead of multiple reads
+    /// Transfer tokens from `from` to `to`.
+    ///
+    /// Optimization 2 & 6: Read config once and cache it locally rather than
+    /// issuing multiple individual storage reads throughout the function.
+    ///
+    /// Optimization 9: Short-circuit on `paused` / `emergency` before touching
+    /// balance storage, so we pay zero balance-read gas on blocked calls.
     pub fn transfer(
         env: Env,
-        from: soroban_sdk::Address,
-        to: soroban_sdk::Address,
-        amount: u64,
-    ) -> Result<(), Error> {
+        from: Address,
+        to: Address,
+        amount: i128,
+    ) -> Result<(), ContractError> {
         from.require_auth();
 
-        // Optimization 2: Cache config read (1 read instead of 3)
-        let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: from.clone(),
-        });
+        // Optimization 2: single config read cached in a local variable.
+        let config: Config =
+            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+                flags: 0,
+                fee_bps: 0,
+                admin: from.clone(),
+            });
 
-        // Optimization 9: Short-circuit evaluation - exit early if contract is paused
+        // Optimization 9: exit immediately when paused (no balance I/O).
         if config.is_paused() {
-            return Err(Error::Paused);
+            return Err(ContractError::Paused);
         }
 
-        // Optimization 5: Use typed enum state — block transfers during emergency
+        // Optimization 5: typed enum state — block transfers during emergency.
         if config.is_emergency() {
-            return Err(Error::EmergencyMode);
+            return Err(ContractError::EmergencyMode);
         }
 
-        // Optimization 10: Use typed errors for efficient error handling
-        if amount == 0 {
-            return Err(Error::InvalidAmount);
+        if amount <= 0 {
+            return Err(ContractError::InvalidAmount);
         }
 
-        // Optimization 6: Single read for from balance
-        let from_balance: u64 = env
+        // Optimization 6: single read for the sender balance.
+        let from_balance: i128 = env
             .storage()
             .persistent()
             .get(&DataKey::Balance(from.clone()))
             .unwrap_or(0);
 
         if from_balance < amount {
-            return Err(Error::InsufficientBalance);
+            return Err(ContractError::InsufficientBalance);
         }
 
-        // Optimization 8: Use checked arithmetic
-        let new_from_balance =
-            from_balance.checked_sub(amount).ok_or(Error::InvalidAmount)?;
+        // Optimization 8: checked arithmetic to catch overflow without panic.
+        let new_from_balance = from_balance
+            .checked_sub(amount)
+            .ok_or(ContractError::InvalidAmount)?;
 
-        // Calculate fee (using integer arithmetic, no floating point)
-        let fee = (amount * config.fee_bps as u64) / 10_000;
-        let to_amount = amount.checked_sub(fee).ok_or(Error::InvalidAmount)?;
+        // Fee calculated with integer arithmetic — no floating point needed.
+        let fee = (amount * config.fee_bps as i128) / 10_000;
+        let to_amount = amount
+            .checked_sub(fee)
+            .ok_or(ContractError::InvalidAmount)?;
 
-        // Optimization 3 & 6: Batch storage operations
-        // Write both balances in sequence rather than scattered through logic
+        // Optimization 3 & 6: batch both balance writes together.
         env.storage()
             .persistent()
             .set(&DataKey::Balance(from.clone()), &new_from_balance);
 
-        let to_balance: u64 = env
+        let to_balance: i128 = env
             .storage()
             .persistent()
             .get(&DataKey::Balance(to.clone()))
             .unwrap_or(0);
-        let new_to_balance =
-            to_balance.checked_add(to_amount).ok_or(Error::InvalidAmount)?;
+        let new_to_balance = to_balance
+            .checked_add(to_amount)
+            .ok_or(ContractError::InvalidAmount)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &new_to_balance);
@@ -177,24 +203,25 @@ impl GasOptimizationContract {
         Ok(())
     }
 
-    /// Optimization 2 & 6: Read-heavy operation with caching
-    /// Get balance without redundant config reads
-    pub fn get_balance(env: Env, account: soroban_sdk::Address) -> u64 {
-        // Optimization 1: Use persistent storage for balances (survives upgrades)
+    /// Return the balance of `account`.
+    ///
+    /// Optimization 1: balances live in persistent storage so they survive
+    /// contract upgrades without a migration step.
+    pub fn get_balance(env: Env, account: Address) -> i128 {
         env.storage()
             .persistent()
             .get(&DataKey::Balance(account))
             .unwrap_or(0)
     }
 
-    /// Optimization 6: Efficient batch query - single storage read
-    pub fn get_balances(
-        env: Env,
-        accounts: soroban_sdk::Vec<soroban_sdk::Address>,
-    ) -> soroban_sdk::Vec<u64> {
-        let mut balances = soroban_sdk::Vec::new(&env);
+    /// Return balances for multiple accounts in a single call.
+    ///
+    /// Optimization 6: batching queries reduces per-call overhead versus
+    /// issuing N individual `get_balance` cross-contract calls.
+    pub fn get_balances(env: Env, accounts: Vec<Address>) -> Vec<i128> {
+        let mut balances = Vec::new(&env);
         for account in accounts.iter() {
-            let balance = env
+            let balance: i128 = env
                 .storage()
                 .persistent()
                 .get(&DataKey::Balance(account.clone()))
@@ -204,119 +231,124 @@ impl GasOptimizationContract {
         balances
     }
 
-    /// Optimization 2 & 6: Caching reduces gas for repeated config access
-    pub fn pause(env: Env) -> Result<(), Error> {
-        let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: env.current_contract_address(),
-        });
+    /// Pause the contract (admin only).
+    pub fn pause(env: Env) -> Result<(), ContractError> {
+        let config: Config =
+            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+                flags: 0,
+                fee_bps: 0,
+                admin: env.current_contract_address(),
+            });
 
         config.admin.require_auth();
 
         let mut new_config = config;
         new_config.set_paused(true);
         env.storage().instance().set(&CONFIG_KEY, &new_config);
-
         Ok(())
     }
 
-    /// Optimization 2 & 6: Caching reduces gas for repeated config access
-    pub fn unpause(env: Env) -> Result<(), Error> {
-        let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: env.current_contract_address(),
-        });
+    /// Unpause the contract (admin only).
+    pub fn unpause(env: Env) -> Result<(), ContractError> {
+        let config: Config =
+            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+                flags: 0,
+                fee_bps: 0,
+                admin: env.current_contract_address(),
+            });
 
         config.admin.require_auth();
 
         let mut new_config = config;
         new_config.set_paused(false);
         env.storage().instance().set(&CONFIG_KEY, &new_config);
-
         Ok(())
     }
 
-    /// Optimization 5: Using typed enum state is more efficient than string
-    pub fn set_emergency(env: Env, emergency: bool) -> Result<(), Error> {
-        let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: env.current_contract_address(),
-        });
+    /// Enable or disable emergency mode (admin only).
+    ///
+    /// Optimization 5: state is stored as a bitflag rather than a string,
+    /// making reads and comparisons significantly cheaper.
+    pub fn set_emergency(env: Env, emergency: bool) -> Result<(), ContractError> {
+        let config: Config =
+            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+                flags: 0,
+                fee_bps: 0,
+                admin: env.current_contract_address(),
+            });
 
         config.admin.require_auth();
 
         let mut new_config = config;
         new_config.set_emergency(emergency);
         env.storage().instance().set(&CONFIG_KEY, &new_config);
-
         Ok(())
     }
 
-    /// Optimization 3: Batch initialization of multiple accounts
-    /// More efficient than calling transfer multiple times
+    /// Mint tokens to multiple recipients in a single call.
+    ///
+    /// Optimization 3: batching writes reduces per-call invocation overhead
+    /// compared with N individual mint calls.
     pub fn batch_mint(
         env: Env,
-        recipients: soroban_sdk::Vec<(soroban_sdk::Address, u64)>,
-    ) -> Result<(), Error> {
-        let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: env.current_contract_address(),
-        });
+        recipients: Vec<(Address, i128)>,
+    ) -> Result<(), ContractError> {
+        let config: Config =
+            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+                flags: 0,
+                fee_bps: 0,
+                admin: env.current_contract_address(),
+            });
 
         config.admin.require_auth();
 
-        // Optimization 3: Write all balances in one batch
         for (recipient, amount) in recipients.iter() {
             if amount > 0 {
-                let current_balance: u64 = env
+                let current: i128 = env
                     .storage()
                     .persistent()
                     .get(&DataKey::Balance(recipient.clone()))
                     .unwrap_or(0);
-                let new_balance =
-                    current_balance.checked_add(amount).ok_or(Error::InvalidAmount)?;
+                let new_balance = current
+                    .checked_add(amount)
+                    .ok_or(ContractError::InvalidAmount)?;
                 env.storage()
                     .persistent()
                     .set(&DataKey::Balance(recipient.clone()), &new_balance);
             }
         }
-
         Ok(())
     }
 
-    /// Optimization 3: Batch burn operation
+    /// Burn tokens from multiple accounts in a single call.
+    ///
+    /// Optimization 3: same batching benefit as `batch_mint`.
     pub fn batch_burn(
         env: Env,
-        accounts: soroban_sdk::Vec<(soroban_sdk::Address, u64)>,
-    ) -> Result<(), Error> {
-        let config: Config = env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: env.current_contract_address(),
-        });
+        accounts: Vec<(Address, i128)>,
+    ) -> Result<(), ContractError> {
+        let config: Config =
+            env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+                flags: 0,
+                fee_bps: 0,
+                admin: env.current_contract_address(),
+            });
 
         config.admin.require_auth();
 
-        // Optimization 3: Process all burns efficiently
         for (account, amount) in accounts.iter() {
-            let current_balance: u64 = env
+            let current: i128 = env
                 .storage()
                 .persistent()
                 .get(&DataKey::Balance(account.clone()))
                 .unwrap_or(0);
-            if current_balance < amount {
-                return Err(Error::InsufficientBalance);
+            if current < amount {
+                return Err(ContractError::InsufficientBalance);
             }
-            let new_balance = current_balance - amount;
             env.storage()
                 .persistent()
-                .set(&DataKey::Balance(account.clone()), &new_balance);
+                .set(&DataKey::Balance(account.clone()), &(current - amount));
         }
-
         Ok(())
     }
 }
