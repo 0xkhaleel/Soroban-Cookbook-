@@ -17,6 +17,16 @@ Complex protocols & optimizations for production systems.
 ### [02-timelock](../examples/advanced/02-timelock/)
 **Delayed execution** for governance & security.
 
+---
+
+### [03-permit-pattern](../examples/advanced/03-permit-pattern/)
+**Permit-based approvals** with signature-backed authorization and deadline enforcement.
+
+**Key Concepts:**
+- Off-chain authorization envelopes
+- Permit-based allowance setup
+- Deadline validation and expiry handling
+
 **Key Concepts:**
 - Ledger-timestamp gates
 - Queue-based execution
@@ -47,6 +57,16 @@ client.submit(&updater, &42_i128);
 // Query with freshness guard
 let value = client.get_value_strict(); // errors if stale
 ```
+
+---
+
+### [05-diamond-security](../examples/advanced/05-diamond-security/)
+**Secure Multi-Facet Proxy (Diamond)** with access controls, upgrade safety, and isolated namespaced storage.
+
+**Key Concepts:**
+- Access control per facet (restricting direct execution to proxy)
+- Upgrade checks & interface supports verification
+- Namespaced key isolation to prevent shared storage collisions
 
 **[More coming...]** Factories, bonding curves, merkle proofs.
 

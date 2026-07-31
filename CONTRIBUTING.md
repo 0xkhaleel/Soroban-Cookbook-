@@ -1,13 +1,66 @@
-Markdown
-# Contributing to Soroban Cookbook 🍳
+# Contributing to Soroban-Cookbook
 
-Thank you for your interest in contributing to the Soroban Cookbook! This project aims to be a comprehensive resource for Soroban developers, and your contributions are what make it great.
+Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
+## Feedback System
+
+We have implemented a comprehensive feedback system to collect and manage input from our community. The system is located in the `docs/feedback-system/` directory.
+
+### How to Provide Feedback
+
+1. **Use the Feedback Form**: Copy the template from `docs/feedback-system/forms/feedback-form-template.md` and fill it out.
+2. **Submit via GitHub**: Create an issue or pull request with your feedback.
+3. **Participate in Surveys**: Copy and fill out our [Community Survey Template](./docs/feedback-system/surveys/USER_SURVEY_TEMPLATE.md) or join external survey links.
+
+### Community & Feedback Channels
+
+To make providing feedback as easy and integrated as possible, you can access the following channels:
+- **Quarterly Surveys**: We run regular user surveys to gather structured feedback on cookbook clarity, missing examples, and environment setup ease. See our [User Surveys Documentation & Process](./docs/feedback-system/surveys/README.md).
+- **Google Forms Survey**: Submit quick structured feedback online via our [Google Forms Survey Link](https://forms.google.com/soroban-cookbook-community-survey).
+- **GitHub Discussions**: Share ideas and participate in community polls in the [Discussions Forums](https://github.com/gloriaibrahim2002-blip/Soroban-Cookbook-/discussions).
+- **Discord Community**: Chat live with maintainers and other Soroban developers in the `#soroban` channel on [Stellar Discord](https://discord.gg/stellardev).
+
+### Review Process
+
+All feedback and contributions go through our review process:
+1. Initial acknowledgment within 2 business days
+2. Content and quality review
+3. Decision and communication
+4. Action tracking and implementation
+
+### Action Tracking
+
+We track all feedback-driven actions using:
+- GitHub Issues for individual tasks
+- Project boards for status visualization
+- Regular status updates in our community channels
+
+### Communication
+
+We commit to:
+- Acknowledging all feedback within 2 business days
+- Providing regular status updates
+- Closing the loop on all submitted feedback
+
+For more details, see the [Feedback System Documentation](docs/feedback-system/README.md).
+
+## Monthly Community Call Governance
+
+The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates and governance documents are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
+
+- [Agenda Template](./GOVERNANCE/monthly-call-agenda-template.md)
+- [Format Guidelines](./GOVERNANCE/monthly-call-format-guidelines.md)
+- [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
+- [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md)
+- [Follow-up Process](./GOVERNANCE/monthly-call-followup-process.md)
+
+To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
 ---
 
 ## 📍 Table of Contents
+- [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
+- [Monthly Community Call Governance](#monthly-community-call-governance)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
@@ -16,139 +69,55 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 - [Testing Requirements](#-testing-requirements)
 - [Example Contribution Template](#-example-contribution-template)
 - [Validation Steps](#-validation-steps)
+- [Bug Bounty Program](#-bug-bounty-program)
+- [Recognition System](#-recognition-system)
+
+## 👋 New Here? Start with Onboarding
+
+If this is your first time in the Soroban Cookbook community, head to **[docs/onboarding.md](./docs/onboarding.md)** before reading the rest of this file.
+
+The onboarding guide covers:
+
+- Learning paths tailored to your background (new to Stellar, Rust dev, EVM dev, or ready to contribute)
+- A first-steps checklist to get your environment running and your first PR open
+- Community channels and how to ask for help effectively
+- External resources — official docs, tools, and learning materials
+- Answers to common first-timer questions
+
+Once you have worked through the onboarding guide and run `cargo test --workspace` successfully, come back here for the full contribution process.
 
 ---
 
 ## 🎯 Ways to Contribute
 
-1.  **Add New Examples**: Create well-documented smart contract examples demonstrating specific patterns.
-2.  **Improve Documentation**: Fix typos, clarify guides, or add new documentation.
-3.  **Bug Reports & Feature Requests**: Use [GitHub Issues] to report bugs or suggest new features.
-4.  **Code Review**: Review open pull requests and provide constructive feedback.
+## 🧪 Testing Requirements
 
----
+Every change that touches contract logic needs test coverage before it merges. This section covers the commands you need day-to-day; for testing patterns, fixtures, and best practices, see the [Testing Guide](./book/src/guides/testing.md) and [Testing Best Practices](./book/src/docs/testing-best-practices.md).
 
-## 🛠️ Development Environment Setup
-
-### 1. Prerequisites
-
-- **Rust**: Latest stable version.
-- **WASM Target**: Required for compiling Soroban contracts.
-- **Stellar CLI**: Used for building, testing, and deploying (Note: `stellar-cli` has replaced `soroban-cli`).
-
-### 2. Installation Steps
+### Running Tests
 
 ```bash
-# 1. Install Rust
-curl --proto '=https' --tlsv1.2 -sSf [https://sh.rustup.rs](https://sh.rustup.rs) | sh
-
-# 2. Add WASM target
-rustup target add wasm32-unknown-unknown
-
-# 3. Install Stellar CLI (version 22.1.0+ recommended)
-cargo install --locked stellar-cli --version 22.1.0
-
-# 4. Clone the repository
-git clone [https://github.com/username/Soroban-Cookbook-.git]
-cd Soroban-Cookbook-
-
-# 5. Verify installation
-cargo test --workspace
-For more detailed setup, see the Getting Started Guide.
-
-To maintain a consistent and high-quality codebase, please follow our [Style Guide](./docs/style-guide.md).
-
-Key highlights:
-- **Naming**: Follow standard [Rust naming conventions](https://rust-lang.github.io/api-guidelines/naming.html) and our specific contract patterns.
-- **Formatting**: Always run `cargo fmt` before committing.
-- **Linting**: Ensure `cargo clippy` passes with no warnings (`-D warnings`).
-- **Documentation**: Use `///` for public interface docs and `//!` for module-level explanations.
-- **Testing**: Every example must include comprehensive unit tests.
-- **No-std**: All contract code must be `#![no_std]`.
-
-🏗️ Project Structure
-examples/: Categorized smart contract examples.
-
-docs/: General documentation and ADRs.
-
-guides/: Step-by-step tutorials and guides.
-
-book/: Source for the mdBook documentation.
-
-tests/: Integration tests for the workspace.
-
-🔄 Pull Request Process
-Branching: Create a feature branch from main.
-
-Bash
-git checkout -b feature/your-feature-name
-Development: Implement your changes following the style guidelines.
-
-Local Testing: Run the validation suite (see below).
-
-Commit: Use descriptive commit messages.
-
-Documentation: If adding an example, ensure it has a README.md and is added to the main README.md and SUMMARY.md if applicable.
-
-Submit PR: Fill out the Pull Request Template.
-
-🧪 Testing Requirements
-All contributions must include tests:
-
-- **Unit Tests**: In `src/test.rs` for individual function logic.
-- **Integration Tests**: In `tests/` for multi-contract or complex interactions.
-- **Mocking**: Use `env.mock_all_auths()` for testing authorization flows.
-- **Coverage**: Aim for high test coverage. Run coverage locally with:
-  ```bash
-  cargo tarpaulin
-  # Reports are written to coverage/ (XML, HTML, LCOV)
-  # Open coverage/tarpaulin-report.html in a browser for a line-by-line view
-  ```
-
-📋 Example Contribution Template
-When adding a new example in examples/category/name/:
-
-Plaintext
-name/
-├── src/
-│   ├── lib.rs       # Contract implementation
-│   └── test.rs      # Unit tests
-├── Cargo.toml       # Metadata and dependencies
-└── README.md        # Description, how to run, and explanation
-The README.md for the example should include:
-
-What it does: Clear purpose statement.
-
-Key Concepts: Explanation of Soroban features used.
-
-How to Run: Commands for testing and building.
-
-✅ Validation Steps
-Before submitting your PR, ensure all these checks pass:
-
-Bash
-# 1. Format check
-cargo fmt --all --check
-
-# 2. Lint check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-
-# 3. Run all tests
+# Run everything in the workspace (what CI runs by default)
 cargo test --workspace
 
-# 4. Build Wasm (for contracts)
-cargo build --workspace --target wasm32-unknown-unknown --release
-🚀 Definition of Done
-[ ] Acceptance criteria of the issue are met.
+# Run tests for a single example you're working on
+cd examples/<category>/<example-name>
+cargo test
 
-[ ] Code follows style guidelines and passes all checks.
+# Run the shared integration test suite
+cargo test -p integration-tests
 
-[ ] Tests are included and passing.
+# Run the security-focused test suite
+cargo test --package security-tests
+```
 
-[ ] Documentation (README, guides, SUMMARY.md) is updated.
+CI also runs `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` — run both locally before opening a PR to avoid a red pipeline.
 
-[ ] PR is linked to relevant issues.
-### CI Testing Strategy
+### Where to Add a Test
 
-- We run targeted tests for changed paths on pull requests to enable fast feedback.
-- For merges to main, the CI fallback runs the entire workspace check to ensure full compatibility.
+- **Example-level test** (`src/test.rs` or `tests/` inside the example crate): the default for any new or changed example. If the behavior only involves that one contract, it belongs here.
+- **Shared integration test** (`tests/integration/`): for scenarios that span multiple contracts — cross-contract calls, multi-step workflows, or state coordination between examples. See `tests/integration/README.md` for existing patterns before adding a new one.
+- **Security test** (`tests/security/`): for authorization bypass, reentrancy, and other security-relevant regressions. See `tests/security/README.md` for the threat models already covered.
+- **Fuzz target** (`tests/fuzz/`): for property-based testing of parsing/serialization boundaries. Only needed when you're adding a new fuzzable surface, not for typical example changes.
+
+Coverage is measured with `cargo tarpaulin` in CI and uploaded to Codecov; run `cargo tarpaulin` locally if you want to check coverage before pushing.

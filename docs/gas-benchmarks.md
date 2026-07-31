@@ -47,7 +47,29 @@ This repository now includes dedicated benchmark coverage for intermediate examp
 - `examples/intermediate/multi-sig-patterns`
 - `examples/intermediate/ajo-factory`
 
-That makes it easier to compare basic and intermediate gas behavior in one place.
+## 🧠 Advanced Example Benchmarks
+
+| Example | Operation | Instructions (est.) | RAM (est.) | Key Takeaway |
+| :--- | :--- | :--- | :--- | :--- |
+| `01-multi-party-auth` | `multi_sig_transfer` (3 signers) | ~75,000 | ~4 KB | Auth per signer adds ~15K instructions each |
+| `01-multi-party-auth` | `encode_auth_vec` (10 signers) | ~40,000 | ~2 KB | Sorting dominates; O(N log N) encoding cost |
+| `02-timelock` | `queue` | ~35,000 | ~1.5 KB | State write with timestamp check |
+| `02-timelock` | `execute` | ~40,000 | ~2 KB | Delay validation + state transition |
+| `03-cross-chain-bridge` | `lock` | ~55,000 | ~3 KB | Mint + storage update + event |
+| `03-cross-chain-bridge` | `release` | ~60,000 | ~3.5 KB | Validator set verification + burn |
+| `05-bridge-security` | `rate_limited_release` | ~50,000 | ~2.5 KB | Epoch check + volume accounting |
+| `05-reentrancy-guard` | `guarded_call` | ~30,000 | ~1.5 KB | Mutex flag adds ~5K over bare call |
+| `05-merkle-proofs` | `verify_proof` (depth 10) | ~45,000 | ~2 KB | Each hash adds ~4K instructions |
+| `05-batch-operations` | `execute_batch` (5 ops) | ~120,000 | ~6 KB | Scales linearly; batch overhead ~20K base |
+| `06-diamond-pattern` | `diamond_cut` (add facet) | ~65,000 | ~4 KB | Selector registration + storage write |
+| `06-diamond-pattern` | `diamond_call` | ~35,000 | ~2 KB | Dispatch overhead ~5K over direct call |
+| `custom-token` | `transfer` | ~45,000 | ~2.5 KB | Same as base SEP-41 token |
+| `custom-token` | `multi_sig_transfer` (2 signers) | ~55,000 | ~3 KB | Signer iteration + auth overhead |
+| `custom-token` | `mint` | ~40,000 | ~2 KB | Auth check + supply update + event |
+
+*Estimates based on test environment. Actual costs vary by network conditions and SDK version.*
+
+That makes it easier to compare basic, intermediate, and advanced gas behavior in one place.
 
 ## 📦 CI Baselines
 

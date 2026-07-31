@@ -2,6 +2,7 @@
 
 use super::*;
 use soroban_sdk::{testutils::Address as _, Address, Env};
+use soroban_sdk::{Address, Env, testutils::Address as _};
 
 fn setup() -> (Env, Address, StorageMigrationClient<'static>) {
     let env = Env::default();
@@ -56,11 +57,13 @@ fn test_prepare_and_execute_migration_batches() {
     client.prepare_migration(&2);
     let state = client.migration_state();
     assert!(matches!(state, MigrationState::Prepared(_, _)));
+    assert!(matches!(state, MigrationState::Prepared(..)));
 
     let processed = client.migrate_batch(&1);
     assert_eq!(processed, 1);
     let state = client.migration_state();
     assert!(matches!(state, MigrationState::Prepared(_, 1)));
+    assert!(matches!(state, MigrationState::Prepared(_, next_index) if next_index == 1));
 
     let processed = client.migrate_batch(&10);
     assert_eq!(processed, 1);

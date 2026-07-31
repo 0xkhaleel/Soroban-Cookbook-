@@ -2,8 +2,6 @@
 //!
 //! This is the initial implementation contract that provides basic arithmetic operations.
 
-#![no_std]
-
 use soroban_sdk::{contract, contractimpl};
 
 #[contract]
