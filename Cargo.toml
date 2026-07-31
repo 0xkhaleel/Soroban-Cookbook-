@@ -29,6 +29,7 @@ members = [
     "examples/tokens/03-optimized-operations",
     "examples/tokens/token-lock",
     "examples/governance/01-vote-delegation",
+    "examples/intermediate/lazy-loading",
     "examples/tokens/10-pausable-permissions",
     "tests/integration",
     "tests/security",
