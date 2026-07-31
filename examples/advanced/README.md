@@ -15,6 +15,7 @@ This category contains examples of complex systems and advanced architectural pa
 
 - [`01-multi-party-auth`](./01-multi-party-auth/) — Multi-party authorization patterns
 - [`02-timelock`](./02-timelock/) — Time-delayed execution
+- [`03-permit-pattern`](./03-permit-pattern/) — EIP-2612-style permit approvals with deadline enforcement
 - [`03-gasless-relayer`](./03-gasless-relayer/) — Meta-transaction relayer with nonce checks and signature verification
 - [`03-data-aggregation-oracle`](./03-data-aggregation-oracle/) — Data aggregation with manipulation detection and outlier filtering (Phase 5)
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with freshness checks
