@@ -47,6 +47,7 @@ const EVENT_ORACLE_UPDATED: Symbol = symbol_short!("price_upd");
 
 impl AmmPoolContract {
     /*
+    #[allow(dead_code)]
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -95,6 +96,7 @@ impl AmmPoolContract {
 
 impl AmmOracleContract {
     /*
+    #[allow(dead_code)]
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()

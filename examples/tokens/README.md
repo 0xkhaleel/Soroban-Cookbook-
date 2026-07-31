@@ -21,4 +21,5 @@ This category contains examples related to fungible tokens, including implementa
 - `04-airdrop-contract`: A contract to efficiently distribute tokens to a list of addresses.
 - `04-snapshot-token`: A fungible token contract with balance snapshot support for historical balance queries.
 - `05-wrapped-asset`: A contract that creates a Soroban-native representation of a classic Stellar asset.
+- `10-automatic-snapshot-triggers`: Time-based & event-based balance snapshots with pruning.
 - [`10-pausable-permissions`](./10-pausable-permissions/): A permission system for pausing — pauser role, multi-sig pause, and time-limited pause.

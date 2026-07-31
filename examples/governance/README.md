@@ -2,8 +2,20 @@
 
 On-chain governance patterns: voting systems, delegation, multisig control, and DAO treasury management.
 
+## 📂 Examples
+
+### [01-delegation-marketplace](./01-delegation-marketplace/)
+A marketplace for listing and renting voting power with incentive mechanisms.
+- **Concepts:** `require_auth()`, persistent storage, typed errors, event topics, fee transfer.
+
 ## Quick Start
 
+| # | Example | Concepts |
+|---|---------|----------|
+| 01 | [simple-voting](./01-simple-voting/) | Proposal creation, one-address-one-vote, time-based deadlines, vote tallying, execution |
+| 02 | [voting-time-constraints](./01-voting-time-constraints/) | Voting periods, proposal deadlines, grace periods, early closure |
+| 06 | [timelock-governance](./06-timelock-governance/) | Proposal queue, mandatory delays, veto, emergency execution |
+| 07 | [automatic-snapshot-triggers](./07-automatic-snapshot-triggers/) | Time-based & event-based snapshots, snapshot pruning, gas-efficient storage |
 ```bash
 cd examples/governance/01-simple-voting
 cargo test && cargo build --target wasm32-unknown-unknown --release
