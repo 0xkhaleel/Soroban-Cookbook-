@@ -143,7 +143,7 @@ impl ErrorDemoContract {
     /// corrected parameters.
     pub fn deposit(env: Env, from: Address, amount: i128) -> Result<i128, ContractError> {
         // ── Guard: predictable user mistakes → typed errors ─────────────────
-        if amount == 0 {
+        if amount <= 0 {
             return Err(ContractError::ZeroAmount);
         }
 
@@ -192,7 +192,7 @@ impl ErrorDemoContract {
     /// - [`ContractError::ContractPaused`]      – contract is paused
     /// - [`ContractError::InsufficientBalance`] – balance < amount
     pub fn withdraw(env: Env, from: Address, amount: i128) -> Result<i128, ContractError> {
-        if amount == 0 {
+        if amount <= 0 {
             return Err(ContractError::ZeroAmount);
         }
 

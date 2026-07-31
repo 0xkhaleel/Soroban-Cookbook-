@@ -1,8 +1,8 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Map};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map};
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 #[contracttype]
 pub struct UserPosition {
     pub deposit: i128,
@@ -95,6 +95,10 @@ impl LendingPool {
             panic!("insufficient deposit");
         }
         position.deposit -= amount;
+        let max_borrow = position.deposit * 80 / 100;
+        if position.borrow > max_borrow {
+            panic!("insufficient collateral remaining");
+        }
         positions.set(user, position);
 
         let mut total_deposits: i128 = env
@@ -149,7 +153,7 @@ impl LendingPool {
         position.borrow += amount;
         positions.set(user, position);
 
-        let mut new_total_borrows = total_borrows + amount;
+        let new_total_borrows = total_borrows + amount;
         env.storage()
             .instance()
             .set(&soroban_sdk::Symbol::new(&env, "positions"), &positions);

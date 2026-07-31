@@ -323,7 +323,7 @@ fn integer_sqrt(value: i128) -> i128 {
     if value <= 0 {
         return 0;
     }
-    let mut n = value as u128;
+    let n = value as u128;
     let mut x = n;
     let mut y = (x + 1) >> 1;
     while y < x {
@@ -385,7 +385,7 @@ mod test {
                 .storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(to.clone()))
-                .unwrap_or(0);
+                .unwrap_or(0i128);
             let next = current
                 .checked_add(amount)
                 .ok_or(TokenError::InvalidAmount)?;
@@ -409,7 +409,7 @@ mod test {
                 .storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(from.clone()))
-                .unwrap_or(0);
+                .unwrap_or(0i128);
             if current < amount {
                 return Err(TokenError::InsufficientBalance);
             }
@@ -418,7 +418,7 @@ mod test {
                 .storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(to.clone()))
-                .unwrap_or(0)
+                .unwrap_or(0i128)
                 .checked_add(amount)
                 .ok_or(TokenError::InvalidAmount)?;
             env.storage()
@@ -434,11 +434,12 @@ mod test {
             env.storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(who))
-                .unwrap_or(0)
+                .unwrap_or(0i128)
         }
     }
 
     struct Fixture {
+        #[allow(dead_code)]
         env: Env,
         token_x: TestTokenClient<'static>,
         token_y: TestTokenClient<'static>,
@@ -451,22 +452,22 @@ mod test {
         let env = Env::default();
         env.mock_all_auths();
 
-        let alice = Address::random(&env);
-        let bob = Address::random(&env);
+        let alice = Address::generate(&env);
+        let bob = Address::generate(&env);
 
-        let token_x_id = env.register_contract(None, TestToken);
-        let token_y_id = env.register_contract(None, TestToken);
+        let token_x_id = env.register(TestToken, ());
+        let token_y_id = env.register(TestToken, ());
         let token_x = TestTokenClient::new(&env, &token_x_id);
         let token_y = TestTokenClient::new(&env, &token_y_id);
 
-        token_x.initialize(&alice, &10_000).unwrap();
-        token_x.mint(&bob, &5_000).unwrap();
-        token_y.initialize(&alice, &10_000).unwrap();
-        token_y.mint(&bob, &5_000).unwrap();
+        token_x.initialize(&alice, &10_000);
+        token_x.mint(&bob, &5_000);
+        token_y.initialize(&alice, &10_000);
+        token_y.mint(&bob, &5_000);
 
-        let amm_id = env.register_contract(None, ConstantProductAmm);
+        let amm_id = env.register(ConstantProductAmm, ());
         let amm = ConstantProductAmmClient::new(&env, &amm_id);
-        amm.initialize(&token_x_id, &token_y_id).unwrap();
+        amm.initialize(&token_x_id, &token_y_id);
 
         Fixture {
             env,
@@ -482,7 +483,7 @@ mod test {
     fn add_initial_liquidity_mints_lp_tokens() {
         let f = setup();
 
-        let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000).unwrap();
+        let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000);
 
         assert_eq!(minted, 1_000);
         assert_eq!(f.amm.lp_balance(&f.alice), 1_000);
@@ -490,7 +491,7 @@ mod test {
         assert_eq!(f.token_x.balance(&f.alice), 9_000);
         assert_eq!(f.token_y.balance(&f.alice), 9_000);
 
-        let (reserve_x, reserve_y) = f.amm.reserves().unwrap();
+        let (reserve_x, reserve_y) = f.amm.reserves();
         assert_eq!(reserve_x, 1_000);
         assert_eq!(reserve_y, 1_000);
     }
@@ -499,25 +500,26 @@ mod test {
     fn add_liquidity_requires_exact_ratio() {
         let f = setup();
 
-        f.amm.add_liquidity(&f.alice, &1_000, &2_000).unwrap_err();
+        f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+        let _ = f
+            .amm
+            .try_add_liquidity(&f.alice, &1_000, &2_000)
+            .unwrap_err();
     }
 
     #[test]
     fn swap_applies_fee_and_price_impact() {
         let f = setup();
 
-        f.amm.add_liquidity(&f.alice, &10_000, &10_000).unwrap();
+        f.amm.add_liquidity(&f.alice, &10_000, &10_000);
 
-        let out = f
-            .amm
-            .swap(&f.bob, &f.token_x.contract_id(), &1_000, &900)
-            .unwrap();
+        let out = f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900);
 
         assert_eq!(out, 906);
         assert_eq!(f.token_y.balance(&f.bob), 5_906);
         assert_eq!(f.token_x.balance(&f.bob), 4_000);
 
-        let (reserve_x, reserve_y) = f.amm.reserves().unwrap();
+        let (reserve_x, reserve_y) = f.amm.reserves();
         assert_eq!(reserve_x, 11_000);
         assert_eq!(reserve_y, 9_094);
     }
@@ -526,15 +528,15 @@ mod test {
     fn remove_liquidity_returns_proportional_amounts() {
         let f = setup();
 
-        f.amm.add_liquidity(&f.alice, &6_000, &6_000).unwrap();
-        f.amm.add_liquidity(&f.bob, &3_000, &3_000).unwrap();
+        f.amm.add_liquidity(&f.alice, &6_000, &6_000);
+        f.amm.add_liquidity(&f.bob, &3_000, &3_000);
 
-        let (returned_x, returned_y) = f.amm.remove_liquidity(&f.bob, &1_000).unwrap();
+        let (returned_x, returned_y) = f.amm.remove_liquidity(&f.bob, &1_000);
 
         assert_eq!(returned_x, 1_000);
         assert_eq!(returned_y, 1_000);
         assert_eq!(f.amm.lp_balance(&f.bob), 2_000);
-        assert_eq!(f.amm.total_supply(), 5_000);
+        assert_eq!(f.amm.total_supply(), 8_000);
         assert_eq!(f.token_x.balance(&f.bob), 3_000);
         assert_eq!(f.token_y.balance(&f.bob), 3_000);
     }

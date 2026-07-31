@@ -1,8 +1,8 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map, Symbol};
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 #[contracttype]
 pub struct Position {
     pub collateral: i128,
@@ -234,8 +234,13 @@ impl LendingContract {
         if actual_repay <= 0 {
             panic!("repay amount too small");
         }
-        let collateral_to_seize = actual_repay * (100 + liquidation_incentive) / 100;
-        position.debt -= actual_repay;
+        let mut collateral_to_seize = actual_repay * (100 + liquidation_incentive) / 100;
+        let mut final_repay = actual_repay;
+        if collateral_to_seize > position.collateral {
+            collateral_to_seize = position.collateral;
+            final_repay = collateral_to_seize * 100 / (100 + liquidation_incentive);
+        }
+        position.debt -= final_repay;
         position.collateral -= collateral_to_seize;
         let mut liquidator_position = positions.get(liquidator.clone()).unwrap_or(Position {
             collateral: 0,
@@ -255,12 +260,12 @@ impl LendingContract {
 
     pub fn emergency_liquidate(env: Env, admin: Address, borrower: Address) {
         admin.require_auth();
-        if !env
+        let paused: bool = env
             .storage()
             .instance()
             .get(&Symbol::new(&env, "emergency_paused"))
-            .unwrap()
-        {
+            .unwrap();
+        if !paused {
             panic!("not in emergency mode");
         }
         let mut positions: Map<Address, Position> = env
