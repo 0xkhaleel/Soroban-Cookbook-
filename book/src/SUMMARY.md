@@ -65,6 +65,7 @@
 
 ## Governance (3 examples)
 - [Overview](./examples/governance.md)
+- [Governance Patterns Guide](./docs/governance-patterns.md)
 - [01 · Simple Voting](./examples/governance/01-simple-voting.md)
 - [02 · Voting Time Constraints](./examples/governance/02-voting-time-constraints.md)
 - [03 · Proposal Lifecycle](./examples/governance/03-proposal-lifecycle.md)
@@ -107,6 +108,12 @@
 - [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Monthly Call Governance](../GOVERNANCE/README.md)
+  - [Agenda Template](../GOVERNANCE/monthly-call-agenda-template.md)
+  - [Format Guidelines](../GOVERNANCE/monthly-call-format-guidelines.md)
+  - [Moderation Guide](../GOVERNANCE/monthly-call-moderation-guide.md)
+  - [Q&A Process](../GOVERNANCE/monthly-call-qa-process.md)
+  - [Follow-up Process](../GOVERNANCE/monthly-call-followup-process.md)
 
 # Architecture Decisions
 

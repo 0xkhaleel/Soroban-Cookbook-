@@ -61,6 +61,12 @@ impl AMMRouter {
     }
 
     fn calculate_swap_output(reserve_in: i128, reserve_out: i128, amount_in: i128) -> i128 {
+        if reserve_in <= 0 || reserve_out <= 0 {
+            panic!("insufficient liquidity in pool");
+        }
+        if amount_in <= 0 {
+            panic!("amount_in must be positive");
+        }
         let amount_in_with_fee = amount_in * 997;
         let numerator = amount_in_with_fee * reserve_out;
         let denominator = reserve_in * 1000 + amount_in_with_fee;
