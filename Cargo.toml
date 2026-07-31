@@ -21,6 +21,7 @@ members = [
     "examples/advanced/05-diamond-security/facet-multiplier",
     "examples/advanced/06-gas-optimization",
     "examples/advanced/07-upgrade-patterns",
+    "examples/tokens/04-snapshot-token",
     "examples/tokens/06-token-wrapper",
     "examples/tokens/03-optimized-operations",
     "examples/tokens/token-lock",
