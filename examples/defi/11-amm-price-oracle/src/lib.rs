@@ -39,11 +39,11 @@ pub struct OracleUpdateEventData {
     pub twap: i128,
 }
 
-const POOL_NS: Symbol = symbol_short!("amm_pool");
 const ORACLE_NS: Symbol = symbol_short!("amm_oracl");
 const EVENT_ORACLE_UPDATED: Symbol = symbol_short!("price_upd");
 
 impl AmmPoolContract {
+    #[allow(dead_code)]
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -90,6 +90,7 @@ impl AmmPoolContract {
 }
 
 impl AmmOracleContract {
+    #[allow(dead_code)]
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()

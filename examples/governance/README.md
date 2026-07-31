@@ -2,6 +2,12 @@
 
 On-chain governance patterns: voting systems, delegation, multisig control, and DAO treasury management.
 
+## 📂 Examples
+
+### [01-delegation-marketplace](./01-delegation-marketplace/)
+A marketplace for listing and renting voting power with incentive mechanisms.
+- **Concepts:** `require_auth()`, persistent storage, typed errors, event topics, fee transfer.
+
 ## Quick Start
 
 | # | Example | Concepts |

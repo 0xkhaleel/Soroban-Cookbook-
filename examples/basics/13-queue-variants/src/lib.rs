@@ -1,8 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, Bytes, Env};
 
 // Bounded queue -----------------------------------------------------------
 

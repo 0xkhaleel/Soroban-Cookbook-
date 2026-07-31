@@ -1,11 +1,11 @@
 [package]
-name = "delegation-marketplace"
+name = "gas-optimization"
 version.workspace = true
 edition.workspace = true
 publish = false
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 soroban-sdk = { workspace = true, features = ["alloc"] }
