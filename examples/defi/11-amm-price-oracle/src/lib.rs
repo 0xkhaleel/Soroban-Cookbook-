@@ -131,6 +131,9 @@ impl AmmOracleContract {
 #[contractimpl]
 impl AmmPoolContract {
     pub fn initialize(env: Env, owner: Address, token_a: Address, token_b: Address) {
+        if env.storage().instance().has(&PoolDataKey::Owner) {
+            panic!("already initialized");
+        }
         assert!(token_a != token_b, "pool tokens must differ");
         env.storage().instance().set(&PoolDataKey::Owner, &owner);
         env.storage().instance().set(&PoolDataKey::TokenA, &token_a);
@@ -141,6 +144,7 @@ impl AmmPoolContract {
     }
 
     pub fn deposit(env: Env, provider: Address, amount_a: i128, amount_b: i128) {
+        provider.require_auth();
         assert!(
             amount_a > 0 && amount_b > 0,
             "deposit amounts must be positive"
@@ -163,7 +167,8 @@ impl AmmPoolContract {
             .set(&PoolDataKey::ReserveB, &reserve_b);
     }
 
-    pub fn swap(env: Env, sell_token: Address, amount_in: i128, min_amount_out: i128) -> i128 {
+    pub fn swap(env: Env, trader: Address, sell_token: Address, amount_in: i128, min_amount_out: i128) -> i128 {
+        trader.require_auth();
         assert!(amount_in > 0, "amount_in must be positive");
         let this = AmmPoolContract;
         let token_a = this.token_a(&env);
@@ -174,14 +179,14 @@ impl AmmPoolContract {
         let contract_addr = env.current_contract_address();
 
         let (in_token, out_token, in_reserve, out_reserve) = if sell_token == token_a {
-            (token_a, token_b, reserve_a, reserve_b)
+            (token_a.clone(), token_b.clone(), reserve_a, reserve_b)
         } else if sell_token == token_b {
-            (token_b, token_a, reserve_b, reserve_a)
+            (token_b.clone(), token_a.clone(), reserve_b, reserve_a)
         } else {
             panic!("unsupported sell token");
         };
 
-        token::Client::new(&env, &in_token).transfer(&env.invoker(), &contract_addr, &amount_in);
+        token::Client::new(&env, &in_token).transfer(&trader, &contract_addr, &amount_in);
 
         let amount_after_fee = amount_in
             .checked_mul(10000 - fee_bps)
@@ -193,7 +198,7 @@ impl AmmPoolContract {
         let amount_out = numerator.checked_div(denominator).unwrap();
         assert!(amount_out >= min_amount_out, "slippage exceeded");
 
-        token::Client::new(&env, &out_token).transfer(&contract_addr, &env.invoker(), &amount_out);
+        token::Client::new(&env, &out_token).transfer(&contract_addr, &trader, &amount_out);
 
         let new_reserve_in = in_reserve + amount_in;
         let new_reserve_out = out_reserve - amount_out;
@@ -248,6 +253,9 @@ impl AmmPoolContract {
 #[contractimpl]
 impl AmmOracleContract {
     pub fn initialize(env: Env, owner: Address, pool_contract: Address) {
+        if env.storage().instance().has(&OracleDataKey::Owner) {
+            panic!("already initialized");
+        }
         env.storage().instance().set(&OracleDataKey::Owner, &owner);
         env.storage()
             .instance()
