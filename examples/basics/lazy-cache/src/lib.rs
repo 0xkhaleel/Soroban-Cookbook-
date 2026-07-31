@@ -136,10 +136,8 @@ fn add_to_cache(env: &Env, metadata: &mut CacheMetadata, id: u32, value: u64) {
                     .temporary()
                     .remove(&StorageKey::Cache(evicted_id));
                 metadata.ids.remove(0);
-                env.events().publish(
-                    (symbol_short!("cache"), symbol_short!("evict")),
-                    evicted_id,
-                );
+                env.events()
+                    .publish((symbol_short!("cache"), symbol_short!("evict")), evicted_id);
             }
         }
         metadata.ids.push_back(id);

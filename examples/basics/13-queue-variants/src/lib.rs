@@ -111,6 +111,10 @@ impl BoundedQueueContract {
         m.len
     }
 
+    pub fn is_empty(env: Env) -> bool {
+        Self::len(env) == 0
+    }
+
     pub fn capacity(env: Env) -> i128 {
         let m = Self::meta(&env);
         m.capacity
@@ -205,6 +209,10 @@ impl CircularBufferContract {
     pub fn len(env: Env) -> i128 {
         let m = Self::meta(&env);
         m.len
+    }
+
+    pub fn is_empty(env: Env) -> bool {
+        Self::len(env) == 0
     }
 
     pub fn capacity(env: Env) -> i128 {

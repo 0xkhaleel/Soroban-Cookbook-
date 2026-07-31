@@ -29,6 +29,7 @@
 //! These two patterns are complementary, not competing.
 
 #![no_std]
+#![allow(unexpected_cfgs)]
 
 pub mod direct_upgrade;
 pub mod init_guard;
