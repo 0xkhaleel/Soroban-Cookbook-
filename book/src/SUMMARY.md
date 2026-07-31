@@ -17,6 +17,10 @@
 - [Video Creation Tools](./guides/video-creation.md)
 - [Introduction Video](./guides/introduction-video.md)
 
+# Playground
+
+- [Playground Infrastructure](./playground.md)
+
 # Examples
 
 - [All Examples Index](./examples-index.md)
