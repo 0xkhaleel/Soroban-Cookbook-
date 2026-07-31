@@ -56,6 +56,9 @@ impl FarmingPoolContract {
     ) -> u32 {
         admin.require_auth();
         Self::check_admin(&env, &admin);
+        if reward_rate <= 0 || reward_rate > 1_000_000_000_000_000 {
+            panic!("Invalid reward rate");
+        }
 
         let mut pools: Vec<u32> = env
             .storage()
@@ -114,6 +117,9 @@ impl FarmingPoolContract {
     pub fn set_reward_rate(env: Env, admin: Address, pool_id: u32, new_rate: i128) {
         admin.require_auth();
         Self::check_admin(&env, &admin);
+        if new_rate <= 0 || new_rate > 1_000_000_000_000_000 {
+            panic!("Invalid reward rate");
+        }
 
         let mut pool = Self::get_pool(&env, pool_id);
         Self::update_pool(&env, &mut pool);
@@ -167,7 +173,7 @@ impl FarmingPoolContract {
 
         if amount > 0 {
             let client = soroban_sdk::token::Client::new(&env, &pool.staking_token);
-            client.transfer(&user, &env.current_contract_address(), &amount);
+            client.transfer(&user, env.current_contract_address(), &amount);
             user_info.amount += amount;
             pool.total_staked += amount;
         }
