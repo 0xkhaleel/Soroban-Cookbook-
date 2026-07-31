@@ -1,5 +1,5 @@
 use super::*;
-use soroban_sdk::{symbol_short, testutils::Address as _, Env};
+use soroban_sdk::{symbol_short, Env};
 
 fn setup(env: &Env) -> PriorityQueueContractClient<'_> {
     let contract_id = env.register_contract(None, PriorityQueueContract);
@@ -34,6 +34,43 @@ fn test_len_and_is_empty_after_insertions() {
 
     assert_eq!(client.len(), 2);
     assert!(!client.is_empty());
+}
+
+/// Heap integrity: whatever order items go in, they must come out by
+/// descending priority, and the root must always hold the maximum.
+#[test]
+fn test_heap_integrity_across_interleaved_pushes_and_pops() {
+    let env = Env::default();
+    let client = setup(&env);
+
+    let items = [
+        (symbol_short!("a"), 4i128),
+        (symbol_short!("b"), 9),
+        (symbol_short!("c"), 1),
+        (symbol_short!("d"), 7),
+        (symbol_short!("e"), 3),
+        (symbol_short!("f"), 8),
+    ];
+    for (item, priority) in items.iter() {
+        client.push(item, priority);
+        // The root is the maximum priority pushed so far.
+        let max_so_far = client.all().iter().map(|e| e.priority).max().unwrap();
+        assert_eq!(client.all().get(0).unwrap().priority, max_so_far);
+    }
+
+    // Draining yields strictly descending priorities.
+    let mut previous = i128::MAX;
+    while !client.is_empty() {
+        let expected_len = client.len() - 1;
+        let top = client.all().get(0).unwrap().priority;
+        assert!(
+            top <= previous,
+            "heap order violated: {top} after {previous}"
+        );
+        previous = top;
+        client.pop_max();
+        assert_eq!(client.len(), expected_len);
+    }
 }
 
 #[test]
