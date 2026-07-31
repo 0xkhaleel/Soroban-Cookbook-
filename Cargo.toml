@@ -13,6 +13,7 @@ members = [
     "examples/intermediate/03-priority-queue",
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-timelock",
+    "examples/advanced/09-storage-layout-validator",
     "examples/advanced/03-permit-pattern",
     "examples/advanced/03-gasless-relayer",
     "examples/advanced/03-oracle-pattern",
