@@ -192,8 +192,7 @@ impl VersionedUpgradeContract {
             env.ledger().timestamp(),
         );
 
-        env.deployer()
-            .update_current_contract_wasm(new_wasm_hash);
+        env.deployer().update_current_contract_wasm(new_wasm_hash);
 
         Ok(())
     }
@@ -299,11 +298,14 @@ impl VersionedUpgradeContract {
             panic!("storage not migrated to v2; call migrate() first");
         }
 
-        let mut counter: CounterV2 = env
-            .storage()
-            .instance()
-            .get(&DataKey::Counter)
-            .unwrap_or(CounterV2 { val: 0, last_updated: 0 });
+        let mut counter: CounterV2 =
+            env.storage()
+                .instance()
+                .get(&DataKey::Counter)
+                .unwrap_or(CounterV2 {
+                    val: 0,
+                    last_updated: 0,
+                });
 
         counter.val = counter.val.checked_add(amount).expect("counter overflow");
         counter.last_updated = env.ledger().timestamp();
@@ -344,7 +346,10 @@ impl VersionedUpgradeContract {
             .storage()
             .instance()
             .get(&DataKey::Counter)
-            .unwrap_or(CounterV2 { val: 0, last_updated: 0 }))
+            .unwrap_or(CounterV2 {
+                val: 0,
+                last_updated: 0,
+            }))
     }
 
     /// Return the admin address, or an error if uninitialised.
@@ -363,6 +368,7 @@ impl VersionedUpgradeContract {
 /// state (v1 schema) and then verify that `migrate()` transforms it correctly.
 /// It is compiled out in production builds.
 #[cfg(any(test, feature = "testutils"))]
+#[allow(unexpected_cfgs)]
 pub fn seed_v1_counter(env: &Env, val: i64) {
     env.storage()
         .instance()

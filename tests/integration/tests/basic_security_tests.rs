@@ -4,11 +4,7 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{
-    symbol_short,
-    testutils::Address as _,
-    Address, Bytes, Env,
-};
+use soroban_sdk::{symbol_short, testutils::Address as _, Address, Bytes, Env};
 
 // ---------------------------------------------------------------------------
 // Security Test 1: Authentication Negative Amount & Overflow Prevention

@@ -39,11 +39,14 @@ pub struct OracleUpdateEventData {
     pub twap: i128,
 }
 
+/*
 const POOL_NS: Symbol = symbol_short!("amm_pool");
+*/
 const ORACLE_NS: Symbol = symbol_short!("amm_oracl");
 const EVENT_ORACLE_UPDATED: Symbol = symbol_short!("price_upd");
 
 impl AmmPoolContract {
+    /*
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -52,6 +55,7 @@ impl AmmPoolContract {
             .expect("pool not initialized");
         owner.require_auth();
     }
+    */
 
     fn token_a(&self, env: &Env) -> Address {
         env.storage()
@@ -90,6 +94,7 @@ impl AmmPoolContract {
 }
 
 impl AmmOracleContract {
+    /*
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -98,6 +103,7 @@ impl AmmOracleContract {
             .expect("oracle not initialized");
         owner.require_auth();
     }
+    */
 
     fn pool_contract(&self, env: &Env) -> Address {
         env.storage()
@@ -167,7 +173,13 @@ impl AmmPoolContract {
             .set(&PoolDataKey::ReserveB, &reserve_b);
     }
 
-    pub fn swap(env: Env, trader: Address, sell_token: Address, amount_in: i128, min_amount_out: i128) -> i128 {
+    pub fn swap(
+        env: Env,
+        trader: Address,
+        sell_token: Address,
+        amount_in: i128,
+        min_amount_out: i128,
+    ) -> i128 {
         trader.require_auth();
         assert!(amount_in > 0, "amount_in must be positive");
         let this = AmmPoolContract;

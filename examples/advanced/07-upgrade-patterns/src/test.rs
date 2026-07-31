@@ -147,8 +147,8 @@ mod direct {
 mod versioned {
     use super::*;
     use crate::versioned_upgrade::{
-        seed_v1_counter, VersionedError, VersionedUpgradeContract,
-        VersionedUpgradeContractClient, CURRENT_VERSION, LEGACY_VERSION,
+        seed_v1_counter, VersionedError, VersionedUpgradeContract, VersionedUpgradeContractClient,
+        CURRENT_VERSION, LEGACY_VERSION,
     };
 
     fn setup() -> (Env, Address, VersionedUpgradeContractClient<'static>) {
@@ -240,10 +240,7 @@ mod versioned {
     fn increment_before_migration_panics() {
         let (_env, _admin, client) = setup();
         let result = client.try_increment(&5i64);
-        assert!(
-            result.is_err(),
-            "increment must fail before migration runs"
-        );
+        assert!(result.is_err(), "increment must fail before migration runs");
     }
 
     // ── Post-migration business logic ────────────────────────────────────────

@@ -171,9 +171,7 @@ impl MerkleAirdropContract {
 
     /// Check if a claimer has already claimed.
     pub fn is_claimed(env: Env, claimer: Address) -> bool {
-        env.storage()
-            .persistent()
-            .has(&DataKey::Claimed(claimer))
+        env.storage().persistent().has(&DataKey::Claimed(claimer))
     }
 
     /// Derive the leaf hash of a claim tuple (claimer, amount).
