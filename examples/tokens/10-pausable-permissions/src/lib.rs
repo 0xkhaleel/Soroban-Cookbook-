@@ -128,7 +128,9 @@ impl PausablePermissions {
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Paused, &false);
-        env.storage().instance().set(&DataKey::PauseExpiresAt, &0u64);
+        env.storage()
+            .instance()
+            .set(&DataKey::PauseExpiresAt, &0u64);
         env.storage()
             .instance()
             .set(&DataKey::PauseVotes, &Vec::<Address>::new(&env));
@@ -171,7 +173,9 @@ impl PausablePermissions {
         Self::require_not_paused(&env)?;
 
         env.storage().instance().set(&DataKey::Paused, &true);
-        env.storage().instance().set(&DataKey::PauseExpiresAt, &0u64);
+        env.storage()
+            .instance()
+            .set(&DataKey::PauseExpiresAt, &0u64);
 
         env.events()
             .publish((NS, EVT_PAUSE, pauser), env.ledger().timestamp());
@@ -244,8 +248,7 @@ impl PausablePermissions {
         votes.push_back(guardian.clone());
         env.storage().instance().set(&DataKey::PauseVotes, &votes);
 
-        env.events()
-            .publish((NS, EVT_VOTE, guardian), votes.len());
+        env.events().publish((NS, EVT_VOTE, guardian), votes.len());
 
         // Check if threshold is met.
         let threshold: u32 = env
@@ -256,7 +259,9 @@ impl PausablePermissions {
 
         if votes.len() >= threshold {
             env.storage().instance().set(&DataKey::Paused, &true);
-            env.storage().instance().set(&DataKey::PauseExpiresAt, &0u64);
+            env.storage()
+                .instance()
+                .set(&DataKey::PauseExpiresAt, &0u64);
             // Reset votes after triggering pause.
             env.storage()
                 .instance()
@@ -289,11 +294,7 @@ impl PausablePermissions {
     ///
     /// After `duration` seconds the pause automatically lifts — guarded
     /// operations check `pause_expires_at` and resume without a transaction.
-    pub fn pause_for(
-        env: Env,
-        caller: Address,
-        duration: u64,
-    ) -> Result<(), PauseError> {
+    pub fn pause_for(env: Env, caller: Address, duration: u64) -> Result<(), PauseError> {
         caller.require_auth();
         if duration == 0 {
             return Err(PauseError::InvalidDuration);
@@ -307,8 +308,7 @@ impl PausablePermissions {
             .instance()
             .set(&DataKey::PauseExpiresAt, &expires_at);
 
-        env.events()
-            .publish((NS, EVT_PAUSE, caller), expires_at);
+        env.events().publish((NS, EVT_PAUSE, caller), expires_at);
         Ok(())
     }
 
@@ -329,7 +329,9 @@ impl PausablePermissions {
         }
 
         env.storage().instance().set(&DataKey::Paused, &false);
-        env.storage().instance().set(&DataKey::PauseExpiresAt, &0u64);
+        env.storage()
+            .instance()
+            .set(&DataKey::PauseExpiresAt, &0u64);
         env.storage()
             .instance()
             .set(&DataKey::PauseVotes, &Vec::<Address>::new(&env));
@@ -424,7 +426,9 @@ impl PausablePermissions {
         if env.ledger().timestamp() >= expires_at {
             // Auto-lift: clear pause state.
             env.storage().instance().set(&DataKey::Paused, &false);
-            env.storage().instance().set(&DataKey::PauseExpiresAt, &0u64);
+            env.storage()
+                .instance()
+                .set(&DataKey::PauseExpiresAt, &0u64);
             env.events()
                 .publish((NS, EVT_EXPIRE), env.ledger().timestamp());
             return false;

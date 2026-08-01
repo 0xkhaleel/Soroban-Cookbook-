@@ -1,7 +1,7 @@
 [package]
 name = "upgrade-patterns"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 publish = false
 
 [lib]
@@ -12,3 +12,6 @@ soroban-sdk = { workspace = true, features = ["alloc"] }
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils", "alloc"] }
+
+[features]
+testutils = []

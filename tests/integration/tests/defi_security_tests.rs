@@ -10,23 +10,21 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
+use amm_price_oracle::{
+    AmmOracleContract, AmmOracleContractClient, AmmPoolContract, AmmPoolContractClient,
+};
+use amm_router::{AMMRouter, AMMRouterClient, Pool as RouterPool};
+use collateralized_lending::{LendingContract, LendingContractClient};
+use farming_pool::{FarmingPoolContract, FarmingPoolContractClient};
 use lending_pool::{LendingPool, LendingPoolClient};
 use staking_pool::{StakingPoolContract, StakingPoolContractClient};
 use swap_liquidity_management::{SwapLiquidityContract, SwapLiquidityContractClient};
-use amm_price_oracle::{
-    AmmPoolContract, AmmPoolContractClient, AmmOracleContract, AmmOracleContractClient,
-};
-use farming_pool::{FarmingPoolContract, FarmingPoolContractClient};
-use amm_router::{AMMRouter, AMMRouterClient, Pool as RouterPool};
-use collateralized_lending::{LendingContract, LendingContractClient};
 
-use soroban_sdk::{
-    testutils::Address as _,
-    token, Address, Env, Vec,
-};
+use soroban_sdk::{testutils::Address as _, token, Address, Env, Vec};
 
+#[allow(dead_code)]
+#[allow(deprecated)]
 fn create_token<'a>(env: &'a Env, admin: &Address) -> (Address, token::Client<'a>) {
-    #![allow(deprecated)]
     let token_id = env.register_stellar_asset_contract_v2(admin.clone());
     let addr = token_id.address();
     let client = token::Client::new(env, &addr);
@@ -169,7 +167,13 @@ fn test_farming_pool_excessive_reward_rate_add() {
     client.initialize(&admin);
 
     // Rates larger than 1e15 are invalid
-    client.add_pool(&admin, &staking_token, &reward_token, &2_000_000_000_000_000, &100);
+    client.add_pool(
+        &admin,
+        &staking_token,
+        &reward_token,
+        &2_000_000_000_000_000,
+        &100,
+    );
 }
 
 #[test]

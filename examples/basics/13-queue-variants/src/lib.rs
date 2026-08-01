@@ -1,8 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, Bytes, Env};
 
 // Bounded queue -----------------------------------------------------------
 
@@ -113,6 +111,10 @@ impl BoundedQueueContract {
         m.len
     }
 
+    pub fn is_empty(env: Env) -> bool {
+        Self::len(env) == 0
+    }
+
     pub fn capacity(env: Env) -> i128 {
         let m = Self::meta(&env);
         m.capacity
@@ -207,6 +209,10 @@ impl CircularBufferContract {
     pub fn len(env: Env) -> i128 {
         let m = Self::meta(&env);
         m.len
+    }
+
+    pub fn is_empty(env: Env) -> bool {
+        Self::len(env) == 0
     }
 
     pub fn capacity(env: Env) -> i128 {

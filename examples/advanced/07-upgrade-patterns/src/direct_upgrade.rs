@@ -40,7 +40,9 @@
 //! version adds more keys, read the versioned-upgrade example to understand
 //! how to migrate old data without corruption.
 
-use soroban_sdk::{contract, contracterror, contractimpl, contracttype, symbol_short, BytesN, Env, Symbol};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, symbol_short, BytesN, Env, Symbol,
+};
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -151,16 +153,17 @@ impl DirectUpgradeContract {
         // Emit the event *before* the deployer call so that even if the host
         // call reverts the event is still part of the failed-transaction
         // diagnostic record.
-        env.events()
-            .publish((NS, EV_UPGRADE, admin, new_wasm_hash.clone()), env.ledger().timestamp());
+        env.events().publish(
+            (NS, EV_UPGRADE, admin, new_wasm_hash.clone()),
+            env.ledger().timestamp(),
+        );
 
         // ── The upgrade itself ──────────────────────────────────────────────
         //
         // After this line returns, the next invocation of any entry point on
         // this contract address will run code_v2. The current invocation
         // continues to completion under code_v1.
-        env.deployer()
-            .update_current_contract_wasm(new_wasm_hash);
+        env.deployer().update_current_contract_wasm(new_wasm_hash);
 
         Ok(())
     }

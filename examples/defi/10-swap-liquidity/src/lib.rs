@@ -33,6 +33,7 @@ const EVENT_ADD: Symbol = symbol_short!("liq_added");
 const EVENT_REMOVE: Symbol = symbol_short!("liq_rmvd");
 
 impl SwapLiquidityContract {
+    /*
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -41,6 +42,7 @@ impl SwapLiquidityContract {
             .expect("contract not initialized");
         owner.require_auth();
     }
+    */
 
     fn token_a(&self, env: &Env) -> Address {
         env.storage()

@@ -1,7 +1,7 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::{testutils::Address as _, Address, Bytes, Env};
+use soroban_sdk::{Bytes, Env};
 
 fn bytes(env: &Env, s: &[u8]) -> Bytes {
     Bytes::from_slice(env, s)

@@ -134,13 +134,7 @@ impl EventAggregator {
     /// cross-invocation accumulation is possible since instance storage
     /// persists across ledgers).  No event is emitted here — this is
     /// deliberate: the emission cost is deferred to `flush()`.
-    pub fn queue_action(
-        env: Env,
-        actor: Address,
-        action_type: Symbol,
-        amount: i128,
-        memo: u64,
-    ) {
+    pub fn queue_action(env: Env, actor: Address, action_type: Symbol, amount: i128, memo: u64) {
         actor.require_auth();
 
         let entry = ActionEntry {
@@ -216,9 +210,7 @@ impl EventAggregator {
         env.storage()
             .instance()
             .set(&DataKey::BatchCounter, &(batch_id + 1));
-        env.storage()
-            .instance()
-            .remove(&DataKey::PendingActions);
+        env.storage().instance().remove(&DataKey::PendingActions);
 
         Ok(batch_id)
     }
