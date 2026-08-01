@@ -1,7 +1,10 @@
 //! Tests for the Pausable Permissions contract.
 
 use super::*;
-use soroban_sdk::{testutils::{Address as _, Ledger as _}, Address, Env, Vec};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger as _},
+    Address, Env, Vec,
+};
 
 // ---------------------------------------------------------------------------
 // Helper
@@ -36,7 +39,10 @@ fn initialize_twice_fails() {
     let env = Env::default();
     let (client, admin) = setup(&env);
     let res = client.try_initialize(&admin);
-    assert_eq!(res.err().unwrap().ok().unwrap(), PauseError::AlreadyInitialized);
+    assert_eq!(
+        res.err().unwrap().ok().unwrap(),
+        PauseError::AlreadyInitialized
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -284,7 +290,10 @@ fn pause_for_fails_with_zero_duration() {
     let (client, admin) = setup(&env);
 
     let res = client.try_pause_for(&admin, &0u64);
-    assert_eq!(res.err().unwrap().ok().unwrap(), PauseError::InvalidDuration);
+    assert_eq!(
+        res.err().unwrap().ok().unwrap(),
+        PauseError::InvalidDuration
+    );
 }
 
 #[test]

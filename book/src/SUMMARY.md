@@ -17,6 +17,10 @@
 - [Video Creation Tools](./guides/video-creation.md)
 - [Introduction Video](./guides/introduction-video.md)
 
+# Playground
+
+- [Playground Infrastructure](./playground.md)
+
 # Examples
 
 - [All Examples Index](./examples-index.md)
@@ -93,6 +97,7 @@
 - [Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)
 - [Glossary](./docs/glossary.md)
+- [Translation Infrastructure](./docs/translation-infrastructure.md)
 - [Common Patterns](./docs/common-patterns.md)
 - [Factory, Proxy, and Registry Patterns](./docs/cross-contract-patterns.md)
 - [Troubleshooting](./docs/troubleshooting.md)
