@@ -31,6 +31,8 @@ members = [
     "examples/advanced/07-upgrade-patterns",
     "examples/advanced/09-fuzz-testing",
     "examples/advanced/10-contract-migrations",
+    "examples/advanced/11-version-registry",
+    "examples/advanced/09-storage-optimization",
     "examples/tokens/01-sep41-token",
     "examples/tokens/03-pausable-token",
     "examples/tokens/04-mint-burn",

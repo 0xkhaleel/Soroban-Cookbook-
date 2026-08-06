@@ -120,6 +120,11 @@
   - [Q&A Process](../GOVERNANCE/monthly-call-qa-process.md)
   - [Follow-up Process](../GOVERNANCE/monthly-call-followup-process.md)
 
+# 中文文档
+
+- [简介](./zh/README.md)
+- [目录](./zh/SUMMARY.md)
+
 # Architecture Decisions
 
 - [ADR Index](./adr/README.md)

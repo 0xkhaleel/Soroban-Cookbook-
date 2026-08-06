@@ -23,13 +23,16 @@ This category contains examples of complex systems and advanced architectural pa
 - [`05-bridge-security`](./05-bridge-security/) — Rate limiting, pause, challenge window, and fraud-proof patterns for bridge releases
 - [`05-rate-limiting`](./05-rate-limiting/) — Per-user time- and amount-based rate limiting with admin overrides
 - [`06-beacon-management`](./06-beacon-management/) — Versioned beacon management with rollback support
+- [`07-trusted-forwarder`](./07-trusted-forwarder/) — Meta-transaction trusted forwarder pattern
 - [`07-upgrade-patterns`](./07-upgrade-patterns/) — Direct WASM upgrade, versioned storage migration, init guards
+- [`08-batch-operations`](./08-batch-operations/) — Batch call interface with atomic rollback
 - [`09-fuzz-testing`](./09-fuzz-testing/) — Fuzzable claimable-balance contract with property tests and cargo-fuzz targets
+- [`09-storage-optimization`](./09-storage-optimization/) — Packed storage, lazy loading, and batch operations
 - [`10-contract-migrations`](./10-contract-migrations/) — Batched v1→v2 storage migration with dual-read and version gates
+- [`11-version-registry`](./11-version-registry/) — Contract version tracking with history and rollback (Phase 5)
 
 ## Planned Examples
 
 - [`04-bridge-validators`](./04-bridge-validators/) — Bridge validators and multi-sig threshold
 - `05-atomic-swaps`: A trustless, cross-contract asset swap.
 - `05-payment-channels`: A basic state channel implementation for off-chain transactions.
-- `08-batch-operations`: Batch call interface with atomic rollback and partial execution modes.
