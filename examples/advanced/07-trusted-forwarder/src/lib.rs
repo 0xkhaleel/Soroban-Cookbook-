@@ -239,6 +239,9 @@ impl TrustedForwarder {
     }
 }
 
+// Demo recipient used by host tests. Gated off wasm so its `initialize` export
+// does not collide with TrustedForwarder (SDK 26 removed contractimpl export=false).
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[repr(u32)]
@@ -248,6 +251,7 @@ pub enum RecipientError {
     UnauthorizedCaller = 3,
 }
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contracttype]
 pub enum RecipientDataKey {
     TrustedForwarder,
@@ -256,10 +260,12 @@ pub enum RecipientDataKey {
     LastSender,
 }
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contract]
 pub struct SimpleRecipient;
 
-#[contractimpl(export = false)]
+#[cfg(any(test, not(target_family = "wasm")))]
+#[contractimpl]
 impl SimpleRecipient {
     pub fn initialize(env: Env, forwarder: Address) -> Result<(), RecipientError> {
         if env.storage().instance().has(&RecipientDataKey::Initialized) {

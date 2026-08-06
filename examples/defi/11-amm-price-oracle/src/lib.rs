@@ -266,7 +266,7 @@ impl AmmPoolContract {
 
 #[contractimpl]
 impl AmmOracleContract {
-    pub fn initialize(env: Env, owner: Address, pool_contract: Address) {
+    pub fn initialize_oracle(env: Env, owner: Address, pool_contract: Address) {
         if env.storage().instance().has(&OracleDataKey::Owner) {
             panic!("already initialized");
         }
