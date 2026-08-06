@@ -57,11 +57,12 @@ fn transfer_works_when_unpaused() {
 
     f.token.transfer(&f.admin, &f.alice, &500_000);
 
-    assert_eq!(f.token.balance(&f.admin), 500_000);
-    assert_eq!(f.token.balance(&f.alice), 500_000);
-
+    // `events().all()` only covers the last successful invocation.
     let events = EventList::new(&f.env, f.env.events().all());
     assert_eq!(events.len(), 1);
+
+    assert_eq!(f.token.balance(&f.admin), 500_000);
+    assert_eq!(f.token.balance(&f.alice), 500_000);
 
     let (_id, topics, data) = events.get(0).unwrap();
     assert_eq!(topics.len(), 4);
