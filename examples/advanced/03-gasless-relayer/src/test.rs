@@ -63,7 +63,10 @@ fn test_relay_transfer_with_valid_signature() {
     };
 
     let signature = sign_tx(&env, &signer, &tx);
-    assert_eq!(client.try_relay_transfer(&relayer, &tx, &signature), Ok(Ok(())));
+    assert_eq!(
+        client.try_relay_transfer(&relayer, &tx, &signature),
+        Ok(Ok(()))
+    );
 }
 
 #[test]
@@ -93,7 +96,10 @@ fn test_replay_rejected() {
     };
 
     let signature = sign_tx(&env, &signer, &tx);
-    assert_eq!(client.try_relay_transfer(&relayer, &tx, &signature), Ok(Ok(())));
+    assert_eq!(
+        client.try_relay_transfer(&relayer, &tx, &signature),
+        Ok(Ok(()))
+    );
     assert_eq!(
         client.try_relay_transfer(&relayer, &tx, &signature),
         Err(Ok(RelayerError::InvalidNonce))

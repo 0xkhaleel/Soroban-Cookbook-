@@ -38,7 +38,15 @@ fn setup() -> (
 
     token_admin_client.mint(&depositor, &10_000);
 
-    (env, depositor, claimant, token_id, contract_id, client, token)
+    (
+        env,
+        depositor,
+        claimant,
+        token_id,
+        contract_id,
+        client,
+        token,
+    )
 }
 
 #[test]

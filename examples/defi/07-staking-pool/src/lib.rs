@@ -1,8 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, token, Address, Env,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env};
 
 const REWARD_PRECISION: i128 = 1_000_000_000_000_000_000;
 

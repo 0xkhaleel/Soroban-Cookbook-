@@ -134,12 +134,7 @@ impl LazyLoadingContract {
     ///
     /// Writes to persistent storage and invalidates any stale cache entry so
     /// the next `get_item` call fetches the fresh value.
-    pub fn set_item(
-        env: Env,
-        owner: Address,
-        id: u32,
-        value: Symbol,
-    ) -> Result<(), LazyError> {
+    pub fn set_item(env: Env, owner: Address, id: u32, value: Symbol) -> Result<(), LazyError> {
         owner.require_auth();
 
         if id == 0 {
@@ -153,9 +148,7 @@ impl LazyLoadingContract {
         };
 
         // Write to canonical persistent storage.
-        env.storage()
-            .persistent()
-            .set(&DataKey::Item(id), &item);
+        env.storage().persistent().set(&DataKey::Item(id), &item);
 
         // Update item count if this is a new id.
         let count: u32 = env
@@ -164,17 +157,14 @@ impl LazyLoadingContract {
             .get(&DataKey::ItemCount)
             .unwrap_or(0);
         if count < id {
-            env.storage()
-                .instance()
-                .set(&DataKey::ItemCount, &id);
+            env.storage().instance().set(&DataKey::ItemCount, &id);
         }
 
         // Cache invalidation: remove the stale cache entry so the next read
         // re-loads the updated value from persistent storage.
         Self::invalidate_cache(&env, id);
 
-        env.events()
-            .publish((NS, EVT_SET, owner), (id, value));
+        env.events().publish((NS, EVT_SET, owner), (id, value));
 
         Ok(())
     }
@@ -280,20 +270,14 @@ impl LazyLoadingContract {
         if keys.len() >= CACHE_CAPACITY {
             let oldest = keys.get(0).unwrap();
             keys.remove(0);
-            env.storage()
-                .instance()
-                .remove(&DataKey::Cache(oldest));
+            env.storage().instance().remove(&DataKey::Cache(oldest));
             env.events().publish((NS, EVT_EVICT), oldest);
         }
 
         // Add new entry.
         keys.push_back(id);
-        env.storage()
-            .instance()
-            .set(&DataKey::Cache(id), item);
-        env.storage()
-            .instance()
-            .set(&DataKey::CacheKeys, &keys);
+        env.storage().instance().set(&DataKey::Cache(id), item);
+        env.storage().instance().set(&DataKey::CacheKeys, &keys);
     }
 
     /// Remove `id` from the cache (both the entry and the keys list).
@@ -311,12 +295,8 @@ impl LazyLoadingContract {
 
         if let Some(idx) = found_idx {
             keys.remove(idx);
-            env.storage()
-                .instance()
-                .remove(&DataKey::Cache(id));
-            env.storage()
-                .instance()
-                .set(&DataKey::CacheKeys, &keys);
+            env.storage().instance().remove(&DataKey::Cache(id));
+            env.storage().instance().set(&DataKey::CacheKeys, &keys);
         }
     }
 }

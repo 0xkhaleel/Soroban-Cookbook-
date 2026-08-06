@@ -1,8 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, Symbol, Vec};
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -171,7 +169,7 @@ impl StorageOptimization {
             panic!("Contract is paused");
         }
 
-        let count: u32 = deposits.len() as u32;
+        let count: u32 = deposits.len();
         for (user, amount) in deposits.iter() {
             let mut data: PackedUserData = env
                 .storage()

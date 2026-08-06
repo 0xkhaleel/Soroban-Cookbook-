@@ -1,8 +1,11 @@
 #![cfg(test)]
 
 use super::*;
+use soroban_sdk::{
+    testutils::{Address as _, Events as _},
+    Address, Env, String, Symbol, TryFromVal,
+};
 use soroban_validation::test_events::EventList;
-use soroban_sdk::{testutils::{Address as _, Events as _}, Address, Env, Symbol, String, TryFromVal};
 
 struct Fixture {
     env: Env,
@@ -21,7 +24,9 @@ fn setup() -> Fixture {
     let token = PausableTokenClient::new(&env, &token_id);
     let name = String::from_str(&env, "Pausable USD");
     let symbol = Symbol::new(&env, "PUSD");
-    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
+    token
+        .initialize(&admin, &name, &symbol, &2u32, &1_000_000i128)
+        .unwrap();
 
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -39,7 +44,10 @@ fn setup() -> Fixture {
 fn initialize_sets_metadata_and_unpaused_state() {
     let f = setup();
 
-    assert_eq!(f.token.name().unwrap(), String::from_str(&f.env, "Pausable USD"));
+    assert_eq!(
+        f.token.name().unwrap(),
+        String::from_str(&f.env, "Pausable USD")
+    );
     assert_eq!(f.token.symbol().unwrap(), Symbol::new(&f.env, "PUSD"));
     assert_eq!(f.token.decimals().unwrap(), 2);
     assert_eq!(f.token.admin().unwrap(), f.admin);
@@ -117,7 +125,9 @@ fn approve_and_transfer_from_work_when_unpaused() {
     f.token.approve(&f.admin, &f.alice, &300_000).unwrap();
     assert_eq!(f.token.allowance(&f.admin, &f.alice), 300_000);
 
-    f.token.transfer_from(&f.alice, &f.admin, &f.bob, &250_000).unwrap();
+    f.token
+        .transfer_from(&f.alice, &f.admin, &f.bob, &250_000)
+        .unwrap();
     assert_eq!(f.token.balance(&f.admin), 750_000);
     assert_eq!(f.token.balance(&f.bob), 250_000);
     assert_eq!(f.token.allowance(&f.admin, &f.alice), 50_000);
@@ -301,7 +311,10 @@ fn burn_rejects_insufficient_balance() {
 fn burn_rejects_zero_amount() {
     let f = setup();
 
-    assert_eq!(f.token.try_burn(&f.admin, &0), Err(Ok(TokenError::InvalidAmount)));
+    assert_eq!(
+        f.token.try_burn(&f.admin, &0),
+        Err(Ok(TokenError::InvalidAmount))
+    );
 }
 
 #[test]
@@ -330,7 +343,8 @@ fn double_initialize_is_rejected() {
     let name = String::from_str(&f.env, "Pausable USD");
     let symbol = Symbol::new(&f.env, "PUSD");
     assert_eq!(
-        f.token.try_initialize(&f.admin, &name, &symbol, &2u32, &1_000_000i128),
+        f.token
+            .try_initialize(&f.admin, &name, &symbol, &2u32, &1_000_000i128),
         Err(Ok(TokenError::AlreadyInitialized))
     );
 }
@@ -343,7 +357,10 @@ fn uninitialized_contract_returns_not_initialized_for_metadata() {
     let token_id = env.register_contract(None, PausableToken);
     let token = PausableTokenClient::new(&env, &token_id);
 
-    assert_eq!(token.try_total_supply(), Err(Ok(TokenError::NotInitialized)));
+    assert_eq!(
+        token.try_total_supply(),
+        Err(Ok(TokenError::NotInitialized))
+    );
     assert_eq!(token.try_name(), Err(Ok(TokenError::NotInitialized)));
     assert_eq!(token.try_symbol(), Err(Ok(TokenError::NotInitialized)));
     assert_eq!(token.try_decimals(), Err(Ok(TokenError::NotInitialized)));
