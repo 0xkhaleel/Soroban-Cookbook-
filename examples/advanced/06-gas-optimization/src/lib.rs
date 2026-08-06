@@ -121,14 +121,14 @@ fn save_config(env: &Env, config: &Config) {
 fn read_balance(env: &Env, account: &Address) -> i128 {
     env.storage()
         .persistent()
-        .get(&DataKey::Balance(*account))
+        .get(&DataKey::Balance(account.clone()))
         .unwrap_or(0)
 }
 
 fn write_balance(env: &Env, account: &Address, amount: i128) {
     env.storage()
         .persistent()
-        .set(&DataKey::Balance(*account), &amount);
+        .set(&DataKey::Balance(account.clone()), &amount);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,7 +1,11 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{symbol_short, testutils::Address as _, Address, BytesN, Env, Symbol, Vec};
+use soroban_sdk::{
+    symbol_short,
+    testutils::{Address as _, Ledger as _},
+    Address, BytesN, Env, Symbol, Vec,
+};
 
 #[test]
 fn test_version_registry_full_lifecycle() {
