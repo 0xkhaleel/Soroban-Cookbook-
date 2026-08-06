@@ -126,10 +126,10 @@ fn test_prevent_reinitialization_amm_oracle() {
 
     let oracle_id = env.register_contract(None, AmmOracleContract);
     let oracle_client = AmmOracleContractClient::new(&env, &oracle_id);
-    oracle_client.initialize(&owner, &pool_id);
+    oracle_client.initialize_oracle(&owner, &pool_id);
 
     // Attempting second initialize must fail
-    oracle_client.initialize(&owner, &pool_id);
+    oracle_client.initialize_oracle(&owner, &pool_id);
 }
 
 // ---------------------------------------------------------------------------

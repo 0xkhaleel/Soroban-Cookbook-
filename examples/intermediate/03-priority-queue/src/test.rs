@@ -1,11 +1,10 @@
 use super::*;
 use soroban_sdk::{symbol_short, testutils::Address as _, vec, Address, Env, Symbol, Vec};
-use soroban_sdk::{symbol_short, Env};
 
 fn setup(env: &Env) -> (PriorityQueueContractClient<'_>, Address) {
     let contract_id = env.register(PriorityQueueContract, ());
     env.mock_all_auths();
-    let admin = Address::generate(&env);
+    let admin = Address::generate(env);
     let client = PriorityQueueContractClient::new(env, &contract_id);
     client.initialize(&admin);
     (client, admin)
@@ -45,7 +44,7 @@ fn test_len_and_is_empty_after_insertions() {
 #[test]
 fn test_heap_integrity_across_interleaved_pushes_and_pops() {
     let env = Env::default();
-    let client = setup(&env);
+    let (client, _) = setup(&env);
 
     let items = [
         (symbol_short!("a"), 4i128),

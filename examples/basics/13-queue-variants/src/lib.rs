@@ -122,10 +122,13 @@ impl BoundedQueueContract {
 }
 
 // Circular buffer ---------------------------------------------------------
+// Host/tests only: shares wasm export names with BoundedQueueContract.
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contract]
 pub struct CircularBufferContract;
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum CBKey {
@@ -133,6 +136,7 @@ pub enum CBKey {
     Element(i128),
 }
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[contracttype]
 pub struct CBMeta {
@@ -142,6 +146,7 @@ pub struct CBMeta {
     pub len: i128,
 }
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contractimpl]
 impl CircularBufferContract {
     pub fn initialize(env: Env, capacity: i128) {

@@ -21,7 +21,8 @@ fn test_version_registry_full_lifecycle() {
     let contract_addr = Address::generate(&env);
     let hash = BytesN::from_array(&env, &[0u8; 32]);
 
-    let _v1 = reg.register(&contract_addr, &hash, &symbol_short!("deploy"));
+    let v1 = reg.register(&contract_addr, &hash, &symbol_short!("deploy"));
+    assert_eq!(v1.timestamp, 1000);
     assert_eq!(reg.get_current_version_number(), 1);
 
     env.ledger().with_mut(|l| l.timestamp = 2000);
@@ -273,7 +274,7 @@ fn test_storage_optimization_nonce_tracking() {
     let data1 = opt.get_user_data(&user);
     assert!(data1.nonce > 0);
 
-    opt.deposit(&user, &50);
+    opt.deposit(&user, &150);
     let data2 = opt.get_user_data(&user);
     assert!(data2.nonce > data1.nonce);
 }
@@ -317,8 +318,8 @@ fn test_storage_optimization_insufficient_balance() {
     opt.initialize(&admin);
 
     let user = Address::generate(&env);
-    opt.deposit(&user, &50);
-    let result = opt.try_withdraw(&user, &100);
+    opt.deposit(&user, &100);
+    let result = opt.try_withdraw(&user, &200);
     assert!(result.is_err());
 }
 

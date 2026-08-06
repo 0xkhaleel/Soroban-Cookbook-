@@ -32,7 +32,12 @@
 #![allow(unexpected_cfgs)]
 
 pub mod direct_upgrade;
+
+// Each pattern module exports overlapping names (`initialize` / `upgrade` / `admin`).
+// Host tests need all three; wasm builds only the primary direct_upgrade example.
+#[cfg(any(test, not(target_family = "wasm")))]
 pub mod init_guard;
+#[cfg(any(test, not(target_family = "wasm")))]
 pub mod versioned_upgrade;
 
 #[cfg(test)]

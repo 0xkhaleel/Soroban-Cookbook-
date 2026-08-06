@@ -1,24 +1,24 @@
 #![no_std]
 
+//! # Gas Optimization Patterns for Soroban
+//!
+//! This contract demonstrates 12 gas optimization techniques:
+//! 1. Storage tier selection (Instance vs Persistent vs Temporary)
+//! 2. Caching frequently accessed values
+//! 3. Batch operations vs individual operations
+//! 4. Symbol interning and short symbols
+//! 5. Using enums instead of strings for state
+//! 6. Minimizing storage reads per operation
+//! 7. Lazy initialization
+//! 8. Checked arithmetic vs unchecked
+//! 9. Short-circuit evaluation
+//! 10. Efficient error handling with typed errors
+//! 11. Bitflags for boolean state packing
+//! 12. Struct packing and layout optimization
+
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
 };
-
-/// # Gas Optimization Patterns for Soroban
-///
-/// This contract demonstrates 12 gas optimization techniques:
-/// 1. Storage tier selection (Instance vs Persistent vs Temporary)
-/// 2. Caching frequently accessed values
-/// 3. Batch operations vs individual operations
-/// 4. Symbol interning and short symbols
-/// 5. Using enums instead of strings for state
-/// 6. Minimizing storage reads per operation
-/// 7. Lazy initialization
-/// 8. Checked arithmetic vs unchecked
-/// 9. Short-circuit evaluation
-/// 10. Efficient error handling with typed errors
-/// 11. Bitflags for boolean state packing
-/// 12. Struct packing and layout optimization
 
 /// DataKey enum for typed, efficient storage access.
 ///

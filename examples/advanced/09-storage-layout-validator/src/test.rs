@@ -175,8 +175,10 @@ fn test_malformed_current_layout() {
     let current = layout(&env, 0, Vec::new(&env));
     let next = layout(&env, 1, Vec::new(&env));
 
-    let err = client.try_validate(&current, &next).unwrap().unwrap_err();
-    assert_eq!(err, Ok(LayoutError::MalformedLayout));
+    assert_eq!(
+        client.try_validate(&current, &next),
+        Err(Ok(LayoutError::MalformedLayout))
+    );
 }
 
 #[test]
@@ -186,8 +188,10 @@ fn test_malformed_next_layout() {
     let current = layout(&env, 1, Vec::new(&env));
     let next = layout(&env, 0, Vec::new(&env));
 
-    let err = client.try_validate(&current, &next).unwrap().unwrap_err();
-    assert_eq!(err, Ok(LayoutError::MalformedLayout));
+    assert_eq!(
+        client.try_validate(&current, &next),
+        Err(Ok(LayoutError::MalformedLayout))
+    );
 }
 
 #[test]
