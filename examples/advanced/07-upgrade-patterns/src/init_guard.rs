@@ -153,6 +153,8 @@ impl InitGuardContract {
             return Err(InitError::AlreadyInitialized);
         }
 
+        admin.require_auth();
+
         // Write all initial state atomically (same transaction).
         env.storage().instance().set(&DataKey::Admin, &admin);
         // The flag is the source of truth — its *presence* is the guard.
