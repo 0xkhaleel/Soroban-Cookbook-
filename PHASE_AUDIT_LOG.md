@@ -25,6 +25,16 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 ## Phase 8 — removed 0 issues
 (none)
 
+## Phase 8 — completed issues (in-repo deliverables created)
+
+### July 23, 2026 — Issue #426: Track Community Metrics ✅
+
+- `docs/community-metrics.md` — metric definitions, targets, alert thresholds, reporting cadence
+- `docs/community-dashboard.md` — rolling weekly data table, quarterly health reports, monthly narratives
+- `.github/workflows/community-metrics.yml` — automated Monday collection workflow (GitHub Actions)
+- `CONTRIBUTING.md` — Community Metrics section added (links to all above)
+- `README.md` — Community Health & Metrics subsection added under Community & Integration
+
 ---
 
 ## June 23, 2026 — 100 issues exported to GitHub

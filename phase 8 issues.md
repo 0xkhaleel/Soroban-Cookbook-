@@ -1,7 +1,7 @@
 # Phase 8: Community & Ecosystem -
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
-**Completion:** 4% (2/50)
+**Completion:** 6% (3/50)
 **Last Audit Date:** July 29, 2026
 
 Community and ecosystem initiatives — no in-repo deliverables yet.
@@ -611,6 +611,24 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
 ## Metrics & Analytics
 
 
+### Issue #426: Track Community Metrics
+
+- **Priority:** High
+- **Status:** ✅ Complete
+
+- **Current state:** Deliverables created in-repo (July 23, 2026).
+- **Implementation hints:** Outcomes documented in README and CONTRIBUTING.md; external resources linked.
+- **Verification:** All acceptance criteria met — see deliverables below.
+- **Scope:** M
+- **Description:** Define, track, and report community health metrics for the Soroban Cookbook.
+- **Acceptance Criteria:**
+  - ✅ Metrics defined — [`docs/community-metrics.md`](./docs/community-metrics.md) defines 20+ metrics across 5 categories (Growth, Engagement, Content Quality, Community Health, Documentation).
+  - ✅ Tracking tools setup — GitHub native Insights + automated GitHub Actions workflow (`.github/workflows/community-metrics.yml`) runs every Monday at 09:00 UTC via the GitHub REST API.
+  - ✅ Dashboard created — [`docs/community-dashboard.md`](./docs/community-dashboard.md) provides a rolling weekly data table, live CI/quality badges, quarterly health report template, and monthly narrative structure.
+  - ✅ Regular reporting — Weekly automated snapshot; monthly narrative by rotating maintainer; quarterly full health report with satisfaction survey defined in [`docs/community-metrics.md § 5`](./docs/community-metrics.md#5-reporting-cadence).
+  - ✅ Documentation — Linked from [`README.md` Community Health & Metrics section](./README.md#-community-health--metrics) and [`CONTRIBUTING.md` Community Metrics section](./CONTRIBUTING.md#-community-metrics).
+
+
 ### Issue #427: Track GitHub Metrics
 
 
@@ -976,11 +994,11 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
 ## Summary
 
 **Total Issues Created:** 70 (Issues #379-#534, #629)
-**Completed:** 2
+**Completed:** 3
 **In Progress:** 0  
-**Planned:** 64
+**Planned:** 63
 
-**Phase 8 Status:** 📋 **0% COMPLETE (Ongoing)**
+**Phase 8 Status:** 📋 **6% COMPLETE (Ongoing)**
 
 Community categories:
 

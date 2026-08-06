@@ -71,6 +71,7 @@ To propose a topic, moderate a session, or improve the process, open an issue or
 - [Validation Steps](#-validation-steps)
 - [Bug Bounty Program](#-bug-bounty-program)
 - [Recognition System](#-recognition-system)
+- [Community Metrics](#-community-metrics)
 
 ## 👋 New Here? Start with Onboarding
 
@@ -85,6 +86,36 @@ The onboarding guide covers:
 - Answers to common first-timer questions
 
 Once you have worked through the onboarding guide and run `cargo test --workspace` successfully, come back here for the full contribution process.
+
+---
+
+## 📊 Community Metrics
+
+The Soroban Cookbook tracks community health transparently so contributors can see
+the impact of their work and maintainers can identify friction early.
+
+| Resource | Description |
+|---|---|
+| [Community Metrics](./docs/community-metrics.md) | Full metric definitions, targets, and alert thresholds |
+| [Community Dashboard](./docs/community-dashboard.md) | Rolling weekly data table + monthly narrative reports |
+| [Automated Workflow](./.github/workflows/community-metrics.yml) | GitHub Actions job that collects data every Monday |
+
+### What We Track
+
+- **Growth** — new contributors, stars, forks, unique clone traffic
+- **Engagement** — issue response time, PR review velocity, discussion activity
+- **Content Quality** — CI pass rate, test coverage, Clippy warnings
+- **Community Health** — bus factor, contributor retention, CoC incidents
+- **Documentation** — feedback submissions, satisfaction scores
+
+### How You Contribute to the Numbers
+
+Every merged PR, answered issue, and submitted feedback form flows into these metrics
+and feeds the [Recognition System](./docs/recognition-system.md). You can:
+
+- Participate in quarterly satisfaction surveys (announced in GitHub Discussions).
+- Flag data anomalies by opening an issue tagged `metrics-anomaly`.
+- Propose new metrics in a GitHub Discussion under the `Ideas` category.
 
 ---
 
