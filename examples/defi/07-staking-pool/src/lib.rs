@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
+    contract, contractimpl, contracttype, token, Address, Env,
 };
 
 const REWARD_PRECISION: i128 = 1_000_000_000_000_000_000;
@@ -24,6 +24,7 @@ pub enum DataKey {
 }
 
 impl StakingPoolContract {
+    /*
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -32,6 +33,7 @@ impl StakingPoolContract {
             .expect("not initialized");
         owner.require_auth();
     }
+    */
 
     fn staking_token(&self, env: &Env) -> Address {
         env.storage()
@@ -122,7 +124,7 @@ impl StakingPoolContract {
         }
         let last_time = self.last_update_time(env);
         let now = env.ledger().timestamp();
-        let elapsed = now.checked_sub(last_time).unwrap_or(0u64) as i128;
+        let elapsed = now.saturating_sub(last_time) as i128;
         let accumulated = elapsed
             .checked_mul(self.reward_rate(env))
             .unwrap()
@@ -156,6 +158,9 @@ impl StakingPoolContract {
         reward_token: Address,
         reward_rate: i128,
     ) {
+        if env.storage().instance().has(&DataKey::Owner) {
+            panic!("already initialized");
+        }
         assert!(reward_rate >= 0, "reward rate must be non-negative");
         env.storage().instance().set(&DataKey::Owner, &owner);
         env.storage()

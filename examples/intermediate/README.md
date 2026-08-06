@@ -17,6 +17,9 @@ This category contains examples that demonstrate common, real-world design patte
 - [`03-pause-unpause`](./03-pause-unpause/) — Emergency pause/unpause mechanism
 - [`storage-migration`](./storage-migration/) — Versioned storage upgrades with explicit staging and batch execution.
 - [`event-history`](./event-history/) — On-chain audit history storage with cursor-based pagination, filtering, and capacity management.
+- [`lazy-loading`](./lazy-loading/) — Lazy loading and bounded caching to reduce gas on large storage sets.
+- [`storage-pagination`](./storage-pagination/) — Per-item storage with opaque cursor-based `list(page_size, cursor)` pagination.
+- [`event-aggregation`](./event-aggregation/) — Batch multiple actions into a single emitted event to reduce per-event overhead.
 
 ## 📋 Prerequisites
 

@@ -79,7 +79,7 @@ impl CompressedStorageContract {
     /// Helper: compress bytes using run-length encoding.
     fn compress_bytes(env: &Env, data: Bytes) -> Bytes {
         let mut out = Bytes::new(env);
-        let original_len = (data.len() as u32).to_be_bytes();
+        let original_len = data.len().to_be_bytes();
         out.extend_from_slice(&original_len);
 
         let mut i = 0u32;

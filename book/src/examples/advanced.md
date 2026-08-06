@@ -17,6 +17,16 @@ Complex protocols & optimizations for production systems.
 ### [02-timelock](../examples/advanced/02-timelock/)
 **Delayed execution** for governance & security.
 
+---
+
+### [03-permit-pattern](../examples/advanced/03-permit-pattern/)
+**Permit-based approvals** with signature-backed authorization and deadline enforcement.
+
+**Key Concepts:**
+- Off-chain authorization envelopes
+- Permit-based allowance setup
+- Deadline validation and expiry handling
+
 **Key Concepts:**
 - Ledger-timestamp gates
 - Queue-based execution
