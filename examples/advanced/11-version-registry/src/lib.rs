@@ -54,10 +54,8 @@ impl VersionRegistry {
             .instance()
             .set(&DataKey::CurrentVersion, &0_u32);
 
-        env.events().publish(
-            (symbol_short!("version"), symbol_short!("init"), admin),
-            (),
-        );
+        env.events()
+            .publish((symbol_short!("version"), symbol_short!("init"), admin), ());
     }
 
     pub fn register(

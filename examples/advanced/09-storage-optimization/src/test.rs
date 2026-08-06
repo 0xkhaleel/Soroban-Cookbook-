@@ -1,10 +1,7 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::{
-    testutils::Address as _,
-    Address, Env, Vec,
-};
+use soroban_sdk::{testutils::Address as _, Address, Env, Vec};
 
 fn setup() -> (Env, Address, StorageOptimizationClient<'static>) {
     let env = Env::default();

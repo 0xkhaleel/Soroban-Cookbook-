@@ -22,8 +22,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env, Symbol,
-    Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env,
+    Symbol, Vec,
 };
 
 pub const VERSION_V1: u32 = 1;
@@ -100,9 +100,7 @@ impl ContractMigrations {
             return Err(MigrationError::AlreadyInitialized);
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage()
-            .instance()
-            .set(&DataKey::Version, &VERSION_V1);
+        env.storage().instance().set(&DataKey::Version, &VERSION_V1);
         env.storage()
             .instance()
             .set(&DataKey::UserList, &Vec::<Address>::new(&env));
@@ -110,8 +108,7 @@ impl ContractMigrations {
             .instance()
             .set(&DataKey::MigrationState, &MigrationState::None);
 
-        env.events()
-            .publish((NS, EV_INIT, admin), VERSION_V1);
+        env.events().publish((NS, EV_INIT, admin), VERSION_V1);
         Ok(())
     }
 
@@ -210,9 +207,7 @@ impl ContractMigrations {
                     tier,
                 },
             );
-            env.storage()
-                .persistent()
-                .remove(&DataKey::Legacy(user));
+            env.storage().persistent().remove(&DataKey::Legacy(user));
 
             processed += 1;
             next_index += 1;

@@ -107,14 +107,11 @@ const CONFIG_KEY: Symbol = symbol_short!("cfg");
 /// on the current contract address.  Centralising the load avoids repeated
 /// multi-line `get(&CONFIG_KEY).unwrap_or(Config { … })` expressions.
 fn load_config(env: &Env) -> Config {
-    env.storage()
-        .instance()
-        .get(&CONFIG_KEY)
-        .unwrap_or(Config {
-            flags: 0,
-            fee_bps: 0,
-            admin: env.current_contract_address(),
-        })
+    env.storage().instance().get(&CONFIG_KEY).unwrap_or(Config {
+        flags: 0,
+        fee_bps: 0,
+        admin: env.current_contract_address(),
+    })
 }
 
 fn save_config(env: &Env, config: &Config) {
@@ -124,14 +121,14 @@ fn save_config(env: &Env, config: &Config) {
 fn read_balance(env: &Env, account: &Address) -> i128 {
     env.storage()
         .persistent()
-        .get(&DataKey::Balance(*account))
+        .get(&DataKey::Balance(account.clone()))
         .unwrap_or(0)
 }
 
 fn write_balance(env: &Env, account: &Address, amount: i128) {
     env.storage()
         .persistent()
-        .set(&DataKey::Balance(*account), &amount);
+        .set(&DataKey::Balance(account.clone()), &amount);
 }
 
 // ---------------------------------------------------------------------------
@@ -148,7 +145,14 @@ impl GasOptimizationContract {
         if env.storage().instance().has(&CONFIG_KEY) {
             return Err(ContractError::Unauthorized);
         }
-        save_config(&env, &Config { flags: 0, fee_bps, admin });
+        save_config(
+            &env,
+            &Config {
+                flags: 0,
+                fee_bps,
+                admin,
+            },
+        );
         Ok(())
     }
 
@@ -265,10 +269,7 @@ impl GasOptimizationContract {
     ///
     /// Optimization 3: batching writes reduces per-call invocation overhead
     /// compared with N individual mint calls.
-    pub fn batch_mint(
-        env: Env,
-        recipients: Vec<(Address, i128)>,
-    ) -> Result<(), ContractError> {
+    pub fn batch_mint(env: Env, recipients: Vec<(Address, i128)>) -> Result<(), ContractError> {
         let config = load_config(&env);
         config.admin.require_auth();
 
@@ -287,10 +288,7 @@ impl GasOptimizationContract {
     /// Burn tokens from multiple accounts in a single call.
     ///
     /// Optimization 3: same batching benefit as `batch_mint`.
-    pub fn batch_burn(
-        env: Env,
-        accounts: Vec<(Address, i128)>,
-    ) -> Result<(), ContractError> {
+    pub fn batch_burn(env: Env, accounts: Vec<(Address, i128)>) -> Result<(), ContractError> {
         let config = load_config(&env);
         config.admin.require_auth();
 

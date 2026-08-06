@@ -51,7 +51,15 @@ fn setup() -> (
     forwarder.register_signer(&user, &pubkey);
     forwarder.fund(&user, &1000);
 
-    (env, forwarder, recipient, user, relayer, admin, (signer, pubkey))
+    (
+        env,
+        forwarder,
+        recipient,
+        user,
+        relayer,
+        admin,
+        (signer, pubkey),
+    )
 }
 
 fn make_tx(
@@ -110,10 +118,7 @@ fn test_forward_success() {
     let tx = make_tx(&env, &user, &recipient.address, data, 1, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
-    assert_eq!(
-        forwarder.try_forward(&tx, &signature, &relayer),
-        Ok(Ok(()))
-    );
+    assert_eq!(forwarder.try_forward(&tx, &signature, &relayer), Ok(Ok(())));
 
     let stored = recipient.get_stored_value();
     assert_eq!(stored, Bytes::from_slice(&env, data));
@@ -127,15 +132,10 @@ fn test_forward_relayer_paid() {
 
     assert_eq!(forwarder.balance(&user), 1000);
     assert_eq!(forwarder.balance(&relayer), 0);
-    let tx = make_tx(
-        &env, &user, &recipient.address, b"data", 1, 10, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &recipient.address, b"data", 1, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
-    assert_eq!(
-        forwarder.try_forward(&tx, &signature, &relayer),
-        Ok(Ok(()))
-    );
+    assert_eq!(forwarder.try_forward(&tx, &signature, &relayer), Ok(Ok(())));
 
     assert_eq!(forwarder.balance(&user), 990);
     assert_eq!(forwarder.balance(&relayer), 10);
@@ -146,9 +146,7 @@ fn test_forward_rejects_invalid_signature() {
     let (env, forwarder, _recipient, user, relayer, _admin, (_signer, _)) = setup();
     let bad_signer = SigningKey::from_bytes(&[99u8; 32]);
 
-    let tx = make_tx(
-        &env, &user, &forwarder.address, b"data", 1, 10, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &forwarder.address, b"data", 1, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &bad_signer, &tx);
 
     let result = forwarder.try_forward(&tx, &signature, &relayer);
@@ -173,9 +171,7 @@ fn test_forward_rejects_expired_deadline() {
 fn test_forward_rejects_bad_nonce() {
     let (env, forwarder, _recipient, user, relayer, _admin, (signer, _)) = setup();
 
-    let tx = make_tx(
-        &env, &user, &forwarder.address, b"data", 99, 10, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &forwarder.address, b"data", 99, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
     assert_eq!(
@@ -188,15 +184,10 @@ fn test_forward_rejects_bad_nonce() {
 fn test_forward_rejects_replay() {
     let (env, forwarder, recipient, user, relayer, _admin, (signer, _)) = setup();
 
-    let tx = make_tx(
-        &env, &user, &recipient.address, b"data", 1, 10, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &recipient.address, b"data", 1, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
-    assert_eq!(
-        forwarder.try_forward(&tx, &signature, &relayer),
-        Ok(Ok(()))
-    );
+    assert_eq!(forwarder.try_forward(&tx, &signature, &relayer), Ok(Ok(())));
 
     assert_eq!(
         forwarder.try_forward(&tx, &signature, &relayer),
@@ -210,9 +201,7 @@ fn test_forward_rejects_insufficient_balance() {
     forwarder.withdraw(&user, &995);
     assert_eq!(forwarder.balance(&user), 5);
 
-    let tx = make_tx(
-        &env, &user, &forwarder.address, b"data", 1, 10, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &forwarder.address, b"data", 1, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
     assert_eq!(
@@ -235,9 +224,7 @@ fn test_forward_not_initialized() {
     forwarder.register_signer(&user, &pubkey);
     forwarder.fund(&user, &100);
 
-    let tx = make_tx(
-        &env, &user, &forwarder.address, b"data", 1, 10, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &forwarder.address, b"data", 1, 10, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
     assert_eq!(
@@ -252,17 +239,13 @@ fn test_nonce_monotonic() {
 
     assert_eq!(forwarder.next_nonce(&user), 1);
 
-    let tx1 = make_tx(
-        &env, &user, &recipient.address, b"first", 1, 10, 1_000_000,
-    );
+    let tx1 = make_tx(&env, &user, &recipient.address, b"first", 1, 10, 1_000_000);
     let sig1 = sign_meta_tx(&env, &signer, &tx1);
     forwarder.forward(&tx1, &sig1, &relayer);
 
     assert_eq!(forwarder.next_nonce(&user), 2);
 
-    let tx2 = make_tx(
-        &env, &user, &recipient.address, b"second", 2, 10, 1_000_000,
-    );
+    let tx2 = make_tx(&env, &user, &recipient.address, b"second", 2, 10, 1_000_000);
     let sig2 = sign_meta_tx(&env, &signer, &tx2);
     forwarder.forward(&tx2, &sig2, &relayer);
 
@@ -323,10 +306,7 @@ fn test_register_signer() {
     let (_signer, pubkey) = generate_keypair(&env);
 
     client.initialize(&admin, &10);
-    assert_eq!(
-        client.try_register_signer(&user, &pubkey),
-        Ok(Ok(()))
-    );
+    assert_eq!(client.try_register_signer(&user, &pubkey), Ok(Ok(())));
 }
 
 #[test]
@@ -395,23 +375,29 @@ fn test_multiple_forwarders_independent_nonces() {
     forwarder.fund(&user_b, &1000);
 
     let tx_a = make_tx(
-        &env, &user_a, &recipient.address, b"from_a", 1, 10, 1_000_000,
+        &env,
+        &user_a,
+        &recipient.address,
+        b"from_a",
+        1,
+        10,
+        1_000_000,
     );
     let sig_a = sign_meta_tx(&env, &signer_a, &tx_a);
 
     let tx_b = make_tx(
-        &env, &user_b, &recipient.address, b"from_b", 1, 10, 1_000_000,
+        &env,
+        &user_b,
+        &recipient.address,
+        b"from_b",
+        1,
+        10,
+        1_000_000,
     );
     let sig_b = sign_meta_tx(&env, &signer_b, &tx_b);
 
-    assert_eq!(
-        forwarder.try_forward(&tx_a, &sig_a, &relayer),
-        Ok(Ok(()))
-    );
-    assert_eq!(
-        forwarder.try_forward(&tx_b, &sig_b, &relayer),
-        Ok(Ok(()))
-    );
+    assert_eq!(forwarder.try_forward(&tx_a, &sig_a, &relayer), Ok(Ok(())));
+    assert_eq!(forwarder.try_forward(&tx_b, &sig_b, &relayer), Ok(Ok(())));
 
     assert_eq!(forwarder.next_nonce(&user_a), 2);
     assert_eq!(forwarder.next_nonce(&user_b), 2);
@@ -444,15 +430,10 @@ fn test_forward_with_zero_fee() {
     forwarder.withdraw(&user, &990);
     assert_eq!(forwarder.balance(&user), 10);
 
-    let tx = make_tx(
-        &env, &user, &recipient.address, b"free", 1, 0, 1_000_000,
-    );
+    let tx = make_tx(&env, &user, &recipient.address, b"free", 1, 0, 1_000_000);
     let signature = sign_meta_tx(&env, &signer, &tx);
 
-    assert_eq!(
-        forwarder.try_forward(&tx, &signature, &relayer),
-        Ok(Ok(()))
-    );
+    assert_eq!(forwarder.try_forward(&tx, &signature, &relayer), Ok(Ok(())));
 
     let stored = recipient.get_stored_value();
     assert_eq!(stored, Bytes::from_slice(&env, b"free"));
@@ -490,10 +471,7 @@ fn test_forward_deadline_boundary() {
     );
     let signature = sign_meta_tx(&env, &signer, &tx);
 
-    assert_eq!(
-        forwarder.try_forward(&tx, &signature, &relayer),
-        Ok(Ok(()))
-    );
+    assert_eq!(forwarder.try_forward(&tx, &signature, &relayer), Ok(Ok(())));
 }
 
 #[test]

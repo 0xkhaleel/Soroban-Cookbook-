@@ -1,5 +1,5 @@
 use super::*;
-use soroban_sdk::{symbol_short, vec, testutils::Address as _, Address, Env, Symbol, Vec};
+use soroban_sdk::{symbol_short, testutils::Address as _, vec, Address, Env, Symbol, Vec};
 use soroban_sdk::{symbol_short, Env};
 
 fn setup(env: &Env) -> (PriorityQueueContractClient<'_>, Address) {
@@ -115,7 +115,12 @@ fn test_bulk_push_inserts_multiple_items() {
     let env = Env::default();
     let (client, admin) = setup(&env);
 
-    let items = vec![&env, symbol_short!("a"), symbol_short!("b"), symbol_short!("c")];
+    let items = vec![
+        &env,
+        symbol_short!("a"),
+        symbol_short!("b"),
+        symbol_short!("c"),
+    ];
     let priorities = vec![&env, 10i128, 5i128, 20i128];
     let result = client.try_bulk_push(&admin, &items, &priorities);
     assert_eq!(result, Ok(Ok(())));

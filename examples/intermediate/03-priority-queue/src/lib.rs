@@ -155,11 +155,7 @@ impl PriorityQueueContract {
         }
     }
 
-    pub fn merge(
-        env: Env,
-        admin: Address,
-        other_queue: Address,
-    ) -> Result<(), QueueError> {
+    pub fn merge(env: Env, admin: Address, other_queue: Address) -> Result<(), QueueError> {
         Self::require_admin(&env, &admin)?;
 
         let client = PriorityQueueContractClient::new(&env, &other_queue);

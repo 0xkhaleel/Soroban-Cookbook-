@@ -68,12 +68,7 @@ proptest! {
     }
 }
 
-fn assert_invariants(
-    env: &Env,
-    contract_id: &Address,
-    token_client: &TokenClient,
-    input: &Input,
-) {
+fn assert_invariants(env: &Env, contract_id: &Address, token_client: &TokenClient, input: &Input) {
     env.as_contract(contract_id, || {
         let storage = env.storage().persistent();
         let is_init = storage.has(&DataKey::Init);

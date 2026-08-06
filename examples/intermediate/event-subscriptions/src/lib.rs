@@ -24,8 +24,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, vec,
-    Address, Env, Error as SdkError, IntoVal, Symbol, Vec,
+    contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, vec, Address,
+    Env, Error as SdkError, IntoVal, Symbol, Vec,
 };
 
 #[contracterror]
@@ -90,12 +90,7 @@ impl EventSubscriptionHub {
     ///
     /// Returns the subscription id, which `subscriber` must present to
     /// `unsubscribe` later.
-    pub fn subscribe(
-        env: Env,
-        subscriber: Address,
-        topic: Symbol,
-        filter: Option<Address>,
-    ) -> u32 {
+    pub fn subscribe(env: Env, subscriber: Address, topic: Symbol, filter: Option<Address>) -> u32 {
         subscriber.require_auth();
 
         let id = next_id(&env);
@@ -191,8 +186,7 @@ impl EventSubscriptionHub {
                 entity.into_val(&env),
                 payload.into_val(&env),
             ];
-            let result =
-                env.try_invoke_contract::<(), SdkError>(&sub.subscriber, &NOTIFY_FN, args);
+            let result = env.try_invoke_contract::<(), SdkError>(&sub.subscriber, &NOTIFY_FN, args);
             if result.is_ok() {
                 notified += 1;
             }

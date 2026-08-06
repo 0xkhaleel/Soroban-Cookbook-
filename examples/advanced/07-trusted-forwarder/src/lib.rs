@@ -1,8 +1,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, xdr::ToXdr, Address,
-    Bytes, BytesN, Env, Symbol, Val, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, xdr::ToXdr, Address, Bytes,
+    BytesN, Env, Symbol, Val, Vec,
 };
 
 const CONTRACT_NS: Symbol = symbol_short!("fwd");
@@ -63,8 +63,12 @@ impl TrustedForwarder {
         if env.storage().instance().has(&ForwarderDataKey::Initialized) {
             return Err(ForwarderError::AlreadyInitialized);
         }
-        env.storage().instance().set(&ForwarderDataKey::Initialized, &true);
-        env.storage().instance().set(&ForwarderDataKey::Admin, &admin);
+        env.storage()
+            .instance()
+            .set(&ForwarderDataKey::Initialized, &true);
+        env.storage()
+            .instance()
+            .set(&ForwarderDataKey::Admin, &admin);
         env.storage().instance().set(&ForwarderDataKey::Fee, &fee);
         Ok(())
     }
@@ -146,11 +150,7 @@ impl TrustedForwarder {
         }
 
         let nonce_key = ForwarderDataKey::Nonce(tx.from.clone());
-        let current_nonce: u64 = env
-            .storage()
-            .instance()
-            .get(&nonce_key)
-            .unwrap_or(0);
+        let current_nonce: u64 = env.storage().instance().get(&nonce_key).unwrap_or(0);
         if tx.nonce != current_nonce + 1 {
             return Err(ForwarderError::InvalidNonce);
         }
@@ -186,18 +186,14 @@ impl TrustedForwarder {
             .instance()
             .get(&ForwarderDataKey::Balance(relayer.clone()))
             .unwrap_or(0);
-        env.storage()
-            .instance()
-            .set(
-                &ForwarderDataKey::Balance(tx.from.clone()),
-                &(balance - tx.fee),
-            );
-        env.storage()
-            .instance()
-            .set(
-                &ForwarderDataKey::Balance(relayer.clone()),
-                &(relayer_balance + tx.fee),
-            );
+        env.storage().instance().set(
+            &ForwarderDataKey::Balance(tx.from.clone()),
+            &(balance - tx.fee),
+        );
+        env.storage().instance().set(
+            &ForwarderDataKey::Balance(relayer.clone()),
+            &(relayer_balance + tx.fee),
+        );
 
         env.storage().instance().set(&nonce_key, &tx.nonce);
         env.storage().instance().set(&used_key, &true);
@@ -278,11 +274,7 @@ impl SimpleRecipient {
         Ok(())
     }
 
-    pub fn forwarded_call(
-        env: Env,
-        sender: Address,
-        data: Bytes,
-    ) -> Result<(), RecipientError> {
+    pub fn forwarded_call(env: Env, sender: Address, data: Bytes) -> Result<(), RecipientError> {
         if !env.storage().instance().has(&RecipientDataKey::Initialized) {
             return Err(RecipientError::NotInitialized);
         }

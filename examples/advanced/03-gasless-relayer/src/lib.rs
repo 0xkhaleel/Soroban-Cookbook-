@@ -1,8 +1,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, xdr::ToXdr, Address,
-    BytesN, Env, Symbol,
+    contract, contracterror, contractimpl, contracttype, symbol_short, xdr::ToXdr, Address, BytesN,
+    Env, Symbol,
 };
 
 const CONTRACT_NS: Symbol = symbol_short!("relayer");
@@ -75,27 +75,39 @@ impl GaslessRelayerContract {
 
         env.storage().instance().set(&DataKey::Initialized, &true);
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::TrustedRelayer(admin.clone()), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::TrustedRelayer(admin.clone()), &true);
         Ok(())
     }
 
     pub fn add_trusted_relayer(env: Env, relayer: Address) -> Result<(), RelayerError> {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
-        env.storage().instance().set(&DataKey::TrustedRelayer(relayer), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::TrustedRelayer(relayer), &true);
         Ok(())
     }
 
     pub fn remove_trusted_relayer(env: Env, relayer: Address) -> Result<(), RelayerError> {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
-        env.storage().instance().set(&DataKey::TrustedRelayer(relayer), &false);
+        env.storage()
+            .instance()
+            .set(&DataKey::TrustedRelayer(relayer), &false);
         Ok(())
     }
 
-    pub fn register_signer(env: Env, owner: Address, pubkey: BytesN<32>) -> Result<(), RelayerError> {
+    pub fn register_signer(
+        env: Env,
+        owner: Address,
+        pubkey: BytesN<32>,
+    ) -> Result<(), RelayerError> {
         owner.require_auth();
-        env.storage().instance().set(&DataKey::SignerPubkey(owner), &pubkey);
+        env.storage()
+            .instance()
+            .set(&DataKey::SignerPubkey(owner), &pubkey);
         Ok(())
     }
 
@@ -105,8 +117,14 @@ impl GaslessRelayerContract {
             return Err(RelayerError::InvalidAmount);
         }
 
-        let current: i128 = env.storage().instance().get(&DataKey::Balance(owner.clone())).unwrap_or(0);
-        env.storage().instance().set(&DataKey::Balance(owner), &(current + amount));
+        let current: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Balance(owner.clone()))
+            .unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(owner), &(current + amount));
         Ok(())
     }
 
@@ -151,23 +169,45 @@ impl GaslessRelayerContract {
         let message = tx.clone().to_xdr(&env);
         let message_hash = env.crypto().sha256(&message).to_bytes();
         let message_bytes: soroban_sdk::Bytes = message_hash.into();
-        env.crypto().ed25519_verify(&pubkey, &message_bytes, &signature);
+        env.crypto()
+            .ed25519_verify(&pubkey, &message_bytes, &signature);
 
-        let balance: i128 = env.storage().instance().get(&DataKey::Balance(tx.from.clone())).unwrap_or(0);
+        let balance: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Balance(tx.from.clone()))
+            .unwrap_or(0);
         if balance < tx.amount {
             return Err(RelayerError::InsufficientBalance);
         }
 
-        let recipient_balance: i128 = env.storage().instance().get(&DataKey::Balance(tx.to.clone())).unwrap_or(0);
-        env.storage().instance().set(&DataKey::Balance(tx.from.clone()), &(balance - tx.amount));
-        env.storage().instance().set(&DataKey::Balance(tx.to.clone()), &(recipient_balance + tx.amount));
+        let recipient_balance: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Balance(tx.to.clone()))
+            .unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(tx.from.clone()), &(balance - tx.amount));
+        env.storage().instance().set(
+            &DataKey::Balance(tx.to.clone()),
+            &(recipient_balance + tx.amount),
+        );
         env.storage().instance().set(&nonce_key, &(tx.nonce));
         env.storage().instance().set(&used_key, &true);
-        env.storage().instance().set(&DataKey::Relay(relayer.clone()), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::Relay(relayer.clone()), &true);
 
         #[allow(deprecated)]
         env.events().publish(
-            (CONTRACT_NS, ACTION_EXEC, tx.from.clone(), tx.to.clone(), tx.nonce),
+            (
+                CONTRACT_NS,
+                ACTION_EXEC,
+                tx.from.clone(),
+                tx.to.clone(),
+                tx.nonce,
+            ),
             RelayEventData {
                 action: ACTION_EXEC,
                 from: tx.from.clone(),
@@ -187,7 +227,10 @@ impl GaslessRelayerContract {
     }
 
     fn is_trusted_relayer(env: &Env, relayer: &Address) -> bool {
-        env.storage().instance().get(&DataKey::TrustedRelayer(relayer.clone())).unwrap_or(false)
+        env.storage()
+            .instance()
+            .get(&DataKey::TrustedRelayer(relayer.clone()))
+            .unwrap_or(false)
     }
 }
 

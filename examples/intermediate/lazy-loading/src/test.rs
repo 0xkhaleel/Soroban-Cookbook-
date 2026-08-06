@@ -51,10 +51,7 @@ fn set_item_fails_with_zero_id() {
     let owner = Address::generate(&env);
 
     let res = client.try_set_item(&owner, &0u32, &symbol_short!("bad"));
-    assert_eq!(
-        res.err().unwrap().ok().unwrap(),
-        LazyError::InvalidInput,
-    );
+    assert_eq!(res.err().unwrap().ok().unwrap(), LazyError::InvalidInput,);
 }
 
 // ---------------------------------------------------------------------------
@@ -67,10 +64,7 @@ fn get_item_returns_error_for_unknown_id() {
     let client = make_client(&env);
 
     let res = client.try_get_item(&99u32);
-    assert_eq!(
-        res.err().unwrap().ok().unwrap(),
-        LazyError::ItemNotFound,
-    );
+    assert_eq!(res.err().unwrap().ok().unwrap(), LazyError::ItemNotFound,);
 }
 
 #[test]
