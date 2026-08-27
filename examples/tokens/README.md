@@ -5,7 +5,7 @@ This category contains examples related to fungible tokens, including implementa
 ## What's Inside?
 
 - **Token Standards**: Implementations of official Stellar token standards like SEP-41.
-- **[Mint/Burn Token](./mint-burn/)**: Admin-controlled minting and user burn flows with supply cap handling.
+- **[Mint/Burn Token](./04-mint-burn/)**: Admin-controlled minting and user burn flows with supply cap handling.
 - **[Allowance Pattern](./allowance-pattern/)**: Delegated spending with `approve`/`transfer_from`, allowance queries, expiration ledgers, and revocation.
 - **[Token Wrapper](./token-wrapper/)**: A 1:1 wrapper around an existing token with deposit, withdraw, backing checks, and invariant tests.
 - **[Snapshot Token](./04-snapshot-token/)**: A fungible token with balance snapshot support for historical/governance voting-power queries.
