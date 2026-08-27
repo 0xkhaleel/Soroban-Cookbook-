@@ -44,6 +44,7 @@ members = [
     "examples/governance/01-vote-delegation",
     "examples/intermediate/lazy-loading",
     "examples/tokens/10-pausable-permissions",
+    "examples/defi/15-reward-strategies",
     "tests/integration",
     "tests/security",
 ]
