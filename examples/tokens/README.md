@@ -10,6 +10,7 @@ This category contains examples related to fungible tokens, including implementa
 - **[Token Wrapper](./token-wrapper/)**: A 1:1 wrapper around an existing token with deposit, withdraw, backing checks, and invariant tests.
 - **[Snapshot Token](./04-snapshot-token/)**: A fungible token with balance snapshot support for historical/governance voting-power queries.
 - **[Token Optimization](./optimized-token-ops/)**: Batched transfer and storage-layout optimization patterns with before/after benchmarks.
+- **[Multi-Token Balance Manager](./08-multi-token-balance-manager/)**: A registry for multiple token contracts with batched balance reads and batched transfers.
 - **Distribution Patterns**: Examples of vesting schedules (like [Vesting Management](./01-vesting-management/)) and airdrop contracts.
 
 ## Examples
