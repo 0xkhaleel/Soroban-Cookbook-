@@ -72,3 +72,8 @@ fifo_queue = { path = "../../examples/basics/14-fifo-queue", package = "fifo-que
 lazy_cache = { path = "../../examples/basics/lazy-cache", package = "lazy_cache" }
 version_registry = { path = "../../examples/advanced/11-version-registry", package = "version-registry" }
 storage_optimization = { path = "../../examples/advanced/09-storage-optimization", package = "storage-optimization" }
+diamond_security = { path = "../../examples/advanced/05-diamond-security", package = "diamond-security" }
+facet_adder = { path = "../../examples/advanced/05-diamond-security/facet-adder", package = "facet-adder" }
+facet_multiplier = { path = "../../examples/advanced/05-diamond-security/facet-multiplier", package = "facet-multiplier" }
+bridge_security = { path = "../../examples/advanced/05-bridge-security", package = "bridge-security" }
+price_oracle = { path = "../../examples/advanced/06-price-oracle", package = "price-oracle" }
