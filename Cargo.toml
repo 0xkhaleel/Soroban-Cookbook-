@@ -7,6 +7,7 @@ members = [
     "examples/intermediate/event-aggregation",
     "examples/basics/01-hello-world",
     "examples/basics/06-validation-patterns",
+    "examples/basics/13-queue-variants",
     "examples/intermediate/03-priority-queue",
     "examples/intermediate/multi-sig-patterns",
     "examples/intermediate/event-subscriptions",
