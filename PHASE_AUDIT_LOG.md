@@ -27,6 +27,14 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 ## Phase 8 — completed issues (in-repo deliverables created)
 
+### Aug 28, 2026 — Issue #441: 10+ Projects Built ✅
+
+- `SHOWCASE.md` — showcases 11 real production Stellar/Soroban projects built using the cookbook, with case studies, developer support, and project tracking sections
+- `CONTRIBUTING.md` — "Built With the Cookbook" section added (links to SHOWCASE.md)
+- External resources linked: Drips Wave org profile, Stellar Discord, GitHub Discussions
+
+---
+
 ### July 23, 2026 — Issue #426: Track Community Metrics ✅
 
 - `docs/community-metrics.md` — metric definitions, targets, alert thresholds, reporting cadence
