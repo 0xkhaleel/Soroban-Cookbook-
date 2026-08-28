@@ -2,23 +2,63 @@
 resolver = "2"
 
 members = [
-    "examples/basics/*",
-    "examples/intermediate/*",
-    "examples/advanced/*",
-    "examples/defi/*",
-    "examples/nfts/*",
-    "examples/governance/*",
-    "examples/tokens/*",
+    "shared",
+    "examples/hello-world",
+    "examples/intermediate/event-aggregation",
+    "examples/basics/01-hello-world",
+    "examples/basics/06-validation-patterns",
+    "examples/intermediate/03-priority-queue",
+    "examples/intermediate/multi-sig-patterns",
+    "examples/intermediate/event-subscriptions",
+    "examples/intermediate/03-priority-queue",
+    "examples/advanced/01-multi-party-auth",
+    "examples/advanced/02-timelock",
+    "examples/advanced/03-gasless-relayer",
+    "examples/advanced/05-diamond-security",
+    "examples/advanced/05-diamond-security/facet-adder",
+    "examples/advanced/05-diamond-security/facet-multiplier",
+    "examples/advanced/07-trusted-forwarder",
+    "examples/advanced/09-storage-layout-validator",
+    "examples/advanced/03-permit-pattern",
+    "examples/advanced/03-gasless-relayer",
+    "examples/advanced/03-oracle-pattern",
+    "examples/advanced/05-rate-limiting",
+    "examples/advanced/03-merkle-airdrop",
+    "examples/advanced/05-diamond-security",
+    "examples/advanced/05-diamond-security/facet-adder",
+    "examples/advanced/05-diamond-security/facet-multiplier",
+    "examples/advanced/06-gas-optimization",
+    "examples/advanced/07-upgrade-patterns",
+    "examples/advanced/09-fuzz-testing",
+    "examples/advanced/10-contract-migrations",
+    "examples/advanced/11-version-registry",
+    "examples/advanced/09-storage-optimization",
+    "examples/tokens/01-sep41-token",
+    "examples/tokens/03-pausable-token",
+    "examples/tokens/04-mint-burn",
+    "examples/tokens/05-vesting",
+    "examples/tokens/04-snapshot-token",
+    "examples/tokens/06-token-wrapper",
+    "examples/tokens/03-optimized-operations",
+    "examples/tokens/token-lock",
+    "examples/governance/01-vote-delegation",
+    "examples/intermediate/lazy-loading",
+    "examples/tokens/10-pausable-permissions",
     "tests/integration",
+    "tests/security",
 ]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.96"
+
+[workspace.lints.rust]
+deprecated = "allow"
 
 [workspace.dependencies]
-soroban-sdk = "21.7.0"
+soroban-sdk = "26.0.0-rc.1"
+base64ct = "=1.6.0"
 
 [profile.release]
 opt-level = "z"
@@ -33,3 +73,12 @@ lto = true
 [profile.release-with-logs]
 inherits = "release"
 debug-assertions = true
+
+[profile.test]
+# Keep overflow checks and debug assertions active during testing so that
+# arithmetic bugs surface as panics rather than silent wrapping.
+opt-level = 3
+debug = true
+overflow-checks = true
+debug-assertions = true
+strip = "symbols"

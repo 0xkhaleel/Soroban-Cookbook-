@@ -1,48 +1,81 @@
 # Governance Examples
 
-Decentralized governance systems, DAO frameworks, and treasury management implementations on Soroban.
+On-chain governance patterns: voting systems, delegation, multisig control, and DAO treasury management.
 
-## 📂 Example Categories
+## 📂 Examples
 
-### Voting Systems
-Mechanisms for decision-making and voting power.
-- **Planned:** Simple Voting (Yes/No), Weighted Voting (Token-based), Quadratic Voting, NFT-based Voting.
+### [01-delegation-marketplace](./01-delegation-marketplace/)
+A marketplace for listing and renting voting power with incentive mechanisms.
+- **Concepts:** `require_auth()`, persistent storage, typed errors, event topics, fee transfer.
 
-### DAO Frameworks
-Complete systems for managing decentralized organizations.
-- **Planned:** Basic DAO with treasury, Multi-sig DAO, Token-gated DAO, NFT-holder DAO.
+## Quick Start
 
-### Proposal Management
-The lifecycle of governance decisions.
-- **Planned:** Timelock (Delayed execution), Veto systems, Cancellation logic, Proposal lifecycle (Draft -> Vote -> Execute).
+| # | Example | Concepts |
+|---|---------|----------|
+| 01 | [simple-voting](./01-simple-voting/) | Proposal creation, one-address-one-vote, time-based deadlines, vote tallying, execution |
+| 02 | [voting-time-constraints](./01-voting-time-constraints/) | Voting periods, proposal deadlines, grace periods, early closure |
+| 06 | [timelock-governance](./06-timelock-governance/) | Proposal queue, mandatory delays, veto, emergency execution |
+| 07 | [automatic-snapshot-triggers](./07-automatic-snapshot-triggers/) | Time-based & event-based snapshots, snapshot pruning, gas-efficient storage |
+```bash
+cd examples/governance/01-simple-voting
+cargo test && cargo build --target wasm32-unknown-unknown --release
+```
 
-### Treasury Management
-Securely managing organization funds.
-- **Planned:** DAO Treasury, Streaming Payments (Vesting), Budget Allocation, Grant systems.
+## Examples by Pattern
 
-## 📋 Planned Examples
+### Voting Fundamentals
 
-- **Simple DAO** - Proposal creation and token-weighted voting.
-- **Weighted Voting** - Calculating voting power based on token balances.
-- **Quadratic Voting** - Fairer voting mechanics for larger communities.
-- **DAO Treasury** - Securely spending DAO funds through governance.
-- **Vesting Schedule** - Automated token release for DAO contributors.
+| # | Example | Focus | Concepts |
+|---|---------|-------|----------|
+| 01 | [simple-voting](./01-simple-voting/) | 🟢 Beginner | Proposal creation, one-address-one-vote, time-based deadlines, tally, execution |
+| 02 | [token-voting](./02-token-voting/) | 🟡 Intermediate | Balance snapshots, token-weighted voting, flash-loan resistance |
+| 02 | [voting-time-constraints](./02-voting-time-constraints/) | 🟡 Intermediate | Voting periods, grace periods, quorum thresholds, early closure |
 
-## 🏛️ Key Concepts
+### Delegation & Authority
 
-### Proposals
-A proposal is a structured set of actions that a DAO can vote on and execute.
+| # | Example | Focus | Concepts |
+|---|---------|-------|----------|
+| 01 | [vote-delegation](./01-vote-delegation/) | 🟡 Intermediate | Liquid delegation, chain traversal, cycle detection, recursion limits |
+| 01 | [proposal-validation](./01-proposal-validation/) | 🟡 Intermediate | Proposal creation gates, validator patterns, pre-voting checks |
 
-### Voting Power
-The amount of influence a participant has in a governance system, often derived from token holdings or reputation.
+### Advanced Governance
 
-### Quorum and Thresholds
-The minimum participation and approval requirements for a proposal to pass.
+| # | Example | Focus | Concepts |
+|---|---------|-------|----------|
+| 03 | [proposal-lifecycle](./03-proposal-lifecycle/) | 🟠 Advanced | Full state machine: Draft → Active → Queued → Executed/Defeated, veto paths |
+| 03 | [dao-treasury](./03-dao-treasury/) | 🟠 Advanced | Multisig fund management, timelock on withdrawals, role-based access |
+| 05 | [delegation](./05-delegation/) | 🟠 Advanced | Enhanced delegation with revocation, time-bounds, and re-delegation |
+| 06 | [timelock-governance](./06-timelock-governance/) | 🟠 Advanced | Mandatory delays, veto windows, emergency bypass, queue management |
 
-## 🎯 Prerequisites
+## Pattern Progression
 
-Before exploring governance examples, ensure you understand:
-- [Basic Examples](../basics/) - Core concepts.
-- [Token Examples](../tokens/) - Fungible and non-fungible tokens.
-- [Intermediate Patterns](../intermediate/) - Access control and multi-sig.
-- [Advanced Patterns](../advanced/) - Timelocks and advanced security.
+**Beginner → Production:**
+
+1. **Start here** — `01-simple-voting` — Learn vote lifecycle and auth patterns
+2. **Add governance token** — `02-token-voting` — Balance-weighted voting
+3. **Formal phases** — `02-voting-time-constraints` — Voting periods and quorum
+4. **Complex workflows** — `03-proposal-lifecycle` — Full state machine
+5. **Production security** — `06-timelock-governance` + `03-dao-treasury` — Multisig + timelock + treasury
+
+## Documentation
+
+See [`docs/governance-patterns.md`](../../docs/governance-patterns.md) for:
+- Pattern explanations with code examples
+- When to use each pattern
+- Security considerations and threat models
+- Voting system comparison table
+- Deployment checklist
+
+See [`docs/governance-rbac-multisig-timelock.md`](../../docs/governance-rbac-multisig-timelock.md) for:
+- RBAC, multisig, and timelock foundations
+- Combined governance flows
+- Role hierarchy design
+- Signer and threshold recommendations
+
+## Next Steps
+
+- Read [`docs/governance-patterns.md`](../../docs/governance-patterns.md) for pattern overview
+- Start with `01-simple-voting` for basic voting flow
+- Combine `02-token-voting` + `06-timelock-governance` for production DAO
+- See [`examples/basics/03-authentication/`](../basics/03-authentication/) for RBAC foundation
+- See [`examples/basics/04-events/`](../basics/04-events/) for event patterns used in governance contracts

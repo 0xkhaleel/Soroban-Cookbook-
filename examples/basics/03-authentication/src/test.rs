@@ -94,6 +94,23 @@ fn test_transfer_updates_balances() {
     assert_eq!(client.get_balance(&user2), 300);
 }
 
+/// Benchmark the transfer function with authentication.
+#[test]
+fn test_transfer_benchmark() {
+    extern crate std;
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    client.set_balance(&admin, &user1, &1000);
+
+    std::println!("--- Transfer with Auth Benchmark ---");
+    env.budget().reset_default();
+    client.transfer(&user1, &user2, &100);
+    env.budget().print();
+}
+
 #[test]
 #[should_panic(expected = "Error(Contract, #4)")]
 fn test_transfer_insufficient_balance_fails() {
@@ -202,6 +219,90 @@ fn test_emit_event() {
     let user = Address::generate(&env);
     // Should not panic.
     client.emit_event(&user, &symbol_short!("hello"));
+}
+
+// ---------------------------------------------------------------------------
+// Negative Authentication Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_transfer_missing_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let from = Address::generate(&env);
+    let to = Address::generate(&env);
+
+    client.set_balance(&admin, &from, &1000);
+    // Disable all-auth-mocking and provide nothing, forcing an auth failure
+    env.mock_auths(&[]);
+    client.transfer(&from, &to, &300);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_approve_missing_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    // Disable all-auth-mocking
+    env.mock_auths(&[]);
+    client.approve(&owner, &spender, &500);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_transfer_from_missing_spender_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    client.approve(&owner, &spender, &500);
+
+    // Disable all-auth-mocking
+    env.mock_auths(&[]);
+
+    // This requires `spender.require_auth()`
+    client.transfer_from(&spender, &owner, &recipient, &200);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_admin_action_missing_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+
+    // Disable all-auth-mocking
+    env.mock_auths(&[]);
+
+    // This requires `admin.require_auth()`
+    client.admin_action(&admin, &10);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_multi_sig_missing_one_auth() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, AuthContract);
+    let client = AuthContractClient::new(&env, &contract_id);
+    let signers = vec![
+        &env,
+        Address::generate(&env),
+        Address::generate(&env),
+        Address::generate(&env),
+        Address::generate(&env),
+    ];
+
+    // Setting mock auths to empty causes any require_auth to panic
+    env.mock_auths(&[]);
+
+    client.multi_sig_action(&signers, &10);
 }
 
 // ---------------------------------------------------------------------------
@@ -436,4 +537,56 @@ fn test_default_state_is_active() {
 
     assert_eq!(client.get_state(), ContractState::Active as u32);
     assert_eq!(client.active_only_action(&user), 1000);
+}
+
+// ---------------------------------------------------------------------------
+// Negative Amount Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_transfer_negative_or_zero_amount_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    client.set_balance(&admin, &user1, &1000);
+
+    let res_zero = client.try_transfer(&user1, &user2, &0);
+    assert_eq!(res_zero, Err(Ok(AuthError::InvalidAmount)));
+
+    let res_neg = client.try_transfer(&user1, &user2, &-50);
+    assert_eq!(res_neg, Err(Ok(AuthError::InvalidAmount)));
+}
+
+#[test]
+fn test_approve_negative_or_zero_amount_fails() {
+    let env = Env::default();
+    let (client, _admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+
+    let res_zero = client.try_approve(&owner, &spender, &0);
+    assert_eq!(res_zero, Err(Ok(AuthError::InvalidAmount)));
+
+    let res_neg = client.try_approve(&owner, &spender, &-50);
+    assert_eq!(res_neg, Err(Ok(AuthError::InvalidAmount)));
+}
+
+#[test]
+fn test_transfer_from_negative_or_zero_amount_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    client.approve(&owner, &spender, &500);
+
+    let res_zero = client.try_transfer_from(&spender, &owner, &recipient, &0);
+    assert_eq!(res_zero, Err(Ok(AuthError::InvalidAmount)));
+
+    let res_neg = client.try_transfer_from(&spender, &owner, &recipient, &-50);
+    assert_eq!(res_neg, Err(Ok(AuthError::InvalidAmount)));
 }
