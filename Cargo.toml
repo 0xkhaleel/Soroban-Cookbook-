@@ -14,6 +14,7 @@ members = [
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-timelock",
     "examples/advanced/03-gasless-relayer",
+    "examples/advanced/03-batch-builder",
     "examples/advanced/05-diamond-security",
     "examples/advanced/05-diamond-security/facet-adder",
     "examples/advanced/05-diamond-security/facet-multiplier",
