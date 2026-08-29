@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Fuzz Testing for Advanced Contracts
 //!
 //! Demonstrates how to structure a Soroban contract so it can be fuzzed with
@@ -24,7 +25,7 @@
 //!
 //! See also: `guides/fuzz-testing.md`.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, Vec};
 

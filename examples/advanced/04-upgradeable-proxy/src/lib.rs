@@ -1,10 +1,11 @@
+#![allow(deprecated)]
 //! # Proxy Pattern Example
 //!
 //! This example demonstrates an upgradeable proxy pattern that separates
 //! the proxy and implementation contracts. The proxy forwards calls to an
 //! implementation contract, allowing safe upgrades while preserving storage.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, symbol_short, vec, Address, Env, IntoVal, Symbol};
 

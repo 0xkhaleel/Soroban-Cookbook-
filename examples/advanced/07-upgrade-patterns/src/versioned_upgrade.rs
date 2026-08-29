@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Pattern 2 — Versioned Storage & Migration
 //!
 //! This module shows how to manage storage layout changes across contract

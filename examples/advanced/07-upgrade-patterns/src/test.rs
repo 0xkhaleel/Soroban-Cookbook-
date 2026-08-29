@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for the upgrade-patterns example crate.
 //!
 //! Each section tests one module in isolation. The test environment does not

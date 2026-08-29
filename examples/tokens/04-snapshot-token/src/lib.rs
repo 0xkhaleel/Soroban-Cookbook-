@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Snapshot Token Example
 //!
 //! A Soroban fungible token contract that implements balance snapshot tracking.
@@ -5,7 +6,7 @@
 //! This is extremely useful for governance/voting systems to prevent flash loan attacks or
 //! timing-based manipulation by pinning voting weight to a pre-announced snapshot.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contracterror, contractevent, contractimpl, contracttype, Address, Env, String,

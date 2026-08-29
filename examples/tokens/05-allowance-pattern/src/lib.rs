@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 //! # Allowance Pattern
 //!

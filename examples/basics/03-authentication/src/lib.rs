@@ -18,7 +18,7 @@
 //! - **Time-Based Restrictions**: Time-locks and cooldown periods
 //! - **State-Based Authorization**: Contract state gating (Active/Paused/Frozen)
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
 use soroban_sdk::{

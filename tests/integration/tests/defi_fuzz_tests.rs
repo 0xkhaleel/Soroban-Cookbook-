@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! DeFi Protocol Fuzz / Property-Based Integration Tests
 //!
 //! Exercises AMM invariants, lending pool accounting, and liquidation logic

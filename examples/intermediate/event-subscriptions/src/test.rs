@@ -1,4 +1,5 @@
 #![cfg(test)]
+#![allow(deprecated)]
 
 use super::*;
 use soroban_sdk::{contract, contractimpl, symbol_short, testutils::Address as _, Env};

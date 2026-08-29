@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Token Lock Pattern
 //!
 //! A time-based lock ledger: each user can hold several lock entries, and every
@@ -7,7 +8,7 @@
 //! not custody SEP-41 tokens. Pair it with a token contract (see
 //! `examples/tokens/06-token-wrapper`) when you need real transfers.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contractimpl, contracttype, symbol_short, vec, Address, Env, Symbol, Vec,

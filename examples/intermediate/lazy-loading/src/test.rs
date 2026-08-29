@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for the Lazy Loading and Caching contract.
 
 use super::*;

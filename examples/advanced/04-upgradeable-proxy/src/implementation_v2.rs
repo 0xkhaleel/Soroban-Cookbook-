@@ -1,8 +1,9 @@
+#![allow(deprecated)]
 //! # Implementation Contract (v2)
 //!
 //! This is an upgraded implementation contract that adds multiplication.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl};
 

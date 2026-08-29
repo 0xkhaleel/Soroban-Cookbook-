@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Iterable Mapping
 //!
 //! This example shows how to build a small key-value map that remains
@@ -9,7 +10,7 @@
 //! so the pattern is best for moderate-sized collections where iteration is
 //! more important than minimizing write cost.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, contracttype, Env, Map, Symbol, Vec};
 

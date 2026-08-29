@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Flash Loan Use Cases
 //!
 //! Practical examples of flash loan receiver contracts built on top of the
@@ -11,7 +12,7 @@
 //! - **Security patterns**: Demonstrate safe callback practices including
 //!   validation, event emission, and rejection of untrusted callers.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 pub mod arbitrage;
 

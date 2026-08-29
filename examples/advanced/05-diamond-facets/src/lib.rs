@@ -41,7 +41,7 @@
 //! (e.g. `mint_and_register` first calls the token facet to mint, then the
 //! registry facet to log metadata).
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
 use soroban_sdk::{

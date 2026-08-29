@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Event Subscription Hub
 //!
 //! Demonstrates a push-style subscription model for event-driven workflows.
@@ -21,7 +22,7 @@
 //! - **Fault isolation** — `publish` uses `try_invoke_contract` so a
 //!   misbehaving or panicking subscriber cannot block delivery to the rest.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, vec, Address,

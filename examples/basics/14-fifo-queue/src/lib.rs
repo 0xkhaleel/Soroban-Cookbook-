@@ -1,10 +1,11 @@
+#![allow(deprecated)]
 //! # FIFO Queue Contract
 //!
 //! This contract demonstrates a First-In-First-Out (FIFO) queue implementation
 //! for ordering tasks or events on-chain. It shows how to efficiently manage
 //! a queue using head/tail indices.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, contracttype, Env, Symbol};
 

@@ -1,10 +1,11 @@
+#![allow(deprecated)]
 //! # Proxy Contract
 //!
 //! This is the proxy contract that forwards calls to an implementation contract.
 //! The proxy maintains the upgrade logic and delegates actual operations to
 //! the implementation contract.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, symbol_short, Address, Env, Symbol, InvokeContract};
 

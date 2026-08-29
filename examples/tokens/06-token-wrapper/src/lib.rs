@@ -1,10 +1,11 @@
+#![allow(deprecated)]
 //! # Token Wrapper Pattern
 //!
 //! Demonstrates a 1:1 wrapper around an existing SEP-41 token. Users deposit
 //! an underlying token into this contract and receive internal wrapped shares.
 //! Unwrapping burns those shares and returns the underlying token.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contracterror, contractevent, contractimpl, contracttype, token::TokenClient,

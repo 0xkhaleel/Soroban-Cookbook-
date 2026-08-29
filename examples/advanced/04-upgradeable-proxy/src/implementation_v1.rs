@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Implementation Contract (v1)
 //!
 //! This is the initial implementation contract that provides basic arithmetic operations.

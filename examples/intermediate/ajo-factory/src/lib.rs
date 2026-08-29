@@ -2,7 +2,8 @@
 //!
 //! Factory contract that deploys new [`ajo::Ajo`] instances via `env.deployer()`.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 use ajo::AjoClient;
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{

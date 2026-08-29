@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Unit tests for the storage migration contract.
 
 use super::*;

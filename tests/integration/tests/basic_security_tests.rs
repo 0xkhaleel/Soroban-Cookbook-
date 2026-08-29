@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Integration tests covering security edge cases, unauthorized access attempts,
 //! and potential exploit vectors across basic cookbook examples.
 

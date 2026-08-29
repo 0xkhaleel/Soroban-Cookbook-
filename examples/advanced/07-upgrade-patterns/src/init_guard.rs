@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Pattern 3 — Safe Initialisation Guards
 //!
 //! This module covers two closely related guards that prevent incorrect

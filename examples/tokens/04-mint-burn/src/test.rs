@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Unit tests for the mint/burn token contract.
 
 use super::*;

@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for the Delegation Marketplace contract.
 
 use super::*;

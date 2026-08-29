@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Property tests mirroring the `advanced_claimable_balance` fuzz target.
 //!
 //! These run under `cargo test` without nightly/`cargo-fuzz`, so they catch
