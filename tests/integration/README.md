@@ -62,6 +62,20 @@ Cross-crate flows spanning multiple token examples (Issue #119):
 30 tests across 8 categories covering the complete governance stack. All tests use
 `env.register_contract` (no WASM binary required).
 
+## RBAC, Multisig, and Timelock Workflows (`rbac_multisig_timelock_tests.rs`)
+
+6 tests simulating a multi-step governance action integrating Role-Based Access Control, Multisig, and Timelocks.
+
+| # | Flow | Result |
+|---|----------|-------|
+| 1 | Full Pipeline (Happy Path) | Success |
+| 2 | Multisig threshold not met | Revert / Failure |
+| 3 | Timelock executed too early | Revert / Failure |
+| 4 | Unauthorized timelock queueing | Revert / Failure |
+| 5 | Cancellation workflow | Success (Timelock execution fails after cancellation) |
+| 6 | RBAC Validation failure | Revert / Failure |
+
+
 | # | Category | Tests | File |
 |---|----------|-------|------|
 | 1 | Proposal lifecycle | 5 | `governance_tests.rs` |
