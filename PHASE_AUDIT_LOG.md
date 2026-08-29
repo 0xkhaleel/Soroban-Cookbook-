@@ -35,6 +35,39 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 - `CONTRIBUTING.md` — Community Metrics section added (links to all above)
 - `README.md` — Community Health & Metrics subsection added under Community & Integration
 
+## Phases 3, 5, 6 — completed issues (in-repo deliverables created)
+
+### August 28, 2026 — Issues #767, #768, #769, #773 ✅
+
+**#767 — Add Proxy Admin Controls (Phase 3)**
+
+- `examples/advanced/03-proxy-admin/` — admin-authenticated `propose_upgrade` /
+  `cancel_upgrade` / `execute_upgrade` with a bounded timelock, emergency
+  pause, and a security checklist in the README (delivered earlier; indexed now)
+- `examples/advanced/README.md` — example added to the implemented list
+
+**#768 — Create Fuzz Test Report (Phase 6)**
+
+- `docs/fuzz-testing.md` — coverage metrics, findings, scenario inventory, CI wiring
+- `.github/workflows/fuzz.yml` — all four `cargo-fuzz` targets now run as a
+  matrix, plus a stable-toolchain property-test job and crash-artifact upload
+- `tests/integration/tests/defi_fuzz_tests.rs` — three regression tests pinning
+  the AMM dust boundary that the F-1 fix had removed from coverage
+- `docs/README.md` — report linked from the documentation index
+
+**#769 — Create Oracle Consumer (Phase 5)**
+
+- `examples/advanced/12-oracle-consumer/` — shared feed interface plus three
+  deployable consumers: validated cache, quorum median, settlement circuit breaker
+- `examples/advanced/README.md` — example added to the implemented list
+
+**#773 — Write Cross-Contract Guide (Phase 3)**
+
+- `docs/cross-contract-patterns.md` — factory / proxy / registry guide with
+  sequence diagrams, upgrade safety notes, and integration tips (delivered
+  earlier); related-examples section completed to cover proxy, registry, and
+  consumer examples
+
 ---
 
 ## June 23, 2026 — 100 issues exported to GitHub
