@@ -78,6 +78,7 @@
 
 ## Tokens (9 examples)
 - [Overview](./examples/tokens.md)
+- [Token Security Checklist](./docs/token-security-checklist.md)
 - [01 · SEP-41 Token](./examples/tokens/01-sep41-token.md)
 - [02 · SEP-41 Extensions](./examples/tokens/02-sep41-extensions.md)
 - [03 · Optimized Operations](./examples/tokens/03-optimized-operations.md)
@@ -97,6 +98,7 @@
 - [Documentation Platform Evaluation](./docs/documentation-platform-evaluation.md)
 - [DeFi Best Practices](./docs/defi-best-practices.md)
 - [DeFi Security Checklist](./docs/defi-security-checklist.md)
+- [Token Security Checklist](./docs/token-security-checklist.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)
