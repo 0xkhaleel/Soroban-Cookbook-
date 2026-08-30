@@ -99,6 +99,15 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 ---
 
+### Aug 30, 2026 — Issue #977: Create Token Security Checklist ✅
+
+- `book/src/docs/token-security-checklist.md` — comprehensive token security checklist covering authorization, arithmetic safety, supply management, transfer/allowance validation, storage TTL lifecycle, and testing requirements
+- `docs/token-security-checklist.md` — repository docs mirror of the token security checklist
+- `book/src/SUMMARY.md` — added navigation entries under Tokens and API Reference
+
+
+---
+
 ## June 23, 2026 — 100 issues exported to GitHub
 
 See [ISSUES_CREATED_LOG.md](ISSUES_CREATED_LOG.md) for GitHub issue numbers and URLs.
