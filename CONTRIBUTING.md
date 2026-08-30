@@ -2,6 +2,17 @@
 
 Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
 
+## Built With the Cookbook
+
+We showcase **10+ real production projects** built using the Soroban Cookbook in
+our [Showcase](./SHOWCASE.md). It includes featured projects, case studies, and a
+developer-support section for anyone building on Soroban.
+
+**Built a project with the cookbook?** Open a pull request that adds your project
+to `SHOWCASE.md` (name, repo link, one-line description, and which cookbook
+patterns you used). This also helps us keep the Phase 8 "#441: 10+ Projects Built"
+milestone current.
+
 ## Feedback System
 
 We have implemented a comprehensive feedback system to collect and manage input from our community. The system is located in the `docs/feedback-system/` directory.

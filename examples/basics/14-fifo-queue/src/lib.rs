@@ -8,7 +8,15 @@
 
 use soroban_sdk::{contract, contractimpl, contracttype, Env, Symbol};
 
-const MAX_QUEUE_SIZE: u32 = 10000;
+/// Smaller limit in unit tests so overflow scenarios stay fast.
+#[cfg(test)]
+const MAX_QUEUE_SIZE: u32 = 10;
+
+#[cfg(not(test))]
+const MAX_QUEUE_SIZE: u32 = 10_000;
+
+#[cfg(test)]
+mod test;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[contracttype]
