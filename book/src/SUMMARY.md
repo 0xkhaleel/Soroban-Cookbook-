@@ -66,10 +66,12 @@
 - [03 · NFT Metadata Standards](./examples/nfts/03-nft-metadata-standards.md)
 - [04 · NFT Marketplace](./examples/nfts/04-nft-marketplace.md)
 - [NFT Patterns Reference](./docs/nft-patterns.md)
+- [NFT Development Video Walkthrough](./docs/nft-development-video.md)
 
 ## Governance (3 examples)
 - [Overview](./examples/governance.md)
 - [Governance Patterns Guide](./docs/governance-patterns.md)
+- [Governance Security Checklist](./docs/governance-security-checklist.md)
 - [01 · Simple Voting](./examples/governance/01-simple-voting.md)
 - [02 · Voting Time Constraints](./examples/governance/02-voting-time-constraints.md)
 - [03 · Proposal Lifecycle](./examples/governance/03-proposal-lifecycle.md)
