@@ -54,6 +54,20 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 ---
 
+### Aug 30, 2026 — Issue #979: Create Grants Application Process ✅
+
+- `docs/grants/README.md` — comprehensive overview of the Soroban Cookbook Community Grants Program
+- `docs/grants/application-form.md` — standardized grant application template with SMART milestone breakdown
+- `docs/grants/review-process.md` — multi-stage evaluation process, committee structure, and 100-point scoring rubric
+- `docs/grants/decision-timeline.md` — 14-day SLA timeline, review cadences, and payout schedules
+- `docs/grants/milestone-tracking.md` — milestone reporting templates, verification protocols, and tranche disbursement rules
+- `book/src/docs/grants-process.md` — mdBook chapter integrating grants documentation into the book
+- `book/src/SUMMARY.md` — added navigation entry under Community
+- `CONTRIBUTING.md` — added Grants Application Process section with links
+
+
+---
+
 ## June 23, 2026 — 100 issues exported to GitHub
 
 See [ISSUES_CREATED_LOG.md](ISSUES_CREATED_LOG.md) for GitHub issue numbers and URLs.

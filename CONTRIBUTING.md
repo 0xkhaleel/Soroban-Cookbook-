@@ -67,11 +67,24 @@ The Soroban Cookbook runs monthly community calls to share progress, demo exampl
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
+## Grants Application Process
+
+We provide micro, standard, and strategic grant funding to developers building open-source smart contract recipes, developer tooling, security guides, and educational materials. All grant resources and workflows are located in the [`docs/grants/`](./docs/grants/) directory:
+
+- [Grants Program Overview](./docs/grants/README.md)
+- [Application Form Template](./docs/grants/application-form.md)
+- [Review Process & Rubric](./docs/grants/review-process.md)
+- [Decision Timeline & SLA](./docs/grants/decision-timeline.md)
+- [Milestone Tracking & Disbursement](./docs/grants/milestone-tracking.md)
+
+To apply, copy the [Application Form](./docs/grants/application-form.md) and submit an issue labeled `grant-application`.
+
 ---
 
 ## 📍 Table of Contents
 - [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
 - [Monthly Community Call Governance](#monthly-community-call-governance)
+- [Grants Application Process](#grants-application-process)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)

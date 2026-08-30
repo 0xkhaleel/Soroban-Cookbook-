@@ -117,6 +117,7 @@
 - [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Grants Application Process](./docs/grants-process.md)
 - [Monthly Call Governance](../GOVERNANCE/README.md)
   - [Agenda Template](../GOVERNANCE/monthly-call-agenda-template.md)
   - [Format Guidelines](../GOVERNANCE/monthly-call-format-guidelines.md)
