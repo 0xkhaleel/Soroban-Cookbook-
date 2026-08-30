@@ -85,6 +85,7 @@ To contribute a new template or improve an existing one, check out the [Project 
 ## 📍 Table of Contents
 - [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
 - [Monthly Community Call Governance](#monthly-community-call-governance)
+- [Grants Application Process](#grants-application-process)
 - [Project Templates](#project-templates)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
