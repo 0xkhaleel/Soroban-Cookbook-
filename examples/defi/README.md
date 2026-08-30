@@ -26,6 +26,8 @@ Complex financial instruments and stablecoin models.
   - [Staking Pool example](./staking-pool/)
 - **Automatic Snapshot Triggers** - Time-based & event-based snapshot triggers with pruning.
   - [Snapshot Triggers example](./14-automatic-snapshot-triggers/)
+- **Reward Strategies** - Linear, exponential decay, and performance-based reward distribution.
+  - [Reward Strategies example](./15-reward-strategies/)
 
 ## ≡ƒôï Planned Examples
 

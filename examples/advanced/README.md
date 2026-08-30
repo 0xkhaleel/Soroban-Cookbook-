@@ -30,6 +30,7 @@ This category contains examples of complex systems and advanced architectural pa
 - [`09-storage-optimization`](./09-storage-optimization/) — Packed storage, lazy loading, and batch operations
 - [`10-contract-migrations`](./10-contract-migrations/) — Batched v1→v2 storage migration with dual-read and version gates
 - [`11-version-registry`](./11-version-registry/) — Contract version tracking with history and rollback (Phase 5)
+- [`12-real-world-case-studies`](./12-real-world-case-studies/) — Problem/solution case studies: checks-effects-interactions, checked-arithmetic fees, and commit-reveal bidding
 
 ## Planned Examples
 
