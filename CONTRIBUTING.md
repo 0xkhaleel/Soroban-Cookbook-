@@ -1,5 +1,7 @@
 # Contributing to Soroban-Cookbook
 
+> 🎉 **Phase 8 (Community & Ecosystem) Complete!** See our [Phase 8 Completion Report](./PHASE_8_COMPLETION_REPORT.md) and join the celebration event!
+
 Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Built With the Cookbook
@@ -67,17 +69,16 @@ The Soroban Cookbook runs monthly community calls to share progress, demo exampl
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
-## Grants Application Process
+## Project Templates
 
-We provide micro, standard, and strategic grant funding to developers building open-source smart contract recipes, developer tooling, security guides, and educational materials. All grant resources and workflows are located in the [`docs/grants/`](./docs/grants/) directory:
+We provide three complete full-stack starter templates in the [`templates/`](./templates/) directory to help developers build and launch dApps rapidly:
 
-- [Grants Program Overview](./docs/grants/README.md)
-- [Application Form Template](./docs/grants/application-form.md)
-- [Review Process & Rubric](./docs/grants/review-process.md)
-- [Decision Timeline & SLA](./docs/grants/decision-timeline.md)
-- [Milestone Tracking & Disbursement](./docs/grants/milestone-tracking.md)
+- [Templates Overview & Guide](./templates/README.md)
+- [🪙 Fungible Token dApp](./templates/token-dapp/)
+- [🎨 NFT Marketplace dApp](./templates/nft-marketplace-dapp/)
+- [🏛️ DAO Governance & Treasury dApp](./templates/dao-governance-dapp/)
 
-To apply, copy the [Application Form](./docs/grants/application-form.md) and submit an issue labeled `grant-application`.
+To contribute a new template or improve an existing one, check out the [Project Templates Guide](./docs/project-templates.md).
 
 ---
 
@@ -85,6 +86,7 @@ To apply, copy the [Application Form](./docs/grants/application-form.md) and sub
 - [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
 - [Monthly Community Call Governance](#monthly-community-call-governance)
 - [Grants Application Process](#grants-application-process)
+- [Project Templates](#project-templates)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)

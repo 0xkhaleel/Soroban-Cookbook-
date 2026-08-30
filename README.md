@@ -172,6 +172,7 @@ We track community health transparently so everyone can see how the project is g
 
 | Resource | Description |
 |---|---|
+| [Project Templates](./templates/) | Full-stack starter templates for Fungible Token, NFT Marketplace, and DAO dApps |
 | [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
