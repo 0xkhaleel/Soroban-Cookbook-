@@ -172,7 +172,7 @@ We track community health transparently so everyone can see how the project is g
 
 | Resource | Description |
 |---|---|
-| [Phase 8 Completion Report](./PHASE_8_COMPLETION_REPORT.md) | Official milestone report celebrating Phase 8 completion & retrospective |
+| [Project Templates](./templates/) | Full-stack starter templates for Fungible Token, NFT Marketplace, and DAO dApps |
 | [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
