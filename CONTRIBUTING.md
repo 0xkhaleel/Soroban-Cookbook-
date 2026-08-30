@@ -67,11 +67,23 @@ The Soroban Cookbook runs monthly community calls to share progress, demo exampl
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
+## Project Templates
+
+We provide three complete full-stack starter templates in the [`templates/`](./templates/) directory to help developers build and launch dApps rapidly:
+
+- [Templates Overview & Guide](./templates/README.md)
+- [🪙 Fungible Token dApp](./templates/token-dapp/)
+- [🎨 NFT Marketplace dApp](./templates/nft-marketplace-dapp/)
+- [🏛️ DAO Governance & Treasury dApp](./templates/dao-governance-dapp/)
+
+To contribute a new template or improve an existing one, check out the [Project Templates Guide](./docs/project-templates.md).
+
 ---
 
 ## 📍 Table of Contents
 - [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
 - [Monthly Community Call Governance](#monthly-community-call-governance)
+- [Project Templates](#project-templates)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
