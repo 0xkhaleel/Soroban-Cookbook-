@@ -7,7 +7,9 @@ members = [
     "examples/intermediate/event-aggregation",
     "examples/basics/01-hello-world",
     "examples/basics/06-validation-patterns",
+    "examples/basics/14-fifo-queue",
     "examples/intermediate/03-priority-queue",
+    "examples/intermediate/03-pause-unpause",
     "examples/intermediate/multi-sig-patterns",
     "examples/intermediate/event-subscriptions",
     "examples/intermediate/03-priority-queue",
@@ -16,6 +18,7 @@ members = [
     "examples/advanced/02-timelock",
     "examples/advanced/03-beacon-proxy-factory",
     "examples/advanced/03-gasless-relayer",
+    "examples/advanced/03-batch-builder",
     "examples/advanced/05-diamond-security",
     "examples/advanced/05-diamond-security/facet-adder",
     "examples/advanced/05-diamond-security/facet-multiplier",
@@ -24,6 +27,7 @@ members = [
     "examples/advanced/03-permit-pattern",
     "examples/advanced/03-gasless-relayer",
     "examples/advanced/03-oracle-pattern",
+    "examples/advanced/04-upgradeable-proxy",
     "examples/advanced/05-rate-limiting",
     "examples/advanced/03-merkle-airdrop",
     "examples/advanced/05-diamond-security",
@@ -35,6 +39,10 @@ members = [
     "examples/advanced/10-contract-migrations",
     "examples/advanced/11-version-registry",
     "examples/advanced/09-storage-optimization",
+    "examples/advanced/05-diamond-facets",
+    "examples/intermediate/event-history",
+    "examples/intermediate/ajo-factory",
+    "examples/intermediate/ajo",
     "examples/tokens/01-sep41-token",
     "examples/tokens/03-pausable-token",
     "examples/tokens/04-mint-burn",
@@ -46,6 +54,9 @@ members = [
     "examples/governance/01-vote-delegation",
     "examples/intermediate/lazy-loading",
     "examples/tokens/10-pausable-permissions",
+    "examples/tokens/08-multi-token-balance-manager",
+    "examples/defi/15-reward-strategies",
+    "examples/advanced/12-real-world-case-studies",
     "tests/integration",
     "tests/security",
 ]
@@ -60,7 +71,7 @@ deprecated = "allow"
 
 [workspace.dependencies]
 soroban-sdk = "26.0.0-rc.1"
-base64ct = "=1.6.0"
+base64ct = "=1.8.3"
 
 [profile.release]
 opt-level = "z"
