@@ -27,6 +27,7 @@ This category contains examples of complex systems and advanced architectural pa
 - [`06-beacon-management`](./06-beacon-management/) — Versioned beacon management with rollback support
 - [`07-trusted-forwarder`](./07-trusted-forwarder/) — Meta-transaction trusted forwarder pattern
 - [`07-upgrade-patterns`](./07-upgrade-patterns/) — Direct WASM upgrade, versioned storage migration, init guards
+- [`04-upgradeable-proxy`](./04-upgradeable-proxy/) — Admin-gated implementation upgrades with proxy-owned storage preservation
 - [`08-batch-operations`](./08-batch-operations/) — Batch call interface with atomic rollback
 - [`09-fuzz-testing`](./09-fuzz-testing/) — Fuzzable claimable-balance contract with property tests and cargo-fuzz targets
 - [`09-storage-optimization`](./09-storage-optimization/) — Packed storage, lazy loading, and batch operations
