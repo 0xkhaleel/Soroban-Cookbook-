@@ -54,6 +54,18 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 ---
 
+### Aug 30, 2026 — Issue #967: Create Project Templates ✅
+
+- `templates/token-dapp/` — full-stack fungible token starter kit with SEP-41 smart contracts, tests, and web UI
+- `templates/nft-marketplace-dapp/` — full-stack NFT marketplace starter kit with minting, listing, and buying contracts, tests, and web UI
+- `templates/dao-governance-dapp/` — full-stack DAO governance starter kit with proposal lifecycle, weighted voting, and execution contracts, tests, and web UI
+- `templates/README.md` & `docs/project-templates.md` — templates guide and developer setup instructions
+- `book/src/docs/project-templates.md` — mdBook chapter integrating project templates
+- `book/src/SUMMARY.md` — added navigation entry under Guides
+
+
+---
+
 ## June 23, 2026 — 100 issues exported to GitHub
 
 See [ISSUES_CREATED_LOG.md](ISSUES_CREATED_LOG.md) for GitHub issue numbers and URLs.
