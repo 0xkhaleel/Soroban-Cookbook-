@@ -887,19 +887,19 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
 
 
 - **Priority:** Medium
-- **Status:** Planned
+- **Status:** Completed
 
-- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Current state:** Showcase created in `SHOWCASE.md` featuring 11 projects, case studies, and developer support; linked from `CONTRIBUTING.md`.
 - **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
 - **Verification:** Manual verification against acceptance criteria; update phase file when done.
 - **Scope:** M
 - **Description:** 10+ projects using cookbook
 - **Acceptance Criteria:**
-  - Project tracking
-  - Showcase created
-  - Developer support
-  - Case studies
-  - 10 projects featured
+  - Project tracking ✅
+  - Showcase created ✅
+  - Developer support ✅
+  - Case studies ✅
+  - 10 projects featured ✅
 
 
 ### Issue #442: Feature in Official Stellar Docs

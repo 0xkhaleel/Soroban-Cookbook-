@@ -12,6 +12,7 @@ Welcome to the Soroban Cookbook documentation. This page gathers quick links, re
 | Deploy to testnet           | [Deployment Guide](../book/src/guides/deployment.md)         |
 | Migrate from Ethereum       | [Ethereum → Soroban](../book/src/guides/ethereum-to-soroban.md) |
 | Fix a build or test error   | [Troubleshooting](./troubleshooting.md)                      |
+| Check fuzz test status      | [Fuzz Testing Report](./fuzz-testing.md)                     |
 | Look up a term              | [Glossary](./glossary.md)                                    |
 | See common patterns         | [Common Patterns](./common-patterns.md)                      |
 | Design multi-contract apps  | [Factory, Proxy, and Registry Patterns](./cross-contract-patterns.md) |
@@ -38,6 +39,7 @@ Welcome to the Soroban Cookbook documentation. This page gathers quick links, re
 - [Dependabot Setup](./dependabot-setup.md) — Automated dependency update configuration
 - [Performance Benchmarks](./benchmarks.md) — Resource usage comparison and optimization tips
 - [Security Audit Preparation](./security-audit/README.md) — Audit scope, prep checklist, and known-issues log for the intermediate examples
+- [Fuzz Testing Report](./fuzz-testing.md) — Fuzz and property-test coverage, findings, and CI wiring
 
 ### 🎬 Video Walkthrough
 
