@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
@@ -355,7 +356,7 @@ impl RbacContract {
     /// Panic unless `account` holds `role`.
     ///
     /// Use at the top of any protected function:
-    /// ```rust
+    /// ```text
     /// Self::only_role(&env, &caller, ROLE_ADMIN);
     /// ```
     fn only_role(env: &Env, account: &Address, role: Symbol) {
@@ -367,7 +368,7 @@ impl RbacContract {
     /// Panic unless `account` holds **at least one** of the supplied `roles`.
     ///
     /// Use for multi-role guards:
-    /// ```rust
+    /// ```text
     /// Self::any_role(&env, &caller, &[ROLE_ADMIN, ROLE_MINTER]);
     /// ```
     fn any_role(env: &Env, account: &Address, roles: &[Symbol]) {

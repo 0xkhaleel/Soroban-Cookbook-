@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
@@ -148,11 +149,13 @@ impl SimpleSwapContract {
 
     pub fn swap(
         env: Env,
+        trader: Address,
         sell_token: Address,
         sell_amount: i128,
         min_buy_amount: i128,
         recipient: Address,
     ) {
+        trader.require_auth();
         assert!(sell_amount > 0, "sell amount must be positive");
         assert!(min_buy_amount > 0, "min buy amount must be positive");
 
@@ -186,8 +189,9 @@ impl SimpleSwapContract {
 
         let contract_addr = this.contract_address(&env);
 
-        token::Client::new(&env, &sell_token).transfer(
-            &env.invoker(),
+        token::Client::new(&env, &sell_token).transfer_from(
+            &contract_addr,
+            &trader,
             &contract_addr,
             &sell_amount,
         );
@@ -196,7 +200,7 @@ impl SimpleSwapContract {
         env.events().publish(
             (EVENT_NS, EVENT_SWAP),
             SwapEventData {
-                trader: env.invoker(),
+                trader,
                 sell_token,
                 buy_token,
                 sell_amount,

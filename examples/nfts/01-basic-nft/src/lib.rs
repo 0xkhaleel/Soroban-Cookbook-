@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String, Vec,
@@ -14,6 +15,7 @@ pub enum DataKey {
     Owner(u32),
     Balance(Address),
     TokenByIndex(u32),
+    TokenIndex(u32),
     OwnerTokenIndex(u32),
     OwnedToken(Address, u32),
     Approved(u32),
@@ -198,7 +200,7 @@ impl BasicNftContract {
     pub fn mint(env: Env, admin: Address, to: Address, token_id: u32) -> Result<(), NftError> {
         admin.require_auth();
 
-        let stored_admin = env
+        let stored_admin: Address = env
             .storage()
             .instance()
             .get(&DataKey::Admin)
@@ -224,7 +226,7 @@ impl BasicNftContract {
         env.storage()
             .instance()
             .set(&DataKey::TotalSupply, &(supply + 1));
-        Self::add_token_to_owner(&env, to, token_id);
+        Self::add_token_to_owner(&env, to.clone(), token_id);
         env.events().publish(
             (symbol_short!("mint"), symbol_short!("nft")),
             (to, token_id),

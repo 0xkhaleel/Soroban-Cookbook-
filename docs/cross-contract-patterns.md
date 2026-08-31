@@ -191,6 +191,17 @@ sequenceDiagram
 
 - [`examples/intermediate/ajo-factory`](../examples/intermediate/ajo-factory/)
   shows a factory deploying initialized child contracts.
+- [`examples/advanced/04-upgradeable-proxy`](../examples/advanced/04-upgradeable-proxy/)
+  shows a stable entry point routing to a versioned implementation.
+- [`examples/advanced/03-proxy-admin`](../examples/advanced/03-proxy-admin/)
+  shows the governance side of the upgrade checklist above: admin-authenticated
+  proposals, a timelock, and an emergency pause.
+- [`examples/advanced/contract-registry`](../examples/advanced/contract-registry/)
+  and [`examples/advanced/11-version-registry`](../examples/advanced/11-version-registry/)
+  show address discovery and version history with rollback.
+- [`examples/advanced/12-oracle-consumer`](../examples/advanced/12-oracle-consumer/)
+  shows the caller side of a cross-contract integration: validating what another
+  contract returns before acting on it.
 - [`docs/common-patterns`](./common-patterns.md) covers lower-level building
   blocks such as initialization guards, stored-admin checks, typed storage keys,
   and events.
