@@ -10,6 +10,8 @@ members = [
     "examples/basics/13-queue-variants",
     "examples/basics/14-fifo-queue",
     "examples/intermediate/03-priority-queue",
+    "examples/intermediate/02-role-based-access-control",
+    "examples/intermediate/access-control",
     "examples/intermediate/03-pause-unpause",
     "examples/intermediate/multi-sig-patterns",
     "examples/intermediate/event-subscriptions",
