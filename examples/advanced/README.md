@@ -15,6 +15,7 @@ This category contains examples of complex systems and advanced architectural pa
 
 - [`01-multi-party-auth`](./01-multi-party-auth/) — Multi-party authorization patterns
 - [`02-timelock`](./02-timelock/) — Time-delayed execution
+- [`03-state-channel-disputes`](./03-state-channel-disputes/) — State channel dispute resolution with challenges, responses, timeouts, and fraud proofs
 - [`03-beacon-proxy-factory`](./03-beacon-proxy-factory/) — Factory-managed beacon proxies with shared upgrades
 - [`03-permit-pattern`](./03-permit-pattern/) — EIP-2612-style permit approvals with deadline enforcement
 - [`03-gasless-relayer`](./03-gasless-relayer/) — Meta-transaction relayer with nonce checks and signature verification

@@ -16,6 +16,7 @@ members = [
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-beacon-proxy",
     "examples/advanced/02-timelock",
+    "examples/advanced/03-state-channel-disputes",
     "examples/advanced/03-beacon-proxy-factory",
     "examples/advanced/03-gasless-relayer",
     "examples/advanced/03-batch-builder",
