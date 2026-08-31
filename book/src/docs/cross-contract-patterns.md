@@ -165,6 +165,16 @@ sequenceDiagram
   tolerant; writes should fail fast and leave no ambiguous partial state.
 - Document every external contract address in deployment notes.
 
+## Optimizing Cross-Contract Calls
+
+Cross-contract calls are the most expensive operations in Soroban after storage. Reduce overhead by combining calls, packing arguments, and minimizing round trips.
+
+- **Bundle calls:** If a workflow requires several reads from one contract, consider a single "view" function that returns all values at once instead of separate calls.
+- **Pack arguments:** Pass a single struct with named fields instead of many positional arguments. It reduces calldata size and makes interfaces easier to evolve.
+- **Minimize round trips:** Prefer a coordinator contract that performs multiple steps in one invocation over requiring the caller to make several sequential calls. This also gives you atomic error handling.
+- **Batch writes:** When writing to multiple contracts, combine updates into one transaction or one contract method if the domain allows it.
+- **Compare gas costs:** Before and after optimization, measure gas with the `soroban` CLI or unit tests, and assert the new cost is lower.
+
 ## Upgrade Safety Checklist
 
 - [ ] New implementation address is registered with an explicit version.
