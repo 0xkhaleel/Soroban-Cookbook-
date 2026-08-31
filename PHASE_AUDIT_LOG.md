@@ -132,6 +132,17 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 ---
 
+### Aug 31, 2026 — Issue #803: Security Audit Prep for Intermediate Examples ✅
+
+- `docs/security-audit/audit-scope.md` — extended in-scope tables to cover all 13 `examples/intermediate/` contracts and all 18 `examples/tokens/` contracts (SEP-41), previously limited to 8 intermediate examples with tokens entirely out of scope
+- `docs/security-audit/known-issues-log.md` — extended KI-2 (orphaned tests) to `09-optimized-token-ops`; added KI-5 (three examples with no README) and KI-6 (stale `examples/tokens/README.md` index); added panic-path review pointers for the newly in-scope examples
+- `docs/security-audit/audit-prep-checklist.md` — extended the per-example readiness table to all 13 intermediate and 18 token examples with structural facts (README/test-file/wired/`require_auth` counts)
+- `docs/security-audit/README.md` — updated scope-at-a-glance summary to intermediate + token examples
+- `tests/docs-audit/` (new package `docs-audit-tests`) — regression tests that fail if a future example is added without updating the audit-scope/checklist docs, or if an example loses its README without the gap being logged
+- `CONTRIBUTING.md` — documented the new `docs-audit-tests` package and test category
+
+---
+
 
 ## June 23, 2026 — 100 issues exported to GitHub
 
