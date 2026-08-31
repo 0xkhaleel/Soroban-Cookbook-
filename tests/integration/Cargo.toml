@@ -1,5 +1,5 @@
 [package]
-name = "integration-tests"}
+name = "integration-tests"
 version.workspace = true
 edition.workspace = true
 publish = false
@@ -20,7 +20,6 @@ multi_party_auth = { path = "../../examples/advanced/01-multi-party-auth", packa
 timelock = { path = "../../examples/advanced/02-timelock", package = "timelock" }
 token_wrapper = { path = "../../examples/tokens/06-token-wrapper", package = "token-wrapper" }
 sep41_token = { path = "../../examples/tokens/01-sep41-token", package = "sep41-token" }
-token = { path = "../../examples/tokens/02-token", package = "token" }
 mint_burn_token = { path = "../../examples/tokens/04-mint-burn", package = "mint-burn-token" }
 pausable_token = { path = "../../examples/tokens/03-pausable-token", package = "pausable-token" }
 vesting_contract = { path = "../../examples/tokens/05-vesting", package = "vesting-contract" }
