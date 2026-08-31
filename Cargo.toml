@@ -75,6 +75,7 @@ members = [
     "examples/advanced/12-real-world-case-studies",
     "tests/integration",
     "tests/security",
+    "tests/docs-audit",
 ]
 
 [workspace.package]
