@@ -37,6 +37,7 @@ This category contains examples of complex systems and advanced architectural pa
 - [`11-version-registry`](./11-version-registry/) — Contract version tracking with history and rollback (Phase 5)
 - [`12-oracle-consumer`](./12-oracle-consumer/) — Three oracle consumer contracts: validated cache, quorum median, and a settlement circuit breaker (Phase 5)
 - [`12-real-world-case-studies`](./12-real-world-case-studies/) — Problem/solution case studies: checks-effects-interactions, checked-arithmetic fees, and commit-reveal bidding
+- [`13-virtual-channel`](./13-virtual-channel/) — Virtual payment channels routed through an intermediary: ledger channels, off-chain updates, and on-chain settlement
 
 ## Planned Examples
 
