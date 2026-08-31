@@ -29,8 +29,8 @@ pub struct LiquidityEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap_liq");
-const EVENT_ADD: Symbol = symbol_short!("liquidity_added");
-const EVENT_REMOVE: Symbol = symbol_short!("liquidity_removed");
+const EVENT_ADD: Symbol = symbol_short!("liq_add");
+const EVENT_REMOVE: Symbol = symbol_short!("liq_rem");
 
 impl SwapLiquidityContract {
     fn require_owner(&self, env: &Env) {

@@ -161,7 +161,7 @@ impl BasicNftContract {
             &approved,
         );
         env.events().publish(
-            (symbol_short!("set_approval_for_all"), symbol_short!("nft")),
+            (symbol_short!("set_aprv"), symbol_short!("nft")),
             (owner, operator, approved),
         );
         Ok(())
