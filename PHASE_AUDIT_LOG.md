@@ -19,6 +19,15 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 ## Phase 6 — removed 3 issues
 #290, #300, #310
 
+### Phase 6 — Completed Issues ✅
+- **Integration Test Framework** (#290) - 12 integration tests implemented
+- **Code Coverage Configuration** (#300) - Tarpaulin coverage with CI integration  
+- **Test CI/CD Workflow** (#310) - Automated test execution and reporting
+- **Phase 6 Completion Report** (#982) - Comprehensive phase documentation
+
+**Completion Date:** August 29, 2026  
+**Status:** All objectives met, integration testing infrastructure established
+
 ## Phase 7 — removed 5 issues
 #335, #348, #352, #373, #374
 
@@ -26,6 +35,14 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 (none)
 
 ## Phase 8 — completed issues (in-repo deliverables created)
+
+### Aug 28, 2026 — Issue #441: 10+ Projects Built ✅
+
+- `SHOWCASE.md` — showcases 11 real production Stellar/Soroban projects built using the cookbook, with case studies, developer support, and project tracking sections
+- `CONTRIBUTING.md` — "Built With the Cookbook" section added (links to SHOWCASE.md)
+- External resources linked: Drips Wave org profile, Stellar Discord, GitHub Discussions
+
+---
 
 ### July 23, 2026 — Issue #426: Track Community Metrics ✅
 
@@ -35,7 +52,86 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 - `CONTRIBUTING.md` — Community Metrics section added (links to all above)
 - `README.md` — Community Health & Metrics subsection added under Community & Integration
 
+## Phases 3, 5, 6 — completed issues (in-repo deliverables created)
+
+### August 28, 2026 — Issues #767, #768, #769, #773 ✅
+
+**#767 — Add Proxy Admin Controls (Phase 3)**
+
+- `examples/advanced/03-proxy-admin/` — admin-authenticated `propose_upgrade` /
+  `cancel_upgrade` / `execute_upgrade` with a bounded timelock, emergency
+  pause, and a security checklist in the README (delivered earlier; indexed now)
+- `examples/advanced/README.md` — example added to the implemented list
+
+**#768 — Create Fuzz Test Report (Phase 6)**
+
+- `docs/fuzz-testing.md` — coverage metrics, findings, scenario inventory, CI wiring
+- `.github/workflows/fuzz.yml` — all four `cargo-fuzz` targets now run as a
+  matrix, plus a stable-toolchain property-test job and crash-artifact upload
+- `tests/integration/tests/defi_fuzz_tests.rs` — three regression tests pinning
+  the AMM dust boundary that the F-1 fix had removed from coverage
+- `docs/README.md` — report linked from the documentation index
+
+**#769 — Create Oracle Consumer (Phase 5)**
+
+- `examples/advanced/12-oracle-consumer/` — shared feed interface plus three
+  deployable consumers: validated cache, quorum median, settlement circuit breaker
+- `examples/advanced/README.md` — example added to the implemented list
+
+**#773 — Write Cross-Contract Guide (Phase 3)**
+
+- `docs/cross-contract-patterns.md` — factory / proxy / registry guide with
+  sequence diagrams, upgrade safety notes, and integration tips (delivered
+  earlier); related-examples section completed to cover proxy, registry, and
+  consumer examples
+
 ---
+
+### Aug 30, 2026 — Issue #979: Create Grants Application Process ✅
+
+- `docs/grants/README.md` — comprehensive overview of the Soroban Cookbook Community Grants Program
+- `docs/grants/application-form.md` — standardized grant application template with SMART milestone breakdown
+- `docs/grants/review-process.md` — multi-stage evaluation process, committee structure, and 100-point scoring rubric
+- `docs/grants/decision-timeline.md` — 14-day SLA timeline, review cadences, and payout schedules
+- `docs/grants/milestone-tracking.md` — milestone reporting templates, verification protocols, and tranche disbursement rules
+- `book/src/docs/grants-process.md` — mdBook chapter integrating grants documentation into the book
+- `book/src/SUMMARY.md` — added navigation entry under Community
+- `CONTRIBUTING.md` — added Grants Application Process section with links
+
+
+---
+
+### Aug 30, 2026 — Issue #967: Create Project Templates ✅
+
+- `templates/token-dapp/` — full-stack fungible token starter kit with SEP-41 smart contracts, tests, and web UI
+- `templates/nft-marketplace-dapp/` — full-stack NFT marketplace starter kit with minting, listing, and buying contracts, tests, and web UI
+- `templates/dao-governance-dapp/` — full-stack DAO governance starter kit with proposal lifecycle, weighted voting, and execution contracts, tests, and web UI
+- `templates/README.md` & `docs/project-templates.md` — templates guide and developer setup instructions
+- `book/src/docs/project-templates.md` — mdBook chapter integrating project templates
+- `book/src/SUMMARY.md` — added navigation entry under Guides
+
+
+---
+
+### Aug 30, 2026 — Issue #977: Create Token Security Checklist ✅
+
+- `book/src/docs/token-security-checklist.md` — comprehensive token security checklist covering authorization, arithmetic safety, supply management, transfer/allowance validation, storage TTL lifecycle, and testing requirements
+- `docs/token-security-checklist.md` — repository docs mirror of the token security checklist
+- `book/src/SUMMARY.md` — added navigation entries under Tokens and API Reference
+
+
+---
+
+### Aug 30, 2026 — Issue #978: Celebrate Phase 8 Completion ✅
+
+- `PHASE_8_COMPLETION_REPORT.md` — comprehensive completion report covering all Phase 8 goals, celebration event schedule, thank-you announcements, project retrospective, and Phase 9 roadmap
+- `phase-8-update.md` — updated phase status to 100% completed
+- `CONTRIBUTING.md` — added Phase 8 completion notice and links
+- `README.md` — added Phase 8 completion status and documentation link
+- **Status:** All Phase 8 objectives met; community governance, metrics, feedback, grants, and project templates delivered.
+
+---
+
 
 ## June 23, 2026 — 100 issues exported to GitHub
 

@@ -1,6 +1,19 @@
 # Contributing to Soroban-Cookbook
 
+> 🎉 **Phase 8 (Community & Ecosystem) Complete!** See our [Phase 8 Completion Report](./PHASE_8_COMPLETION_REPORT.md) and join the celebration event!
+
 Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## Built With the Cookbook
+
+We showcase **10+ real production projects** built using the Soroban Cookbook in
+our [Showcase](./SHOWCASE.md). It includes featured projects, case studies, and a
+developer-support section for anyone building on Soroban.
+
+**Built a project with the cookbook?** Open a pull request that adds your project
+to `SHOWCASE.md` (name, repo link, one-line description, and which cookbook
+patterns you used). This also helps us keep the Phase 8 "#441: 10+ Projects Built"
+milestone current.
 
 ## Feedback System
 
@@ -56,11 +69,24 @@ The Soroban Cookbook runs monthly community calls to share progress, demo exampl
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
+## Project Templates
+
+We provide three complete full-stack starter templates in the [`templates/`](./templates/) directory to help developers build and launch dApps rapidly:
+
+- [Templates Overview & Guide](./templates/README.md)
+- [🪙 Fungible Token dApp](./templates/token-dapp/)
+- [🎨 NFT Marketplace dApp](./templates/nft-marketplace-dapp/)
+- [🏛️ DAO Governance & Treasury dApp](./templates/dao-governance-dapp/)
+
+To contribute a new template or improve an existing one, check out the [Project Templates Guide](./docs/project-templates.md).
+
 ---
 
 ## 📍 Table of Contents
 - [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
 - [Monthly Community Call Governance](#monthly-community-call-governance)
+- [Grants Application Process](#grants-application-process)
+- [Project Templates](#project-templates)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
