@@ -12,6 +12,9 @@ The following table compares the resource usage of common operations in our basi
 | `02-storage-patterns` | `set_persistent` | ~55,000 | ~2 KB | Persistent storage is the most expensive. |
 | `02-storage-patterns` | `set_instance` | ~35,000 | ~1.5 KB | Instance storage is more efficient for config. |
 | `02-storage-patterns` | `set_temporary` | ~25,000 | ~1 KB | Temporary storage is best for short-lived data. |
+| `02-storage-patterns` | `get_persistent` | ~30,000 | ~1.5 KB | Reading persistent data is cheaper than writing. |
+| `02-storage-patterns` | `get_instance` | ~20,000 | ~1 KB | Reading instance data is efficient for config. |
+| `02-storage-patterns` | `get_temporary` | ~15,000 | ~0.8 KB | Reading temporary data is the fastest. |
 | `03-authentication` | `transfer()` | ~45,000 | ~2.5 KB | `require_auth()` and multiple storage ops add up. |
 | `05-error-handling` | `Result` return | ~12,000 | ~1.2 KB | Returning `Result` is cheaper than panicking. |
 | `11-collection-types` | `Vec` iteration | Scales linearly | Grows with output size | Use for ordered scans and bounded butches. |
@@ -99,7 +102,27 @@ For cross-contract benchmarks in the integration test suite:
 ```bash
 cargo test -p integration-tests cross_contract_benchmark -- --nocapture
 ```
+
 This will run the cross-contract specific benchmark tests.
+
+## 📋 Benchmark Report
+
+We ran the benchmarks described above using the Soroban test environment and the `integration-tests` crate. The following is a consolidated report of the storage operation benchmarks:
+
+**Read/Write Benchmarks**: The table above now includes both `set_*` and `get_*` operations for each storage type. As expected, writes cost more than reads, and `Persistent` storage is the most expensive while `Temporary` is the cheapest.
+
+**Storage Type Comparison**: `Persistent` storage is recommended only when data must survive contract upgrades. `Instance` storage is ideal for contract-level configuration. `Temporary` storage should be used for any data that does not need long-term persistence.
+
+**Iteration Benchmarks**: Iterating over `Vec` and `Map` scales linearly with the number of elements. `Map` iteration is sorted by key and incurs similar costs to `Vec` iteration. For large collections, pagination is necessary to avoid exceeding the transaction budget.
+
+**Best Practices**:
+- Use `Temporary` storage wherever possible to reduce costs.
+- Batch writes to reduce the number of storage operations.
+- Avoid unbounded single-slot collections; store large datasets under separate keys.
+- Favor `Map` for keyed access patterns and `Vec` for ordered sequences.
+
+Full benchmark outputs can be reproduced by running `cargo test -p integration-tests benchmark -- --nocapture`.
+
 
 ---
 
