@@ -70,6 +70,7 @@ members = [
     "examples/tokens/08-multi-token-balance-manager",
     "examples/defi/15-reward-strategies",
     "examples/advanced/12-real-world-case-studies",
+    "examples/advanced/13-virtual-channel",
     "tests/integration",
     "tests/security",
 ]
