@@ -108,6 +108,12 @@ To generate a report automatically, run the storage benchmark tests with:
 cargo test -p collection-types benchmark -- nocapture
 ```
 
+For cross-contract benchmarks in the integration test suite:
+
+```bash
+cargo test -p integration-tests cross_contract_benchmark -- --nocapture
+```
+
 ---
 
 ## ⟊ Execution Time Benchmarks

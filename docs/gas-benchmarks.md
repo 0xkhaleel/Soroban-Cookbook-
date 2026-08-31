@@ -47,6 +47,21 @@ This repository now includes dedicated benchmark coverage for intermediate examp
 - `examples/intermediate/multi-sig-patterns`
 - `examples/intermediate/ajo-factory`
 
+## 📞 Cross-Contract Call Benchmarks
+
+| Example | Operation | Instructions | RAM | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `cross-contract-calls` | `direct_call()` | ~25,000 | ~1.5 KB | Baseline direct contract invocation. |
+| `cross-contract-calls` | `factory_deploy()` | ~95,000 | ~5 KB | Deployment of a child contract via factory pattern. |
+| `cross-contract-calls` | `proxy_call()` | ~35,000 | ~2 KB | Delegating call through a proxy contract adds ~10K overhead. |
+
+### Optimization Recommendations
+
+- Prefer direct calls over proxy indirection when upgradeability is not required; proxy dispatch adds measurable overhead.
+- Batch related cross-contract operations inside a single contract call to reduce repeated call overhead.
+- Cache addresses and call data in instance storage when the same child contract is invoked frequently.
+- Measure with `scripts/benchmark.sh` after any SDK upgrade; host-function costs can shift between versions.
+
 ## 🧠 Advanced Example Benchmarks
 
 | Example | Operation | Instructions (est.) | RAM (est.) | Key Takeaway |
