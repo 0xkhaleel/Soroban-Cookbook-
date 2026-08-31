@@ -46,7 +46,7 @@ jobs:
       # 1. Checkout
       # -----------------------------------------------------------------------
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Fetch full history so we can commit the dashboard update
           fetch-depth: 0
