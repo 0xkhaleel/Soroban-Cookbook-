@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Pattern 1 — Direct WASM Upgrade
 //!
 //! The simplest possible upgrade pattern: a single admin address may swap the

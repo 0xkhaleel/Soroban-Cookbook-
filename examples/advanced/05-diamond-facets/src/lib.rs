@@ -51,7 +51,7 @@
 //! - `supports_selector(selector)` — check if a selector is registered
 //! - `facet_count()` — total number of registered facets
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
 use soroban_sdk::{

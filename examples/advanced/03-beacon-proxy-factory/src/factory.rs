@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Beacon Proxy Factory Contract
 //!
 //! The factory is the top-level orchestrator. It:

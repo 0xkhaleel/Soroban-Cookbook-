@@ -1,8 +1,9 @@
+#![allow(deprecated)]
 //! # Storage Migration Example
 //!
 //! Demonstrates a versioned migration pattern for upgrading contract storage safely.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, Vec};
 

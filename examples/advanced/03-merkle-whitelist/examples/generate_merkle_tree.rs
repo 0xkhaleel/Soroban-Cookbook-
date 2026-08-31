@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Off-chain Merkle tree generation tool
 //!
 //! This example demonstrates how to build a Merkle tree off-chain and generate

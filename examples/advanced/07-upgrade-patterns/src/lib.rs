@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Contract Upgrade Patterns
 //!
 //! A collection of idiomatic patterns for upgrading Soroban smart contracts
@@ -28,7 +29,7 @@
 //!
 //! These two patterns are complementary, not competing.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 #![allow(unexpected_cfgs)]
 
 pub mod direct_upgrade;

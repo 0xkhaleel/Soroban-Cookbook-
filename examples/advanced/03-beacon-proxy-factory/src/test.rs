@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Beacon Proxy Factory — Integration Tests
 //!
 //! ## Test coverage

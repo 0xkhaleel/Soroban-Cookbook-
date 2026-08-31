@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Storage Pagination
 //!
 //! Cursor-based pagination over a large on-chain collection without loading
@@ -30,7 +31,7 @@
 //! items, later pages may include newly appended entries. Deletes / reordering
 //! are out of scope for this example.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, Bytes, Env, Symbol, Vec,

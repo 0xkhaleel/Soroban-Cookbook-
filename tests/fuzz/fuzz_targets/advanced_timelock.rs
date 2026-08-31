@@ -1,4 +1,5 @@
 #![no_main]
+#![allow(deprecated)]
 
 //! Fuzz the advanced timelock queue / execute / cancel surface.
 

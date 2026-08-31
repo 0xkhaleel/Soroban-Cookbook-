@@ -34,7 +34,8 @@
 //! 3. **Strategy switch guard** – switching to a higher-risk strategy requires the
 //!    vault to be below a configurable `max_tvl_for_aggressive` threshold.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol};
 

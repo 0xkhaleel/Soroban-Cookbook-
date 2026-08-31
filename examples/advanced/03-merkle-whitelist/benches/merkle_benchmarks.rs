@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Performance benchmarks for Merkle Whitelist contract
 //!
 //! Run with: cargo bench --bench merkle_benchmarks

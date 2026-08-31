@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 //! # Compressed Storage Example
 //!
 //! This contract demonstrates how to compress byte payloads before storing them

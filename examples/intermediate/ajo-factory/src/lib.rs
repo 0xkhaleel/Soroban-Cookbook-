@@ -15,7 +15,8 @@
 //! Template registration is open (no admin required) but duplicate IDs are
 //! rejected.  Instance creation requires the creator to authorise.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 use ajo::AjoClient;
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{

@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! DeFi Security and Economic Exploit Prevention Integration Tests
 //!
 //! Verifies fixes for:

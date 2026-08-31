@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for the Pausable Permissions contract.
 
 use super::*;

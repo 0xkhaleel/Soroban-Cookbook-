@@ -1,4 +1,5 @@
 #![no_main]
+#![allow(deprecated)]
 
 //! Fuzz encode / decode / validate for multi-party auth vectors.
 

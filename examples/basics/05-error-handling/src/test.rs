@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for panic-vs-errors patterns.
 //!
 //! Each test is labelled to show *which* failure mode it exercises.

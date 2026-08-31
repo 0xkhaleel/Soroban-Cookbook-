@@ -1,4 +1,5 @@
 #![no_main]
+#![allow(deprecated)]
 
 //! Fuzz deposit → claim on the advanced claimable-balance example.
 //! Asserts token/storage invariants after each step.

@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Beacon Proxy Factory
 //!
 //! This example demonstrates the **Beacon Proxy Factory** pattern — an extension of
@@ -70,7 +71,7 @@
 //! cargo build -p beacon-proxy-factory --target wasm32v1-none --release --no-default-features --features impl-v2
 //! ```
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 // Each contract module is included in test builds (rlib) unconditionally so
 // env.register() can find all contract types.  For cdylib (WASM) builds,
