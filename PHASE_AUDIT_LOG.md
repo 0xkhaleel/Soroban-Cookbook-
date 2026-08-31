@@ -85,6 +85,10 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
   earlier); related-examples section completed to cover proxy, registry, and
   consumer examples
 
+**#801 — Add Iterable Mapping Utilities (Phase 3)**
+
+- `examples/intermediate/iterable-mappings/` — added filtering (`filter_by_min_value`, `filter_by_page`), mapping (`map_values_scale`, `map_values_scale_page`), and reducing (`reduce_sum`, `reduce_sum_page`) contract methods and generic functional Rust utilities (`filter_by_predicate`, `transform_values`, `reduce_values`), with 18 unit tests and updated README documentation.
+
 ---
 
 ### Aug 30, 2026 — Issue #979: Create Grants Application Process ✅
