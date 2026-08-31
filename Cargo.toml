@@ -9,6 +9,7 @@ members = [
     "examples/basics/06-validation-patterns",
     "examples/basics/13-queue-variants",
     "examples/basics/14-fifo-queue",
+    "examples/intermediate/iterable-mappings",
     "examples/intermediate/03-priority-queue",
     "examples/intermediate/03-pause-unpause",
     "examples/intermediate/multi-sig-patterns",
