@@ -42,3 +42,16 @@ This category contains examples of complex systems and advanced architectural pa
 - [`04-bridge-validators`](./04-bridge-validators/) — Bridge validators and multi-sig threshold
 - `05-atomic-swaps`: A trustless, cross-contract asset swap.
 - `05-payment-channels`: A basic state channel implementation for off-chain transactions.
+
+## Video Tutorials
+
+Screen-recorded walkthroughs of the advanced patterns are planned but not yet
+produced. Planned topics:
+
+- Diamond multi-facet proxy pattern (`05-diamond-facets`, `05-diamond-security`)
+- Bridge security: rate limiting, challenge windows, fraud proofs (`05-bridge-security`)
+- Price oracle: median aggregation, TWAP, staleness handling (`06-price-oracle`)
+- Meta-transactions: trusted forwarder and gasless relayer (`03-gasless-relayer`, `07-trusted-forwarder`)
+- Upgrade governance: timelocks and versioned migrations (`07-upgrade-patterns`, `10-contract-migrations`)
+
+Tracked in #758.
